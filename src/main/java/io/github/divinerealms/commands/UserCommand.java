@@ -36,7 +36,7 @@ public class UserCommand implements CommandExecutor {
           if (args[1].equalsIgnoreCase(target.getName())) {
             if (args[2].equalsIgnoreCase("set")) {
               if (args.length == 5) {
-//              getHelper().addToTeam(target.getUniqueId(), args[3], args[4]);
+                getHelper().addToTeam(target.getUniqueId(), args[3], args[4]);
                 getLogger().send(sender, args[1], "user.added-to-team", getConfig().getString(args[3]));
               } else getLogger().sendLong(sender, "user.help");
             } else if (args[2].equalsIgnoreCase("unset")) {
