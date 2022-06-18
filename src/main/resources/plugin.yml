@@ -1,0 +1,12 @@
+name: LeagueManager
+version: 1.0.0-b1
+author: Neeonn
+depend:
+  - Vault
+  - LuckPerms
+load: POSTWORLD
+main: io.github.divinerealms.LeagueManager
+commands:
+  leaguemanager:
+    description: Base command.
+    aliases: [lm]

@@ -1,0 +1,62 @@
+prefix: "&8┃ &dLeague&eManager &8┃ &f"
+reload: "&2✔ &aPlugin reloaded!"
+unknown-command: "&4✕ &cUnknown command."
+insufficient-permission: "&4✕ &cInsufficient permission."
+ingame-only: "&4✕ &cThis command can be used only in game."
+help:
+  - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
+  - "&d &lLeague&e&lManager &7- &rHelp command."
+  - "&r &r"
+  - "&e &lTeam Commands:&r"
+  - "&6 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2>"
+  - "&7   - &fCreate a team with the colored tag (ex cel and &4C&0E&4L&r)."
+  - "&6 /&elm t&6|&eteam delete &2<&ateam-name&2>"
+  - "&7   - &fDelete an existing team."
+  - "&r &r"
+  - "&b &lUser Commands:&r"
+  - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> <&aleague-type&2>"
+  - "&7   - &fAdd player to a team (ex cel) with the league type (main or juniors)."
+  - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>"
+  - "&7   - &fRemove player from a team."
+  - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
+team:
+  created: "&2✔ &aTeam %teamTag% &ahas been successfully &2created&a!"
+  deleted: "&2✔ &aTeam %teamTag% &ahas been successfully &8deleted&a!"
+  not-found: "&4✕ &cTeam %teamTag% &cwasn't found!"
+  already-defined: "&4✕ &cTeam %teamTag% &calready exists!"
+  usage:
+    create: |-
+      &4✕ &cInvalid arguments. Usage:
+      &6/&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2>
+    delete: |-
+      &4✕ &cInvalid arguments. Usage:
+      &6/&elm t&6|&eteam delete &2<&ateam-name&2>
+  help:
+    - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
+    - "&d &lLeague&e&lManager &7- &rTeam commands."
+    - "&r &r"
+    - "&6 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2>"
+    - "&7   - &fCreate a team with the colored tag (ex cel and &4C&0E&4L&r)."
+    - "&6 /&elm t&6|&eteam delete &2<&ateam-name&2>"
+    - "&7   - &fDelete an existing team."
+    - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
+user:
+  not-found: "&4✕ &cPlayer wasn't found."
+  added-to-team: "&2✔ &aPlayer &b%player% &ahas been successfully &2added &ato team %teamTag%&a!"
+  removed-from-a-team: "&2✔ &aPlayer &b%player% &ahas been successfully &8removed &afrom team %teamTag%&a!"
+  usage:
+    set: |-
+      &4✕ &cInvalid arguments. Usage:
+      &6/&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> <&aleague-type&2>
+    unset: |-
+      &4✕ &cInvalid arguments. Usage:
+      &6/&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>
+  help:
+    - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
+    - "&d &lLeague&e&lManager &7- &rUser commands."
+    - "&r &r"
+    - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> <&aleague-type&2>"
+    - "&7   - &fAdd player to a team (ex cel) with the league type (main or juniors)."
+    - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>"
+    - "&7   - &fRemove player from a team."
+    - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
