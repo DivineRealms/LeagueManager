@@ -30,7 +30,6 @@ public class UserCommand implements CommandExecutor {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().sendLong(sender, "user.help");
       } else {
-        //noinspection deprecation
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         if (target.hasPlayedBefore()) {
           if (args[1].equalsIgnoreCase(target.getName())) {
