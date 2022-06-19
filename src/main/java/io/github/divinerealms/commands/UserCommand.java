@@ -30,18 +30,27 @@ public class UserCommand implements CommandExecutor {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().sendLong(sender, "user.help");
       } else {
+        //noinspection deprecation
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         if (target.hasPlayedBefore()) {
           if (args[1].equalsIgnoreCase(target.getName())) {
             if (args[2].equalsIgnoreCase("set")) {
               if (args.length == 5) {
-                getHelper().addToTeam(target.getUniqueId(), args[3], args[4]);
-                getLogger().send(sender, args[1], "user.added-to-team", getConfig().getString(args[3]));
+                if (getConfig().getConfig().contains(args[3])) {
+                  if (!getHelper().hasPermission(target.getUniqueId(), "chatcontrol.channel." + args[3].toLowerCase())) {
+                    getHelper().addToTeam(target.getUniqueId(), args[3], args[4]);
+                    getLogger().send(sender, args[1], "user.added-to-team", getConfig().getString(args[3]));
+                  } else getLogger().send(sender, args[1], "user.already-in-that-team", args[3]);
+                } else getLogger().send(sender, "team.not-found", args[3]);
               } else getLogger().sendLong(sender, "user.help");
             } else if (args[2].equalsIgnoreCase("unset")) {
               if (args.length == 4) {
-                getHelper().removeFromATeam(target.getUniqueId(), args[3]);
-                getLogger().send(sender, args[1], "user.removed-from-a-team", getConfig().getString(args[3]));
+                if (getConfig().getConfig().contains(args[3])) {
+                  if (getHelper().hasPermission(target.getUniqueId(), "chatcontrol.channel." + args[3].toLowerCase())) {
+                    getHelper().removeFromATeam(target.getUniqueId(), args[3]);
+                    getLogger().send(sender, args[1], "user.removed-from-a-team", args[3]);
+                  } else getLogger().send(sender, args[1], "user.not-in-that-team", args[3]);
+                } else getLogger().send(sender, "team.not-found", args[3]);
               } else getLogger().sendLong(sender, "user.help");
             } else getLogger().send(sender, "unknown-command");
           } else getLogger().send(sender, "unknown-command");

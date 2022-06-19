@@ -56,4 +56,9 @@ public class Helper {
     user.data().clear(NodeType.META.predicate(metaNode1 -> metaNode1.getMetaKey().equalsIgnoreCase("team")));
     getLuckPermsAPI().getUserManager().saveUser(user);
   }
+
+  public boolean hasPermission(final UUID uniqueId, final String permission) {
+    final User user = getPlayer(uniqueId);
+    return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+  }
 }

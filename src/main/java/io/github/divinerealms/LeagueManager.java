@@ -16,23 +16,23 @@ public class LeagueManager extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    setup();
     setUtilManager(new UtilManager(this));
     getUtilManager().reloadUtils();
     getUtilManager().getLogger().sendBanner();
     getUtilManager().getLogger().info("Loading commands...");
+    getCommand("leagueManager").setExecutor(new BaseCommand(this, getUtilManager()));
     getUtilManager().getLogger().info("Loading listeners...");
-    setup();
     getUtilManager().getLogger().info("Successfully enabled!");
   }
 
   public void reload() {
-    getUtilManager().reloadUtils();
     setup();
+    getUtilManager().reloadUtils();
+    getCommand("leagueManager").setExecutor(new BaseCommand(this, getUtilManager()));
   }
 
   private void setup() {
-    getCommand("leagueManager").setExecutor(new BaseCommand(this, getUtilManager()));
-
     if (!setupPermissions()) {
       getUtilManager().getLogger().info("&cDisabled due to no Vault dependency found!");
       getServer().getPluginManager().disablePlugin(this);

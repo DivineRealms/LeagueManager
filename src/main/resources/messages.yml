@@ -44,6 +44,8 @@ user:
   not-found: "&4✕ &cPlayer wasn't found."
   added-to-team: "&2✔ &aPlayer &b%player% &ahas been successfully &2added &ato team %teamTag%&a!"
   removed-from-a-team: "&2✔ &aPlayer &b%player% &ahas been successfully &8removed &afrom team %teamTag%&a!"
+  not-in-that-team: "&4✕ &cPlayer &b%player% &cis not in the %teamTag% &cteam!"
+  already-in-that-team: "&4✕ &cPlayer &b%player% &cis already in %teamTag% &cteam!"
   usage:
     set: |-
       &4✕ &cInvalid arguments. Usage:
