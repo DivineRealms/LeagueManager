@@ -56,6 +56,10 @@ public class Logger {
     } else getConsoleSender().sendMessage(getMessages().colorizeTeam(path, teamTag));
   }
 
+  public void announceState(final String path, final String state) {
+    getServer().broadcastMessage(getMessages().colorizeState(path, state));
+  }
+
   public void send(final CommandSender sender, final String playerName, final String path, final String teamTag) {
     if (sender instanceof Player) {
       final Player player = (Player) sender;
@@ -70,6 +74,16 @@ public class Logger {
         final Player player = (Player) sender;
         player.sendMessage(getMessages().colorizeMessage(message));
       } else getConsoleSender().sendMessage(getMessages().colorizeMessage(message));
+    }
+  }
+
+  public void sendLong(final CommandSender sender, final String path, final String teamTag) {
+    final List<String> list = getMessages().getStringList(path);
+    for (final String message : list) {
+      if (sender instanceof Player) {
+        final Player player = (Player) sender;
+        player.sendMessage(getMessages().colorizeTeam(message, teamTag));
+      } else getConsoleSender().sendMessage(getMessages().colorizeTeam(message, teamTag));
     }
   }
 

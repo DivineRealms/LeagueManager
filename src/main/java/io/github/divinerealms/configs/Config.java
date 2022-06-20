@@ -3,6 +3,7 @@ package io.github.divinerealms.configs;
 import io.github.divinerealms.managers.ConfigManager;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 

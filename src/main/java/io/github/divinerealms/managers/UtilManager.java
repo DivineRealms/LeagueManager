@@ -3,13 +3,9 @@ package io.github.divinerealms.managers;
 import io.github.divinerealms.LeagueManager;
 import io.github.divinerealms.configs.Config;
 import io.github.divinerealms.configs.Messages;
-import io.github.divinerealms.utils.Logger;
 import io.github.divinerealms.utils.Helper;
+import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
-import lombok.Setter;
-import net.luckperms.api.LuckPerms;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class UtilManager {
   @Getter private final Messages messages;

@@ -16,7 +16,9 @@ public class HelpCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    getLogger().sendLong(sender, "help");
+    if (!sender.hasPermission("leaguemanager.reload")) {
+      getLogger().send(sender, "insufficient-permission");
+    } else getLogger().sendLong(sender, "help");
     return true;
   }
 }

@@ -3,40 +3,65 @@ reload: "&2✔ &aPlugin reloaded!"
 unknown-command: "&4✕ &cUnknown command."
 insufficient-permission: "&4✕ &cInsufficient permission."
 ingame-only: "&4✕ &cThis command can be used only in game."
+toggle: "&2✔ &aFootCube toggled %state%."
 help:
   - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
   - "&d &lLeague&e&lManager &7- &rHelp command."
   - "&r &r"
+  - "&6 /&elm reload &7- &fReloads the plugin."
+  - "&6 /&elm toggle &7- &fToggles FootCube."
+  - "&r &r"
   - "&e &lTeam Commands:&r"
-  - "&6 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2>"
-  - "&7   - &fCreate a team with the colored tag (ex cel and &4C&0E&4L&r)."
+  - "&6 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2> &3[&bbranch&3] [&bbranch-tag&3]"
+  - "&7   - &fCreate a team with the colored tag (ex cel and &4C&0E&4L&r)"
+  - "&7   - &fand if it has a juniors team, type \"branch\"."
+  - "&7   - &fExample: &6/&elm t create nkp &0N&fK&0P &ebranch"
+  - "&7   - &fExample 2: &6/&elm t create nkp &1V&fK&1S &ebranch &1F&fK&1B"
+  - "&7 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2> <&amain-single&2|&ams&2/&ajuniors-single&2|&ajs&2>"
+  - "&7   - &fIf you only want to create a team that doesn't have a branch"
+  - "&7   - &f(if it's just a main or juniors team) use this command."
   - "&6 /&elm t&6|&eteam delete &2<&ateam-name&2>"
   - "&7   - &fDelete an existing team."
   - "&r &r"
   - "&b &lUser Commands:&r"
-  - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> <&aleague-type&2>"
-  - "&7   - &fAdd player to a team (ex cel) with the league type (main or juniors)."
+  - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> &3[&bbranch&3]"
+  - "&7   - &fAdd player to a team (ex cel) with the branch."
+  - "&7   - &fIf the player is in juniors, add true as an argument."
+  - "&7   - &fExample: &6/&elm u Neeonn set nkp"
+  - "&7   - &fExample: &6/&elm u 1nvader set vks true"
   - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>"
   - "&7   - &fRemove player from a team."
   - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
 team:
   created: "&2✔ &aTeam %teamTag% &ahas been successfully &2created&a!"
   deleted: "&2✔ &aTeam %teamTag% &ahas been successfully &8deleted&a!"
+  info:
+    - "&9❖ &bInfo about team %teamTag%&b:"
+    - "&7   - &fTeam Tag: %teamTag%"
+    - "&7   - &fBranch: %branch%"
+  list: "&9❖ &bDefined teams: %list%&b."
+  list-empty: "&4✕ &cThere aren't any teams."
   not-found: "&4✕ &cTeam %teamTag% &cwasn't found!"
   already-defined: "&4✕ &cTeam %teamTag% &calready exists!"
   usage:
-    create: |-
-      &4✕ &cInvalid arguments. Usage:
-      &6/&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2>
-    delete: |-
-      &4✕ &cInvalid arguments. Usage:
-      &6/&elm t&6|&eteam delete &2<&ateam-name&2>
+    create:
+      - "&4✕ &cInvalid arguments. Usage:"
+      - "&6/&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2> &3[&bbranch&3][&bbranch-tag&3]"
+    delete:
+      - "&4✕ &cInvalid arguments. Usage:"
+      - "&6/&elm t&6|&eteam delete &2<&ateam-name&2>"
   help:
     - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
     - "&d &lLeague&e&lManager &7- &rTeam commands."
     - "&r &r"
-    - "&6 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2>"
-    - "&7   - &fCreate a team with the colored tag (ex cel and &4C&0E&4L&r)."
+    - "&6 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2> &3[&bbranch&3] [&bbranch-tag&3]"
+    - "&7   - &fCreate a team with the colored tag (ex cel and &4C&0E&4L&r)"
+    - "&7   - &fand if it has a juniors team, type \"branch\"."
+    - "&7   - &fExample: &6/&elm t create nkp &0N&fK&0P &ebranch"
+    - "&7   - &fExample 2: &6/&elm t create nkp &1V&fK&1S &ebranch &1F&fK&1B"
+    - "&7 /&elm t&6|&eteam create &2<&ateam-name&2> <&acolored-tag&2> <&amain-single&2|&ams&2/&ajuniors-single&2|&ajs&2>"
+    - "&7   - &fIf you only want to create a team that doesn't have a branch"
+    - "&7   - &f(if it's just a main or juniors team) use this command."
     - "&6 /&elm t&6|&eteam delete &2<&ateam-name&2>"
     - "&7   - &fDelete an existing team."
     - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
@@ -47,18 +72,21 @@ user:
   not-in-that-team: "&4✕ &cPlayer &b%player% &cis not in the %teamTag% &cteam!"
   already-in-that-team: "&4✕ &cPlayer &b%player% &cis already in %teamTag% &cteam!"
   usage:
-    set: |-
-      &4✕ &cInvalid arguments. Usage:
-      &6/&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> <&aleague-type&2>
-    unset: |-
-      &4✕ &cInvalid arguments. Usage:
-      &6/&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>
+    set:
+      - "&4✕ &cInvalid arguments. Usage:"
+      - "&6/&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> &3[&bbranch&3]"
+    unset:
+      - "&4✕ &cInvalid arguments. Usage:"
+      - "&6/&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>"
   help:
     - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
     - "&d &lLeague&e&lManager &7- &rUser commands."
     - "&r &r"
-    - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> <&aleague-type&2>"
-    - "&7   - &fAdd player to a team (ex cel) with the league type (main or juniors)."
+    - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eset &2<&ateam-name&2> &3[&bbranch&3]"
+    - "&7   - &fAdd player to a team (ex cel) with the branch."
+    - "&7   - &fIf the player is in juniors, add true as an argument."
+    - "&7   - &fExample: &6/&elm u Neeonn set nkp"
+    - "&7   - &fExample: &6/&elm u 1nvader set vks true"
     - "&6 /&elm u&6|&euser &2<&aplayer-name&2> &eunset &2<&ateam-name&2>"
     - "&7   - &fRemove player from a team."
     - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"

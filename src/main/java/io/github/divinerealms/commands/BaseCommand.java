@@ -27,6 +27,9 @@ public class BaseCommand implements CommandExecutor {
     } else if (args[0].equalsIgnoreCase("reload")) {
       final ReloadCommand reloadCommand = new ReloadCommand(getLeagueManager(), getUtilManager());
       reloadCommand.onCommand(sender, command, label, args);
+    } else if (args[0].equalsIgnoreCase("toggle")) {
+      final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
+      toggleCommand.onCommand(sender, command, label, args);
     } else if (args[0].equalsIgnoreCase("team") || args[0].equalsIgnoreCase("t")) {
       final TeamCommand teamCommand = new TeamCommand(getUtilManager());
       teamCommand.onCommand(sender, command, label, args);

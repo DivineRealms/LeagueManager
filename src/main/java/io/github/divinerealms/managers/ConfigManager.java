@@ -34,7 +34,7 @@ public class ConfigManager {
 
   public void saveDefaultConfig(final String name) {
     if (getFile() == null) setFile(new File(getPlugin().getDataFolder(), name));
-    if (!getFile().exists()) getPlugin().saveResource(name, false);
+    if (!getFile().exists()) getPlugin().saveResource(name, true);
   }
 
   public void saveConfig(final String name) {

@@ -54,6 +54,13 @@ public class Messages extends ConfigManager {
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
+  public String colorizeState(final String path, final String state) {
+    final String message = getString(path)
+        .replace("%prefix%", getPrefix())
+        .replace("%state%", state);
+    return ChatColor.translateAlternateColorCodes('&', message);
+  }
+
   public String getString(final String path) {
     return getMessages().getString(path, getNotFound(path, getName()));
   }

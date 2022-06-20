@@ -11,6 +11,7 @@ import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.node.types.PermissionNode;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -19,8 +20,8 @@ public class Helper {
   @Getter @Setter private LuckPerms luckPermsAPI;
   @Getter private final Config config;
   @Getter private final String[] permissions = new String[] {
-      "chatcontrol.channel.autojoin.%team%", "chatcontrol.channel.autojoin.%team%.write",
-      "chatcontrol.channel.autojoin.%team%.read", "chatcontrol.channel.join.%team%",
+      "chatcontrol.channel.autoJoin.%team%", "chatcontrol.channel.autoJoin.%team%.write",
+      "chatcontrol.channel.autoJoin.%team%.read", "chatcontrol.channel.join.%team%",
       "chatcontrol.channel.join.%team%.write", "chatcontrol.channel.join.%team%.read",
       "chatcontrol.channel.send.%team%", "chatcontrol.channel.%team%"
   };
@@ -37,28 +38,35 @@ public class Helper {
     return userFuture.join();
   }
 
-  public void addToTeam(final UUID uniqueId, final String team, final String leagueType) {
-    final User user = getPlayer(uniqueId);
-    for (final String permission : getPermissions())
-      user.data().add(Node.builder(permission.replace("%team%", team)).build());
-    final String teamTag = getConfig().getString(team);
-    final MetaNode metaNode = MetaNode.builder("team", teamTag).build();
-    user.data().clear(NodeType.META.predicate(metaNode1 -> metaNode1.getMetaKey().equalsIgnoreCase("team")));
-    if (leagueType.equalsIgnoreCase("main")) user.data().add(metaNode);
-    else if (leagueType.equalsIgnoreCase("juniors")) user.data().add(MetaNode.builder("team", teamTag + " &aB").build());
-    getLuckPermsAPI().getUserManager().saveUser(user);
-  }
-
-  public void removeFromATeam(final UUID uniqueId, final String team) {
-    final User user = getPlayer(uniqueId);
-    for (final String permission : getPermissions())
-      user.data().remove(Node.builder(permission.replace("%team%", team)).build());
-    user.data().clear(NodeType.META.predicate(metaNode1 -> metaNode1.getMetaKey().equalsIgnoreCase("team")));
-    getLuckPermsAPI().getUserManager().saveUser(user);
-  }
-
   public boolean hasPermission(final UUID uniqueId, final String permission) {
     final User user = getPlayer(uniqueId);
     return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+  }
+
+  public void addPermission(final UUID uniqueId, final String permission) {
+    final User user = getPlayer(uniqueId);
+    user.data().add(PermissionNode.builder(permission).build());
+  }
+
+  public void unsetPermission(final UUID uniqueId, final String permission) {
+    final User user = getPlayer(uniqueId);
+    user.data().remove(PermissionNode.builder(permission).build());
+  }
+
+  public void setMeta(final UUID uniqueId, final String type, final String value) {
+    final User user = getPlayer(uniqueId);
+    final MetaNode metaNode = MetaNode.builder(type, value).build();
+    user.data().clear(NodeType.META.predicate(metaNode1 -> metaNode1.getMetaKey().equalsIgnoreCase(type)));
+    user.data().add(metaNode);
+  }
+
+  public void unsetMeta(final UUID uniqueId, final String type) {
+    final User user = getPlayer(uniqueId);
+    user.data().clear(NodeType.META.predicate(metaNode -> metaNode.getMetaKey().equalsIgnoreCase(type)));
+  }
+
+  public void saveUser(final UUID uniqueId) {
+    final User user = getPlayer(uniqueId);
+    getLuckPermsAPI().getUserManager().saveUser(user);
   }
 }
