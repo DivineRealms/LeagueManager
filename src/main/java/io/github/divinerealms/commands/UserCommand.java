@@ -47,7 +47,7 @@ public class UserCommand implements CommandExecutor {
                     if (branchTag.equals(" &aB")) getHelper().setMeta(target.getUniqueId(), "team", teamTag);
                     else getHelper().setMeta(target.getUniqueId(), "team", branchTag);
                     getHelper().setMeta(target.getUniqueId(), "team-b", "&a B");
-                    getLogger().send(sender, args[1], "user.added-to-team", branchTag);
+                    getLogger().send(sender, args[1], "user.added-to-team", args[3].toUpperCase());
                   } else getLogger().sendLong(sender, "user.usage.set");
                 } else getLogger().send(sender, args[1], "user.already-in-that-team", args[3].toUpperCase());
               } else getLogger().send(sender, "team.not-found", args[3].toUpperCase());
