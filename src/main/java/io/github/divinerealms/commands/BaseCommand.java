@@ -21,22 +21,26 @@ public class BaseCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
-      final HelpCommand helpCommand = new HelpCommand(getUtilManager());
-      helpCommand.onCommand(sender, command, label, args);
-    } else if (args[0].equalsIgnoreCase("reload")) {
-      final ReloadCommand reloadCommand = new ReloadCommand(getLeagueManager(), getUtilManager());
-      reloadCommand.onCommand(sender, command, label, args);
-    } else if (args[0].equalsIgnoreCase("toggle")) {
-      final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
-      toggleCommand.onCommand(sender, command, label, args);
-    } else if (args[0].equalsIgnoreCase("team") || args[0].equalsIgnoreCase("t")) {
-      final TeamCommand teamCommand = new TeamCommand(getUtilManager());
-      teamCommand.onCommand(sender, command, label, args);
-    } else if (args[0].equalsIgnoreCase("user") || args[0].equalsIgnoreCase("u")) {
-      final UserCommand userCommand = new UserCommand(getUtilManager());
-      userCommand.onCommand(sender, command, label, args);
-    } else getLogger().send(sender, "unknown-command");
+    if (!sender.hasPermission("leaguemanager.admin")) {
+      getLogger().send(sender, "insufficient-permission");
+    } else {
+      if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
+        final HelpCommand helpCommand = new HelpCommand(getUtilManager());
+        helpCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("reload")) {
+        final ReloadCommand reloadCommand = new ReloadCommand(getLeagueManager(), getUtilManager());
+        reloadCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("toggle")) {
+        final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
+        toggleCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("team") || args[0].equalsIgnoreCase("t")) {
+        final TeamCommand teamCommand = new TeamCommand(getUtilManager());
+        teamCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("user") || args[0].equalsIgnoreCase("u")) {
+        final UserCommand userCommand = new UserCommand(getUtilManager());
+        userCommand.onCommand(sender, command, label, args);
+      } else getLogger().send(sender, "unknown-command");
+    }
     return true;
   }
 }

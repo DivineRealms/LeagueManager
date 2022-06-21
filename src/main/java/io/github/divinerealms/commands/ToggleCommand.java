@@ -19,17 +19,13 @@ public class ToggleCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (!sender.hasPermission("leaguemanager.admin")) {
-      getLogger().send(sender, "insufficient-permission");
+    final String groupName = "default", permission = "commandwhitelist.bypass.fc", path = "toggle";
+    if (getHelper().groupHasPermission(groupName, permission)) {
+      getHelper().groupRemovePermission(groupName, permission);
+      getLogger().announceState(path, "off");
     } else {
-      final String groupName = "default", permission = "commandwhitelist.bypass.fc", path = "toggle";
-      if (getHelper().groupHasPermission(groupName, permission)) {
-        getHelper().groupRemovePermission(groupName, permission);
-        getLogger().announceState(path, "off");
-      } else {
-        getHelper().groupAddPermission(groupName, permission);
-        getLogger().announceState(path, "on");
-      }
+      getHelper().groupAddPermission(groupName, permission);
+      getLogger().announceState(path, "on");
     }
     return true;
   }
