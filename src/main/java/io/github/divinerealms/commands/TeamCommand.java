@@ -44,10 +44,10 @@ public class TeamCommand implements CommandExecutor {
               getUtilManager().getConfig().set(args[2] + ".juniors", " &aB");
               getLogger().send(sender, "team.created", args[2].toUpperCase());
             } else if (args[4].equalsIgnoreCase("main-single") || args[4].equalsIgnoreCase("ms")) {
-              getUtilManager().getConfig().set(args[2], args[3]);
+              getUtilManager().getConfig().set(args[2] + ".main", args[3]);
               getLogger().send(sender, "team.created", args[2].toUpperCase());
             } else if (args[4].equalsIgnoreCase("juniors-single") || args[4].equalsIgnoreCase("js")) {
-              getUtilManager().getConfig().set(args[2], args[3]);
+              getUtilManager().getConfig().set(args[2] + ".juniors", args[3]);
               getLogger().send(sender, "team.created", args[2].toUpperCase());
             } else getLogger().sendLong(sender, "team.usage.create");
           } else if (args.length == 6) {

@@ -36,14 +36,13 @@ public class UserCommand implements CommandExecutor {
           if (args[1].equalsIgnoreCase(target.getName())) {
             if (args[2].equalsIgnoreCase("set")) {
               if (args.length >= 4) {
-                final String teamName = args[3].toLowerCase();
-                final String teamTag = getConfig().getString(args[3]);
-                final String branchTag = getConfig().getString(args[3] + ".juniors");
+                final String teamName = args[3].toLowerCase(),
+                    teamTag = getConfig().getString(args[3] + ".main"),
+                    branchTag = getConfig().getString(args[3] + ".juniors");
                 if (getConfig().getConfig().contains(args[3])) {
                   if (!getHelper().hasPermission(target.getUniqueId(), "chatcontrol.channel." + teamName)) {
                     for (final String permission : getHelper().getPermissions())
-                      getHelper().addPermission(target.getUniqueId(), permission
-                          .replace("%team%", teamName));
+                      getHelper().addPermission(target.getUniqueId(), permission.replace("%team%", teamName));
                     if (args.length == 4) {
                       getHelper().setMeta(target.getUniqueId(), "team", teamTag);
                       getLogger().send(sender, args[1], "user.added-to-team", teamTag);
@@ -52,23 +51,21 @@ public class UserCommand implements CommandExecutor {
                       else getHelper().setMeta(target.getUniqueId(), "team", branchTag);
                       getLogger().send(sender, args[1], "user.added-to-team", branchTag);
                     } else getLogger().sendLong(sender, "user.usage.set");
-                    getHelper().saveUser(target.getUniqueId());
                   } else getLogger().send(sender, args[1], "user.already-in-that-team", branchTag);
                 } else getLogger().send(sender, "team.not-found", args[3].toUpperCase());
               } else getLogger().sendLong(sender, "user.usage.set");
             } else if (args[2].equalsIgnoreCase("unset")) {
               if (args.length == 4) {
                 final String teamName = args[3].toLowerCase();
-                final String teamTag = getConfig().getString(args[3]);
                 if (getConfig().getConfig().contains(args[3])) {
                   if (getHelper().hasPermission(target.getUniqueId(), "chatcontrol.channel." + teamName)) {
                     for (final String permission : getHelper().getPermissions())
                       getHelper().unsetPermission(target.getUniqueId(), permission
                           .replace("%team%", teamName));
                     getHelper().unsetMeta(target.getUniqueId(), "team");
-                    getHelper().saveUser(target.getUniqueId());
-                    getLogger().send(sender, args[1], "user.removed-from-a-team", teamTag);
-                  } else getLogger().send(sender, args[1], "user.not-in-that-team", teamTag);
+                    getHelper().unsetMeta(target.getUniqueId(), "team-b");
+                    getLogger().send(sender, args[1], "user.removed-from-a-team", teamName.toUpperCase());
+                  } else getLogger().send(sender, args[1], "user.not-in-that-team", teamName.toUpperCase());
                 } else getLogger().send(sender, "team.not-found", args[3].toUpperCase());
               } else getLogger().sendLong(sender, "user.usage.unset");
             } else getLogger().send(sender, "unknown-command");
