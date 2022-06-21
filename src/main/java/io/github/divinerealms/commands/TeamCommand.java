@@ -38,7 +38,7 @@ public class TeamCommand implements CommandExecutor {
         } else if (args.length == 5) {
           if (args[4].equalsIgnoreCase("branch")) {
             getUtilManager().getConfig().set(args[2] + ".main", args[3]);
-            getUtilManager().getConfig().set(args[2] + ".juniors", " &aB");
+            getUtilManager().getConfig().set(args[2] + ".juniors", "&a B");
             getLogger().send(sender, "team.created", args[2].toUpperCase());
           } else if (args[4].equalsIgnoreCase("main-single") || args[4].equalsIgnoreCase("ms")) {
             getUtilManager().getConfig().set(args[2] + ".main", args[3]);
