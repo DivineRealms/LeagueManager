@@ -51,7 +51,7 @@ public class UserCommand implements CommandExecutor {
                       else getHelper().setMeta(target.getUniqueId(), "team", branchTag);
                       getLogger().send(sender, args[1], "user.added-to-team", branchTag);
                     } else getLogger().sendLong(sender, "user.usage.set");
-                  } else getLogger().send(sender, args[1], "user.already-in-that-team", branchTag);
+                  } else getLogger().send(sender, args[1], "user.already-in-that-team", args[3].toUpperCase());
                 } else getLogger().send(sender, "team.not-found", args[3].toUpperCase());
               } else getLogger().sendLong(sender, "user.usage.set");
             } else if (args[2].equalsIgnoreCase("unset")) {
@@ -64,8 +64,8 @@ public class UserCommand implements CommandExecutor {
                           .replace("%team%", teamName));
                     getHelper().unsetMeta(target.getUniqueId(), "team");
                     getHelper().unsetMeta(target.getUniqueId(), "team-b");
-                    getLogger().send(sender, args[1], "user.removed-from-a-team", teamName.toUpperCase());
-                  } else getLogger().send(sender, args[1], "user.not-in-that-team", teamName.toUpperCase());
+                    getLogger().send(sender, args[1], "user.removed-from-a-team", args[3].toUpperCase());
+                  } else getLogger().send(sender, args[1], "user.not-in-that-team", args[3].toUpperCase());
                 } else getLogger().send(sender, "team.not-found", args[3].toUpperCase());
               } else getLogger().sendLong(sender, "user.usage.unset");
             } else getLogger().send(sender, "unknown-command");
