@@ -25,8 +25,8 @@ public class Helper {
   @Getter private final String[] permissions = new String[] {
       "chatcontrol.channel.%team%", "chatcontrol.channel.send.%team%", "chatcontrol.channel.join.%team%",
       "chatcontrol.channel.join.%team%.write", "chatcontrol.channel.join.%team%.read",
-      "chatcontrol.channel.autojoin.%team%", "chatcontrol.channel.autojoin.%team%.write",
-      "chatcontrol.channel.autojoin.%team%.read", "chatcontrol.channel.leave.%team%",
+      "chatcontrol.channel.autojoin.%team%", "chatcontrol.channel.autojoin.%team%.read",
+      "chatcontrol.channel.leave.%team%",
   };
 
   public Helper(final LeagueManager plugin, final UtilManager utilManager) {
