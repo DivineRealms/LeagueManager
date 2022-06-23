@@ -35,10 +35,6 @@ help:
 team:
   created: "&2✔ &aTeam %teamTag% &ahas been successfully &2created&a!"
   deleted: "&2✔ &aTeam %teamTag% &ahas been successfully &8deleted&a!"
-  info:
-    - "&9❖ &bInfo about team %teamTag%&b:"
-    - "&7   - &fTeam Tag: %teamTag%"
-    - "&7   - &fBranch: %branch%"
   list: "&9❖ &bDefined teams: %list%&b."
   list-empty: "&4✕ &cThere aren't any teams."
   not-found: "&4✕ &cTeam %teamTag% &cwasn't found!"

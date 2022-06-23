@@ -1,6 +1,5 @@
 package io.github.divinerealms.utils;
 
-import io.github.divinerealms.configs.Config;
 import io.github.divinerealms.configs.Messages;
 import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
@@ -22,7 +21,6 @@ public class Logger {
   @Getter private final PluginDescriptionFile description;
   @Getter private final List<String> banner = new ArrayList<>();
   @Getter private final ConsoleCommandSender consoleSender;
-  @Getter private final Config config;
   @Getter private final Messages messages;
   @Getter @Setter private String prefix;
 
@@ -30,7 +28,6 @@ public class Logger {
     this.server = plugin.getServer();
     this.description = plugin.getDescription();
     this.consoleSender = server.getConsoleSender();
-    this.config = utilManager.getConfig();
     this.messages = utilManager.getMessages();
   }
 
@@ -42,32 +39,32 @@ public class Logger {
     getConsoleSender().sendMessage(getMessages().colorizeMessage(getPrefix() + message));
   }
 
-  public void send(final CommandSender sender, final String path) {
+  public void sendMessage(final CommandSender sender, final String path) {
     if (sender instanceof Player) {
       final Player player = (Player) sender;
       player.sendMessage(getMessages().colorize(path));
     } else getConsoleSender().sendMessage(getMessages().colorize(path));
   }
 
-  public void send(final CommandSender sender, final String path, final String teamTag) {
+  public void sendMessage(final CommandSender sender, final String path, final String teamTag) {
     if (sender instanceof Player) {
       final Player player = (Player) sender;
-      player.sendMessage(getMessages().colorizeTeam(path, teamTag));
-    } else getConsoleSender().sendMessage(getMessages().colorizeTeam(path, teamTag));
+      player.sendMessage(getMessages().colorize(path, teamTag));
+    } else getConsoleSender().sendMessage(getMessages().colorize(path, teamTag));
   }
 
   public void announceState(final String path, final String state) {
     getServer().broadcastMessage(getMessages().colorizeState(path, state));
   }
 
-  public void send(final CommandSender sender, final String playerName, final String path, final String teamTag) {
+  public void sendMessage(final CommandSender sender, final String playerName, final String path, final String teamTag) {
     if (sender instanceof Player) {
       final Player player = (Player) sender;
-      player.sendMessage(getMessages().colorizeUser(playerName, path, teamTag));
-    } else getConsoleSender().sendMessage(getMessages().colorizeUser(playerName, path, teamTag));
+      player.sendMessage(getMessages().colorize(playerName, path, teamTag));
+    } else getConsoleSender().sendMessage(getMessages().colorize(playerName, path, teamTag));
   }
 
-  public void sendLong(final CommandSender sender, final String path) {
+  public void sendLongMessage(final CommandSender sender, final String path) {
     final List<String> list = getMessages().getStringList(path);
     for (final String message : list) {
       if (sender instanceof Player) {
@@ -77,13 +74,13 @@ public class Logger {
     }
   }
 
-  public void sendLong(final CommandSender sender, final String path, final String teamTag) {
+  public void sendLongMessage(final CommandSender sender, final String path, final String teamTag) {
     final List<String> list = getMessages().getStringList(path);
     for (final String message : list) {
       if (sender instanceof Player) {
         final Player player = (Player) sender;
-        player.sendMessage(getMessages().colorizeTeam(message, teamTag));
-      } else getConsoleSender().sendMessage(getMessages().colorizeTeam(message, teamTag));
+        player.sendMessage(getMessages().colorizeMessage(message, teamTag));
+      } else getConsoleSender().sendMessage(getMessages().colorizeMessage(message, teamTag));
     }
   }
 

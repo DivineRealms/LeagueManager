@@ -33,13 +33,18 @@ public class Messages extends ConfigManager {
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
+  public String colorizeMessage(final String message, final String teamTag) {
+    final String formattedMessage = message.replace("%teamTag%", teamTag);
+    return ChatColor.translateAlternateColorCodes('&', formattedMessage);
+  }
+
   public String colorize(final String path) {
     final String message = getString(path)
         .replace("%prefix%", getPrefix());
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
-  public String colorizeUser(final String playerName, final String path, final String teamTag) {
+  public String colorize(final String playerName, final String path, final String teamTag) {
     final String message = getString(path)
         .replace("%prefix%", getPrefix())
         .replace("%player%", playerName)
@@ -47,7 +52,7 @@ public class Messages extends ConfigManager {
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
-  public String colorizeTeam(final String path, final String teamTag) {
+  public String colorize(final String path, final String teamTag) {
     final String message = getString(path)
         .replace("%prefix%", getPrefix())
         .replace("%teamTag%", teamTag);

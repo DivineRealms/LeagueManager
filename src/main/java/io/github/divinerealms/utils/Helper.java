@@ -1,8 +1,6 @@
 package io.github.divinerealms.utils;
 
 import io.github.divinerealms.LeagueManager;
-import io.github.divinerealms.configs.Config;
-import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
@@ -10,7 +8,8 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.Node;
+import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PermissionNode;
 
@@ -21,7 +20,6 @@ public class Helper {
   @Getter @Setter private LuckPerms luckPermsAPI;
   @Getter private final UserManager userManager;
   @Getter private final GroupManager groupManager;
-  @Getter private final Config config;
   @Getter private final String[] permissions = new String[] {
       "chatcontrol.channel.%team%", "chatcontrol.channel.send.%team%", "chatcontrol.channel.join.%team%",
       "chatcontrol.channel.join.%team%.write", "chatcontrol.channel.join.%team%.read",
@@ -29,11 +27,10 @@ public class Helper {
       "chatcontrol.channel.leave.%team%",
   };
 
-  public Helper(final LeagueManager plugin, final UtilManager utilManager) {
+  public Helper(final LeagueManager plugin) {
     this.luckPermsAPI = plugin.getLuckPermsAPI();
     this.userManager = getLuckPermsAPI().getUserManager();
     this.groupManager = getLuckPermsAPI().getGroupManager();
-    this.config = utilManager.getConfig();
   }
 
   public User getPlayer(final UUID uniqueId) {
@@ -41,13 +38,28 @@ public class Helper {
     return userFuture.join();
   }
 
-  public Group getGroup(final String groupName) {
-    return getGroupManager().getGroup(groupName);
+  public boolean playerInGroup(final UUID uniqueId, final String groupName) {
+    final User user = getPlayer(uniqueId);
+    final Group group = getGroup(groupName);
+    return user.getInheritedGroups(user.getQueryOptions()).contains(group);
   }
 
-  public boolean hasPermission(final UUID uniqueId, final String permission) {
-    final User user = getPlayer(uniqueId);
-    return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+  public void playerAddGroup(final UUID uniqueId, final String groupName) {
+    final Group group = getGroup(groupName);
+
+    getUserManager().modifyUser(uniqueId, user -> {
+      final Node node = InheritanceNode.builder(group).build();
+      user.data().add(node);
+    });
+  }
+
+  public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
+    final Group group = getGroup(groupName);
+    getUserManager().modifyUser(uniqueId, user -> user.data().remove(InheritanceNode.builder(group).build()));
+  }
+
+  public Group getGroup(final String groupName) {
+    return getGroupManager().getGroup(groupName);
   }
 
   public boolean groupHasPermission(final String groupName, final String permission) {
@@ -55,32 +67,42 @@ public class Helper {
     return group.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
   }
 
-  public void addPermission(final UUID uniqueId, final String permission) {
-    getUserManager().modifyUser(uniqueId, user -> user.data().add(PermissionNode.builder(permission).build()));
-  }
-
   public void groupAddPermission(final String groupName, final String permission) {
     getGroupManager().modifyGroup(groupName, group -> group.data().add(PermissionNode.builder(permission).build()));
-  }
-
-  public void unsetPermission(final UUID uniqueId, final String permission) {
-    getUserManager().modifyUser(uniqueId, user -> user.data().remove(PermissionNode.builder(permission).build()));
   }
 
   public void groupRemovePermission(final String groupName, final String permission) {
     getGroupManager().modifyGroup(groupName, group -> group.data().remove(PermissionNode.builder(permission).build()));
   }
 
-  public void setMeta(final UUID uniqueId, final String type, final String value) {
-    final MetaNode metaNode = MetaNode.builder(type, value).build();
-    getUserManager().modifyUser(uniqueId, user -> {
-      user.data().clear(NodeType.META.predicate(metaNode1 -> metaNode1.getMetaKey().equalsIgnoreCase(type)));
-      user.data().add(metaNode);
+  public boolean isGroupLoaded(final String groupName) {
+    return getGroupManager().isLoaded(groupName);
+  }
+
+  public boolean groupExists(final String groupName) {
+    return getGroup(groupName) != null;
+  }
+
+  public void createGroup(final String groupName) {
+    getGroupManager().createAndLoadGroup(groupName);
+  }
+
+  public void deleteGroup(final String groupName) {
+    final Group group = getGroup(groupName);
+    getGroupManager().deleteGroup(group);
+  }
+
+  public void setGroupPermissions(final String groupName) {
+    getGroupManager().modifyGroup(groupName, group -> {
+      for (final String permission : getPermissions()) {
+        final String branch = groupName.endsWith("b") ? groupName.replaceAll("b$", "") : groupName,
+            formattedPermission = permission.replace("%team%", branch);
+        group.data().add(PermissionNode.builder(formattedPermission).build());
+      }
     });
   }
 
-  public void unsetMeta(final UUID uniqueId, final String type) {
-    getUserManager().modifyUser(uniqueId, user ->
-        user.data().clear(NodeType.META.predicate(metaNode -> metaNode.getMetaKey().equalsIgnoreCase(type))));
+  public void setGroupMeta(final String groupName, final String key, final String value) {
+    getGroupManager().modifyGroup(groupName, group -> group.data().add(MetaNode.builder(key, value).build()));
   }
 }

@@ -20,7 +20,7 @@ public class ReloadCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
     getPlugin().reload();
-    getLogger().send(sender, "reload");
+    getLogger().sendMessage(sender, "reload");
     return true;
   }
 }

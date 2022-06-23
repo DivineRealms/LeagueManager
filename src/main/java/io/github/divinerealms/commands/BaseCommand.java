@@ -22,7 +22,7 @@ public class BaseCommand implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (!sender.hasPermission("leaguemanager.admin")) {
-      getLogger().send(sender, "insufficient-permission");
+      getLogger().sendMessage(sender, "insufficient-permission");
     } else {
       if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
         final HelpCommand helpCommand = new HelpCommand(getUtilManager());
@@ -33,13 +33,19 @@ public class BaseCommand implements CommandExecutor {
       } else if (args[0].equalsIgnoreCase("toggle")) {
         final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
         toggleCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("team") || args[0].equalsIgnoreCase("t")) {
-        final TeamCommand teamCommand = new TeamCommand(getUtilManager());
-        teamCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("user") || args[0].equalsIgnoreCase("u")) {
-        final UserCommand userCommand = new UserCommand(getUtilManager());
-        userCommand.onCommand(sender, command, label, args);
-      } else getLogger().send(sender, "unknown-command");
+      } else if (args[0].equalsIgnoreCase("setTeam") || args[0].equalsIgnoreCase("st")) {
+        final SetTeamCommand setTeamCommand = new SetTeamCommand(getUtilManager());
+        setTeamCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("unsetTeam") || args[0].equalsIgnoreCase("ut")) {
+        final UnsetTeamCommand unsetTeamCommand = new UnsetTeamCommand(getUtilManager());
+        unsetTeamCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("createTeam") || args[0].equalsIgnoreCase("ct")) {
+        final CreateTeamCommand createTeamCommand = new CreateTeamCommand(getUtilManager());
+        createTeamCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("deleteTeam") || args[0].equalsIgnoreCase("dt")) {
+        final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getUtilManager());
+        deleteTeamCommand.onCommand(sender, command, label, args);
+      } else getLogger().sendMessage(sender, "unknown-command");
     }
     return true;
   }

@@ -16,7 +16,7 @@ public class HelpCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    getLogger().sendLong(sender, "help");
+    getLogger().sendLongMessage(sender, "help");
     return true;
   }
 }
