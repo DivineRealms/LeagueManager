@@ -9,12 +9,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class BaseCommand implements CommandExecutor {
-  @Getter private final LeagueManager leagueManager;
+  @Getter private final LeagueManager plugin;
   @Getter private final UtilManager utilManager;
   @Getter private final Logger logger;
 
-  public BaseCommand(final LeagueManager leagueManager, final UtilManager utilManager) {
-    this.leagueManager = leagueManager;
+  public BaseCommand(final LeagueManager plugin, final UtilManager utilManager) {
+    this.plugin = plugin;
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
   }
@@ -28,7 +28,7 @@ public class BaseCommand implements CommandExecutor {
         final HelpCommand helpCommand = new HelpCommand(getUtilManager());
         helpCommand.onCommand(sender, command, label, args);
       } else if (args[0].equalsIgnoreCase("reload")) {
-        final ReloadCommand reloadCommand = new ReloadCommand(getLeagueManager(), getUtilManager());
+        final ReloadCommand reloadCommand = new ReloadCommand(getPlugin(), getUtilManager());
         reloadCommand.onCommand(sender, command, label, args);
       } else if (args[0].equalsIgnoreCase("toggle")) {
         final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
@@ -40,10 +40,10 @@ public class BaseCommand implements CommandExecutor {
         final UnsetTeamCommand unsetTeamCommand = new UnsetTeamCommand(getUtilManager());
         unsetTeamCommand.onCommand(sender, command, label, args);
       } else if (args[0].equalsIgnoreCase("createTeam") || args[0].equalsIgnoreCase("ct")) {
-        final CreateTeamCommand createTeamCommand = new CreateTeamCommand(getUtilManager());
+        final CreateTeamCommand createTeamCommand = new CreateTeamCommand(getPlugin(), getUtilManager());
         createTeamCommand.onCommand(sender, command, label, args);
       } else if (args[0].equalsIgnoreCase("deleteTeam") || args[0].equalsIgnoreCase("dt")) {
-        final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getUtilManager());
+        final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getPlugin(), getUtilManager());
         deleteTeamCommand.onCommand(sender, command, label, args);
       } else getLogger().sendMessage(sender, "unknown-command");
     }

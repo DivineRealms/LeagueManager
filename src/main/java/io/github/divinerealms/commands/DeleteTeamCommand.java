@@ -1,18 +1,24 @@
 package io.github.divinerealms.commands;
 
+import io.github.divinerealms.LeagueManager;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.group.GroupManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class DeleteTeamCommand implements CommandExecutor {
+  @Getter  private final LuckPerms luckPermsAPI;
   @Getter private final Helper helper;
   @Getter private final Logger logger;
 
-  public DeleteTeamCommand(final UtilManager utilManager) {
+  public DeleteTeamCommand(final LeagueManager plugin, final UtilManager utilManager) {
+    this.luckPermsAPI = plugin.getLuckPermsAPI();
     this.helper = utilManager.getHelper();
     this.logger = utilManager.getLogger();
   }
@@ -23,9 +29,11 @@ public class DeleteTeamCommand implements CommandExecutor {
       getLogger().sendLongMessage(sender, "team.help");
     } else if (args.length == 2) {
       final String name = args[1], nameUppercase = name.toUpperCase();
+      final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
 
-      if (getHelper().isGroupLoaded(name)) {
-        getHelper().deleteGroup(name);
+      if (groupManager.isLoaded(name)) {
+        final Group group = getHelper().getGroup(name);
+        groupManager.deleteGroup(group);
         getLogger().sendMessage(sender, "team.deleted", nameUppercase);
       } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
     } else getLogger().sendLongMessage(sender, "team.usage.delete");

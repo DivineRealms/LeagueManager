@@ -40,7 +40,7 @@ public class UnsetTeamCommand implements CommandExecutor {
             getLogger().sendMessage(sender, target.getName(), "user.removed-from-a-team", nameUppercase);
           } else getLogger().sendMessage(sender, target.getName(), "user.not-in-that-team", nameUppercase);
         } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
-      } else getLogger().sendLongMessage(sender, "user.usage.set");
+      } else getLogger().sendLongMessage(sender, "user.usage.unset");
     } else getLogger().sendLongMessage(sender, "unknown-command");
     return true;
   }

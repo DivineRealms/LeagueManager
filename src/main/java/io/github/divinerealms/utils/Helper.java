@@ -10,7 +10,6 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
-import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PermissionNode;
 
 import java.util.UUID;
@@ -75,34 +74,7 @@ public class Helper {
     getGroupManager().modifyGroup(groupName, group -> group.data().remove(PermissionNode.builder(permission).build()));
   }
 
-  public boolean isGroupLoaded(final String groupName) {
-    return getGroupManager().isLoaded(groupName);
-  }
-
   public boolean groupExists(final String groupName) {
     return getGroup(groupName) != null;
-  }
-
-  public void createGroup(final String groupName) {
-    getGroupManager().createAndLoadGroup(groupName);
-  }
-
-  public void deleteGroup(final String groupName) {
-    final Group group = getGroup(groupName);
-    getGroupManager().deleteGroup(group);
-  }
-
-  public void setGroupPermissions(final String groupName) {
-    getGroupManager().modifyGroup(groupName, group -> {
-      for (final String permission : getPermissions()) {
-        final String branch = groupName.endsWith("b") ? groupName.replaceAll("b$", "") : groupName,
-            formattedPermission = permission.replace("%team%", branch);
-        group.data().add(PermissionNode.builder(formattedPermission).build());
-      }
-    });
-  }
-
-  public void setGroupMeta(final String groupName, final String key, final String value) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().add(MetaNode.builder(key, value).build()));
   }
 }
