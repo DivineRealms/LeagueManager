@@ -9,6 +9,7 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PermissionNode;
+import net.luckperms.api.node.types.WeightNode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,6 +36,7 @@ public class CreateTeamCommand implements CommandExecutor {
 
       if (!groupManager.isLoaded(name)) {
         groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
+          group.data().add(WeightNode.builder(5).build());
           group.data().add(MetaNode.builder("team", tag).build());
           if (isBranch) group.data().add(MetaNode.builder("team-b", "&a B").build());
 
