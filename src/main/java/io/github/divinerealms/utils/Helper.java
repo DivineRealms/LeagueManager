@@ -8,7 +8,6 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
 
@@ -37,19 +36,28 @@ public class Helper {
     return userFuture.join();
   }
 
+  public boolean playerHasPermission(final UUID uniqueId, final String permission) {
+    final User user = getPlayer(uniqueId);
+    return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
+  }
+
   public boolean playerInGroup(final UUID uniqueId, final String groupName) {
     final User user = getPlayer(uniqueId);
     final Group group = getGroup(groupName);
     return user.getInheritedGroups(user.getQueryOptions()).contains(group);
   }
 
+  public void playerRemoveTeams(final UUID uniqueId) {
+    final User user = getPlayer(uniqueId);
+    for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
+      final int weight = 100, groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+      if (groupWeight == weight) playerRemoveGroup(uniqueId, group.getName());
+    }
+  }
+
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
     final Group group = getGroup(groupName);
-
-    getUserManager().modifyUser(uniqueId, user -> {
-      final Node node = InheritanceNode.builder(group).build();
-      user.data().add(node);
-    });
+    getUserManager().modifyUser(uniqueId, user -> user.data().add(InheritanceNode.builder(group).build()));
   }
 
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {

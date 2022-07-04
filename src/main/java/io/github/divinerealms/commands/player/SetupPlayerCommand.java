@@ -1,4 +1,4 @@
-package io.github.divinerealms.commands;
+package io.github.divinerealms.commands.player;
 
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
@@ -10,12 +10,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class UnsetTeamCommand implements CommandExecutor {
-  @Getter
-  private final Helper helper;
+public class SetupPlayerCommand implements CommandExecutor {
+  @Getter private final Helper helper;
   @Getter private final Logger logger;
 
-  public UnsetTeamCommand(final UtilManager utilManager) {
+  public SetupPlayerCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();
     this.logger = utilManager.getLogger();
   }
@@ -34,13 +33,14 @@ public class UnsetTeamCommand implements CommandExecutor {
       }
 
       if (args[1].equalsIgnoreCase(target.getName())) {
+        // is player in database?
         if (getHelper().groupExists(name)) {
-          if (getHelper().playerInGroup(target.getUniqueId(), name)) {
-            getHelper().playerRemoveGroup(target.getUniqueId(), name);
-            getLogger().sendMessage(sender, target.getName(), "user.removed-from-a-team", nameUppercase);
-          } else getLogger().sendMessage(sender, target.getName(), "user.not-in-that-team", nameUppercase);
+          if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
+            getHelper().playerAddGroup(target.getUniqueId(), name);
+            getLogger().sendMessage(sender, target.getName(), "user.added-to-team", nameUppercase);
+          } else getLogger().sendMessage(sender, target.getName(), "user.already-in-that-team", nameUppercase);
         } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
-      } else getLogger().sendLongMessage(sender, "user.usage.unset");
+      } else getLogger().sendLongMessage(sender, "user.usage.set");
     } else getLogger().sendLongMessage(sender, "unknown-command");
     return true;
   }

@@ -1,4 +1,4 @@
-package io.github.divinerealms.commands;
+package io.github.divinerealms.commands.player;
 
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
@@ -35,6 +35,7 @@ public class SetTeamCommand implements CommandExecutor {
       if (args[1].equalsIgnoreCase(target.getName())) {
         if (getHelper().groupExists(name)) {
           if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
+            getHelper().playerRemoveTeams(target.getUniqueId());
             getHelper().playerAddGroup(target.getUniqueId(), name);
             getLogger().sendMessage(sender, target.getName(), "user.added-to-team", nameUppercase);
           } else getLogger().sendMessage(sender, target.getName(), "user.already-in-that-team", nameUppercase);

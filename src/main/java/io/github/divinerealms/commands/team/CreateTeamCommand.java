@@ -1,4 +1,4 @@
-package io.github.divinerealms.commands;
+package io.github.divinerealms.commands.team;
 
 import io.github.divinerealms.LeagueManager;
 import io.github.divinerealms.managers.UtilManager;
@@ -36,7 +36,7 @@ public class CreateTeamCommand implements CommandExecutor {
 
       if (!groupManager.isLoaded(name)) {
         groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
-          group.data().add(WeightNode.builder(5).build());
+          group.data().add(WeightNode.builder(100).build());
           group.data().add(MetaNode.builder("team", tag).build());
           if (isBranch) group.data().add(MetaNode.builder("team-b", "&a B").build());
 

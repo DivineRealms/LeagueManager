@@ -1,4 +1,4 @@
-package io.github.divinerealms.commands;
+package io.github.divinerealms.commands.team;
 
 import io.github.divinerealms.LeagueManager;
 import io.github.divinerealms.managers.UtilManager;

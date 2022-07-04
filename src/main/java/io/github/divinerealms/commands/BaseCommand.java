@@ -1,6 +1,10 @@
 package io.github.divinerealms.commands;
 
 import io.github.divinerealms.LeagueManager;
+import io.github.divinerealms.commands.player.SetTeamCommand;
+import io.github.divinerealms.commands.player.UnsetTeamCommand;
+import io.github.divinerealms.commands.team.CreateTeamCommand;
+import io.github.divinerealms.commands.team.DeleteTeamCommand;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
