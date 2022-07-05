@@ -53,6 +53,20 @@ public class Logger {
     } else getConsoleSender().sendMessage(getMessages().colorize(path, teamTag));
   }
 
+  public void sendMessage(final String playerName, final CommandSender sender, final String path) {
+    if (sender instanceof Player) {
+      final Player player = (Player) sender;
+      player.sendMessage(getMessages().colorizePlayer(path, playerName));
+    } else getConsoleSender().sendMessage(getMessages().colorizePlayer(path, playerName));
+  }
+
+  public void sendMessage(final CommandSender sender, final String playerName, final String path, final Time time) {
+    if (sender instanceof Player) {
+      final Player player = (Player) sender;
+      player.sendMessage(getMessages().colorize(playerName, path, time));
+    } else getConsoleSender().sendMessage(getMessages().colorize(playerName, path, time));
+  }
+
   public void announceState(final String path, final String state) {
     getServer().broadcastMessage(getMessages().colorizeState(path, state));
   }

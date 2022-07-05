@@ -1,6 +1,7 @@
 package io.github.divinerealms.configs;
 
 import io.github.divinerealms.managers.ConfigManager;
+import io.github.divinerealms.utils.Time;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -44,6 +45,13 @@ public class Messages extends ConfigManager {
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
+  public String colorizePlayer(final String path, final String playerName) {
+    final String message = getString(path)
+        .replace("%prefix%", getPrefix())
+        .replace("%player%", playerName);
+    return ChatColor.translateAlternateColorCodes('&', message);
+  }
+
   public String colorize(final String playerName, final String path, final String teamTag) {
     final String message = getString(path)
         .replace("%prefix%", getPrefix())
@@ -56,6 +64,14 @@ public class Messages extends ConfigManager {
     final String message = getString(path)
         .replace("%prefix%", getPrefix())
         .replace("%teamTag%", teamTag);
+    return ChatColor.translateAlternateColorCodes('&', message);
+  }
+
+  public String colorize(final String playerName, final String path, final Time time) {
+    final String message = getString(path)
+        .replace("%prefix%", getPrefix())
+        .replace("%player%", playerName)
+        .replace("%duration%", String.valueOf(time));
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 

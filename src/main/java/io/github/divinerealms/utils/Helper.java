@@ -36,11 +36,6 @@ public class Helper {
     return userFuture.join();
   }
 
-  public boolean playerHasPermission(final UUID uniqueId, final String permission) {
-    final User user = getPlayer(uniqueId);
-    return user.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
-  }
-
   public boolean playerInGroup(final UUID uniqueId, final String groupName) {
     final User user = getPlayer(uniqueId);
     final Group group = getGroup(groupName);

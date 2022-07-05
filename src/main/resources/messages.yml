@@ -26,6 +26,10 @@ help:
   - "&7   - &fExample: &6/&elm st 1nvader vksb"
   - "&6 /&elm ut&6|&eunsetteam &2<&aplayer-name&2> <&ateam-name&2>"
   - "&7   - &fRemove player from a team."
+  - "&6 /&elm ban &2<&aplayer-name&2> <&aduration&2>"
+  - "&7   - &fBan player from FC. Example: &6/&elm ban Neeonn 2h"
+  - "&6 /&elm unban &2<&aplayer-name&2>"
+  - "&7   - &fUnban player from FC."
   - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
 team:
   created: "&2✔ &aTeam %teamTag% &ahas been successfully &2created&a!"
@@ -58,6 +62,10 @@ user:
   removed-from-a-team: "&2✔ &aPlayer &b%player% &ahas been successfully &8removed &afrom team %teamTag%&a!"
   not-in-that-team: "&4✕ &cPlayer &b%player% &cis not in the %teamTag% &cteam!"
   already-in-that-team: "&4✕ &cPlayer &b%player% &cis already in %teamTag% &cteam!"
+  ban: "&2✔ &aPlayer &b%player% &ahas been successfully banned for &e%duration%&a!"
+  unban: "&2✔ &aPlayer &b%player% &ahas been successfully unbanned!"
+  not-banned: "&4✕ &cPlayer &b%player% &cis not banned from FC!"
+  already-banned: "&4✕ &cPlayer &b%player% &cis already banned from FC! Unban them first."
   usage:
     set:
       - "&4✕ &cInvalid arguments. Usage:"
@@ -65,6 +73,12 @@ user:
     unset:
       - "&4✕ &cInvalid arguments. Usage:"
       - "&6/&elm ut&6|&eunsetteam &2<&aplayer-name&2> <&ateam-name&2>"
+    ban:
+      - "&4✕ &cInvalid arguments. Usage:"
+      - "&6/&elm ban &2<&aplayer-name&2> <&aduration&2>"
+    unban:
+      - "&4✕ &cInvalid arguments. Usage:"
+      - "&6/&elm unban &2<&aplayer-name&2>"
   help:
     - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
     - "&d &lLeague&e&lManager &7- &rUser commands."
@@ -75,4 +89,8 @@ user:
     - "&7   - &fExample: &6/&elm st 1nvader vksb"
     - "&6 /&elm ut&6|&eunsetteam &2<&aplayer-name&2> <&ateam-name&2>"
     - "&7   - &fRemove player from a team."
+    - "&6 /&elm ban &2<&aplayer-name&2> <&aduration&2>"
+    - "&7   - &fBan player from FC. Example: &6/&elm ban Neeonn 2h"
+    - "&6 /&elm unban &2<&aplayer-name&2>"
+    - "&7   - &fUnban player from FC."
     - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"

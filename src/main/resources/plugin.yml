@@ -1,5 +1,5 @@
 name: LeagueManager
-version: ${project.version}
+version: 1.0.5
 author: Neeonn
 depend:
   - LuckPerms

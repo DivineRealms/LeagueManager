@@ -1,7 +1,9 @@
 package io.github.divinerealms.commands;
 
 import io.github.divinerealms.LeagueManager;
+import io.github.divinerealms.commands.player.BanPlayerCommand;
 import io.github.divinerealms.commands.player.SetTeamCommand;
+import io.github.divinerealms.commands.player.UnbanPlayerCommand;
 import io.github.divinerealms.commands.player.UnsetTeamCommand;
 import io.github.divinerealms.commands.team.CreateTeamCommand;
 import io.github.divinerealms.commands.team.DeleteTeamCommand;
@@ -37,6 +39,12 @@ public class BaseCommand implements CommandExecutor {
       } else if (args[0].equalsIgnoreCase("toggle")) {
         final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
         toggleCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("ban")) {
+        final BanPlayerCommand banPlayerCommand = new BanPlayerCommand(getUtilManager());
+        banPlayerCommand.onCommand(sender, command, label, args);
+      } else if (args[0].equalsIgnoreCase("unban")) {
+        final UnbanPlayerCommand unbanPlayerCommand = new UnbanPlayerCommand(getUtilManager());
+        unbanPlayerCommand.onCommand(sender, command, label, args);
       } else if (args[0].equalsIgnoreCase("setTeam") || args[0].equalsIgnoreCase("st")) {
         final SetTeamCommand setTeamCommand = new SetTeamCommand(getUtilManager());
         setTeamCommand.onCommand(sender, command, label, args);
