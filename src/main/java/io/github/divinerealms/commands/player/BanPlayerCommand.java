@@ -46,7 +46,9 @@ public class BanPlayerCommand implements CommandExecutor {
           final DataMutateResult result = user.data().add(node);
 
           if (result.wasSuccessful()) {
-            getLogger().sendMessage(target.getPlayer(), target.getName(), "user.ban", time);
+            getLogger().sendMessage(sender, target.getName(), "user.ban", time);
+            if (target.isOnline())
+              getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time);
           } else getLogger().sendMessage(sender, "user.already-banned");
         });
       } else getLogger().sendLongMessage(sender, "user.usage.ban");

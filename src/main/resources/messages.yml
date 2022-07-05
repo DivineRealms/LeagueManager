@@ -3,7 +3,7 @@ reload: "&2✔ &aPlugin reloaded!"
 unknown-command: "&4✕ &cUnknown command."
 insufficient-permission: "&4✕ &cInsufficient permission."
 ingame-only: "&4✕ &cThis command can be used only in game."
-toggle: "&2✔ &aFootCube toggled %state% due to the league."
+toggle: "&2✔ &aFootCube toggled &e&l%state% &adue to the league."
 help:
   - "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
   - "&d &lLeague&e&lManager &7- &rHelp command."
@@ -63,7 +63,9 @@ user:
   not-in-that-team: "&4✕ &cPlayer &b%player% &cis not in the %teamTag% &cteam!"
   already-in-that-team: "&4✕ &cPlayer &b%player% &cis already in %teamTag% &cteam!"
   ban: "&2✔ &aPlayer &b%player% &ahas been successfully banned for &e%duration%&a!"
+  banned: "%prefix%&cYou have been banned from FC for &e%duration%&c!"
   unban: "&2✔ &aPlayer &b%player% &ahas been successfully unbanned!"
+  unbanned: "%prefix%&aYou've been unbanned from FC!"
   not-banned: "&4✕ &cPlayer &b%player% &cis not banned from FC!"
   already-banned: "&4✕ &cPlayer &b%player% &cis already banned from FC! Unban them first."
   usage:

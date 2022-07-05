@@ -44,8 +44,10 @@ public class UnbanPlayerCommand implements CommandExecutor {
             final DataMutateResult result = user1.data().remove(node);
 
             if (result.wasSuccessful()) {
-              getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unban");
-            } else getLogger().sendMessage(target.getName(), target.getPlayer(), "user.not-banned");
+              getLogger().sendMessage(target.getName(), sender, "user.unban");
+              if (target.isOnline())
+                getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unbanned");
+            } else getLogger().sendMessage(target.getName(), sender, "user.not-banned");
           });
         } else getLogger().sendMessage(target.getName(), target.getPlayer(), "user.not-banned");
       } else getLogger().sendLongMessage(sender, "user.usage.unban");
