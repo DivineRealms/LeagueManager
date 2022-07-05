@@ -49,7 +49,7 @@ public class BanPlayerCommand implements CommandExecutor {
             getLogger().sendMessage(sender, target.getName(), "user.ban", time);
             if (target.isOnline())
               getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time);
-          } else getLogger().sendMessage(sender, "user.already-banned");
+          } else getLogger().sendMessage(target.getName(), sender, "user.already-banned");
         });
       } else getLogger().sendLongMessage(sender, "user.usage.ban");
     } else getLogger().sendLongMessage(sender, "unknown-command");
