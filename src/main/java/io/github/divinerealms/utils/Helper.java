@@ -52,12 +52,14 @@ public class Helper {
 
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
     final Group group = getGroup(groupName);
-    getUserManager().modifyUser(uniqueId, user -> user.data().add(InheritanceNode.builder(group).build()));
+    getUserManager().modifyUser(uniqueId, user -> user.data().add(
+        InheritanceNode.builder(group).withContext("server", "football").build()));
   }
 
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
     final Group group = getGroup(groupName);
-    getUserManager().modifyUser(uniqueId, user -> user.data().remove(InheritanceNode.builder(group).build()));
+    getUserManager().modifyUser(uniqueId, user -> user.data().remove(
+        InheritanceNode.builder(group).withContext("server", "football").build()));
   }
 
   public Group getGroup(final String groupName) {
