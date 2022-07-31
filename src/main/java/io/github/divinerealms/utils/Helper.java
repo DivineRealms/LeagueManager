@@ -72,11 +72,13 @@ public class Helper {
   }
 
   public void groupAddPermission(final String groupName, final String permission) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().add(PermissionNode.builder(permission).build()));
+    getGroupManager().modifyGroup(groupName, group -> group.data().add(
+        PermissionNode.builder(permission).withContext("server", "football").build()));
   }
 
   public void groupRemovePermission(final String groupName, final String permission) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().remove(PermissionNode.builder(permission).build()));
+    getGroupManager().modifyGroup(groupName, group -> group.data().remove(
+        PermissionNode.builder(permission).withContext("server", "football").build()));
   }
 
   public boolean groupExists(final String groupName) {

@@ -40,7 +40,8 @@ public class BanPlayerCommand implements CommandExecutor {
 
       if (args[1].equalsIgnoreCase(target.getName())) {
         final PermissionNode node = PermissionNode.builder(permission).value(false)
-            .expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
+            .expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS)
+            .withContext("server", "football").build();
 
         getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
           final DataMutateResult result = user.data().add(node);
