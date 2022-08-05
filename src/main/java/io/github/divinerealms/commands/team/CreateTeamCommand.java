@@ -27,30 +27,34 @@ public class CreateTeamCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
-      getLogger().sendLongMessage(sender, "team.help");
-    } else if (args.length == 3) {
-      final String name = args[1], tag = args[2], nameUppercase = name.toUpperCase();
-      final boolean isBranch = name.endsWith("b");
-      final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
+    if (!sender.hasPermission("leaguemanager.command.createteam")) {
+      getLogger().sendMessage(sender, "insufficient-permission");
+    } else {
+      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+        getLogger().sendLongMessage(sender, "team.help");
+      } else if (args.length == 3) {
+        final String name = args[1], tag = args[2], nameUppercase = name.toUpperCase();
+        final boolean isBranch = name.endsWith("b");
+        final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
 
-      if (!groupManager.isLoaded(name)) {
-        groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
-          group.data().add(WeightNode.builder(100).build());
-          group.data().add(MetaNode.builder("team", tag).build());
-          if (isBranch) group.data().add(MetaNode.builder("team-b", "&a B").build());
+        if (!groupManager.isLoaded(name)) {
+          groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
+            group.data().add(WeightNode.builder(100).build());
+            group.data().add(MetaNode.builder("team", tag).build());
+            if (isBranch) group.data().add(MetaNode.builder("team-b", "&a B").build());
 
-          for (final String permission : getHelper().getPermissions()) {
-            final String branch = isBranch ? name.replaceAll("b$", "") : name,
-                formattedPermission = permission.replace("%team%", branch);
-            group.data().add(PermissionNode.builder(formattedPermission).build());
-          }
+            for (final String permission : getHelper().getPermissions()) {
+              final String branch = isBranch ? name.replaceAll("b$", "") : name,
+                  formattedPermission = permission.replace("%team%", branch);
+              group.data().add(PermissionNode.builder(formattedPermission).build());
+            }
 
-          getLogger().sendMessage(sender, "team.created", nameUppercase);
-          return group;
-        }).thenCompose(groupManager::saveGroup);
-      } else getLogger().sendMessage(sender, "team.already-defined", nameUppercase);
-    } else getLogger().sendLongMessage(sender, "team.usage.create");
+            getLogger().sendMessage(sender, "team.created", nameUppercase);
+            return group;
+          }).thenCompose(groupManager::saveGroup);
+        } else getLogger().sendMessage(sender, "team.already-defined", nameUppercase);
+      } else getLogger().sendLongMessage(sender, "team.usage.create");
+    }
     return true;
   }
 }

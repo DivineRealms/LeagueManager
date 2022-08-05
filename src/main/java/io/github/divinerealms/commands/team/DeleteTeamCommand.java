@@ -25,18 +25,22 @@ public class DeleteTeamCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
-      getLogger().sendLongMessage(sender, "team.help");
-    } else if (args.length == 2) {
-      final String name = args[1], nameUppercase = name.toUpperCase();
-      final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
+    if (!sender.hasPermission("leaguemanager.command.deleteteam")) {
+      getLogger().sendMessage(sender, "insufficient-permission");
+    } else {
+      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+        getLogger().sendLongMessage(sender, "team.help");
+      } else if (args.length == 2) {
+        final String name = args[1], nameUppercase = name.toUpperCase();
+        final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
 
-      if (groupManager.isLoaded(name)) {
-        final Group group = getHelper().getGroup(name);
-        groupManager.deleteGroup(group);
-        getLogger().sendMessage(sender, "team.deleted", nameUppercase);
-      } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
-    } else getLogger().sendLongMessage(sender, "team.usage.delete");
+        if (groupManager.isLoaded(name)) {
+          final Group group = getHelper().getGroup(name);
+          groupManager.deleteGroup(group);
+          getLogger().sendMessage(sender, "team.deleted", nameUppercase);
+        } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
+      } else getLogger().sendLongMessage(sender, "team.usage.delete");
+    }
     return true;
   }
 }

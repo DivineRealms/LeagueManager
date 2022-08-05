@@ -21,27 +21,31 @@ public class SetTeamCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
-      getLogger().sendLongMessage(sender, "user.help");
-    } else if (args.length == 3) {
-      final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-      final String name = args[2], nameUppercase = name.toUpperCase();
+    if (!sender.hasPermission("leaguemanager.command.setteam")) {
+      getLogger().sendMessage(sender, "insufficient-permission");
+    } else {
+      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+        getLogger().sendLongMessage(sender, "user.help");
+      } else if (args.length == 3) {
+        final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+        final String name = args[2], nameUppercase = name.toUpperCase();
 
-      if (target == null || !target.hasPlayedBefore()) {
-        getLogger().sendMessage(sender, "user.not-found");
-        return true;
-      }
+        if (target == null || !target.hasPlayedBefore()) {
+          getLogger().sendMessage(sender, "user.not-found");
+          return true;
+        }
 
-      if (args[1].equalsIgnoreCase(target.getName())) {
-        if (getHelper().groupExists(name)) {
-          if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-            getHelper().playerRemoveTeams(target.getUniqueId());
-            getHelper().playerAddGroup(target.getUniqueId(), name);
-            getLogger().sendMessage(sender, target.getName(), "user.added-to-team", nameUppercase);
-          } else getLogger().sendMessage(sender, target.getName(), "user.already-in-that-team", nameUppercase);
-        } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
-      } else getLogger().sendLongMessage(sender, "user.usage.set");
-    } else getLogger().sendLongMessage(sender, "unknown-command");
+        if (args[1].equalsIgnoreCase(target.getName())) {
+          if (getHelper().groupExists(name)) {
+            if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
+              getHelper().playerRemoveTeams(target.getUniqueId());
+              getHelper().playerAddGroup(target.getUniqueId(), name);
+              getLogger().sendMessage(sender, target.getName(), "user.added-to-team", nameUppercase);
+            } else getLogger().sendMessage(sender, target.getName(), "user.already-in-that-team", nameUppercase);
+          } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
+        } else getLogger().sendLongMessage(sender, "user.usage.set");
+      } else getLogger().sendLongMessage(sender, "unknown-command");
+    }
     return true;
   }
 }

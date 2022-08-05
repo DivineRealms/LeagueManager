@@ -24,34 +24,38 @@ public class UnbanPlayerCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
-      getLogger().sendLongMessage(sender, "user.help");
-    } else if (args.length == 2) {
-      final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-      final String permission = "commandwhitelist.bypass.fc";
+    if (!sender.hasPermission("leaguemanager.command.unban")) {
+      getLogger().sendMessage(sender, "insufficient-permission");
+    } else {
+      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+        getLogger().sendLongMessage(sender, "user.help");
+      } else if (args.length == 2) {
+        final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+        final String permission = "commandwhitelist.bypass.fc";
 
-      if (target == null || !target.hasPlayedBefore()) {
-        getLogger().sendMessage(sender, "user.not-found");
-        return true;
-      }
+        if (target == null || !target.hasPlayedBefore()) {
+          getLogger().sendMessage(sender, "user.not-found");
+          return true;
+        }
 
-      if (args[1].equalsIgnoreCase(target.getName())) {
-        final User user = getHelper().getPlayer(target.getUniqueId());
-        final Node node = user.getCachedData().getPermissionData().queryPermission(permission).node();
+        if (args[1].equalsIgnoreCase(target.getName())) {
+          final User user = getHelper().getPlayer(target.getUniqueId());
+          final Node node = user.getCachedData().getPermissionData().queryPermission(permission).node();
 
-        if (node != null && node.hasExpiry()) {
-          getHelper().getUserManager().modifyUser(target.getUniqueId(), user1 -> {
-            final DataMutateResult result = user1.data().remove(node);
+          if (node != null && node.hasExpiry()) {
+            getHelper().getUserManager().modifyUser(target.getUniqueId(), user1 -> {
+              final DataMutateResult result = user1.data().remove(node);
 
-            if (result.wasSuccessful()) {
-              getLogger().sendMessage(target.getName(), sender, "user.unban");
-              if (target.isOnline())
-                getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unbanned");
-            } else getLogger().sendMessage(target.getName(), sender, "user.not-banned");
-          });
-        } else getLogger().sendMessage(target.getName(), target.getPlayer(), "user.not-banned");
-      } else getLogger().sendLongMessage(sender, "user.usage.unban");
-    } else getLogger().sendLongMessage(sender, "unknown-command");
+              if (result.wasSuccessful()) {
+                getLogger().sendMessage(target.getName(), sender, "user.unban");
+                if (target.isOnline())
+                  getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unbanned");
+              } else getLogger().sendMessage(target.getName(), sender, "user.not-banned");
+            });
+          } else getLogger().sendMessage(target.getName(), target.getPlayer(), "user.not-banned");
+        } else getLogger().sendLongMessage(sender, "user.usage.unban");
+      } else getLogger().sendLongMessage(sender, "unknown-command");
+    }
     return true;
   }
 }

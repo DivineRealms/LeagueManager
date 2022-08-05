@@ -26,38 +26,52 @@ public class BaseCommand implements CommandExecutor {
   }
 
   @Override
-  public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    if (!sender.hasPermission("leaguemanager.admin")) {
-      getLogger().sendMessage(sender, "insufficient-permission");
-    } else {
-      if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
-        final HelpCommand helpCommand = new HelpCommand(getUtilManager());
-        helpCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("reload")) {
+  public boolean onCommand(final CommandSender sender, final Command cmd, String label, String[] args) {
+    if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
+      final HelpCommand helpCommand = new HelpCommand(getUtilManager());
+      helpCommand.onCommand(sender, cmd, label, args);
+    }
+
+    switch (args[0]) {
+      case "reload":
+      case "rl":
         final ReloadCommand reloadCommand = new ReloadCommand(getPlugin(), getUtilManager());
-        reloadCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("toggle")) {
+        reloadCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "toggle":
         final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
-        toggleCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("ban")) {
+        toggleCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "ban":
         final BanPlayerCommand banPlayerCommand = new BanPlayerCommand(getUtilManager());
-        banPlayerCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("unban")) {
+        banPlayerCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "unban":
         final UnbanPlayerCommand unbanPlayerCommand = new UnbanPlayerCommand(getUtilManager());
-        unbanPlayerCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("setTeam") || args[0].equalsIgnoreCase("st")) {
+        unbanPlayerCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "setTeam":
+      case "st":
         final SetTeamCommand setTeamCommand = new SetTeamCommand(getUtilManager());
-        setTeamCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("unsetTeam") || args[0].equalsIgnoreCase("ut")) {
+        setTeamCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "unsetTeam":
+      case "ut":
         final UnsetTeamCommand unsetTeamCommand = new UnsetTeamCommand(getUtilManager());
-        unsetTeamCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("createTeam") || args[0].equalsIgnoreCase("ct")) {
+        unsetTeamCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "createTeam":
+      case "ct":
         final CreateTeamCommand createTeamCommand = new CreateTeamCommand(getPlugin(), getUtilManager());
-        createTeamCommand.onCommand(sender, command, label, args);
-      } else if (args[0].equalsIgnoreCase("deleteTeam") || args[0].equalsIgnoreCase("dt")) {
+        createTeamCommand.onCommand(sender, cmd, label, args);
+        break;
+      case "deleteTeam":
+      case "dt":
         final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getPlugin(), getUtilManager());
-        deleteTeamCommand.onCommand(sender, command, label, args);
-      } else getLogger().sendMessage(sender, "unknown-command");
+        deleteTeamCommand.onCommand(sender, cmd, label, args);
+        break;
+      default:
+        getLogger().sendMessage(sender, "unknown-command");
     }
     return true;
   }

@@ -19,8 +19,12 @@ public class ReloadCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    getPlugin().reload();
-    getLogger().sendMessage(sender, "reload");
+    if (!sender.hasPermission("leaguemanager.command.reload")) {
+      getLogger().sendMessage(sender, "insufficient-permission");
+    } else {
+      getPlugin().reload();
+      getLogger().sendMessage(sender, "reload");
+    }
     return true;
   }
 }
