@@ -30,7 +30,7 @@ public class CreateTeamCommand implements CommandExecutor {
     if (!sender.hasPermission("leaguemanager.command.createteam")) {
       getLogger().sendMessage(sender, "insufficient-permission");
     } else {
-      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+      if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().sendLongMessage(sender, "team.help");
       } else if (args.length == 3) {
         final String name = args[1], tag = args[2], nameUppercase = name.toUpperCase();

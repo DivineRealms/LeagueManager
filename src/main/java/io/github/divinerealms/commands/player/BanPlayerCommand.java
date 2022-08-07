@@ -29,7 +29,7 @@ public class BanPlayerCommand implements CommandExecutor {
     if (!sender.hasPermission("leaguemanager.command.ban")) {
       getLogger().sendMessage(sender, "insufficient-permission");
     } else {
-      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+      if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().sendLongMessage(sender, "user.help");
       } else if (args.length == 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);

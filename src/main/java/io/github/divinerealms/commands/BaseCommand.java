@@ -27,7 +27,10 @@ public class BaseCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command cmd, String label, String[] args) {
-    if (args.length == 1) {
+    if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
+      final HelpCommand helpCommand = new HelpCommand(getUtilManager());
+      helpCommand.onCommand(sender, cmd, label, args);
+    } else {
       switch (args[0].toLowerCase()) {
         case "reload":
         case "rl":
@@ -69,9 +72,6 @@ public class BaseCommand implements CommandExecutor {
         default:
           getLogger().sendMessage(sender, "unknown-command");
       }
-    } else {
-      final HelpCommand helpCommand = new HelpCommand(getUtilManager());
-      helpCommand.onCommand(sender, cmd, label, args);
     }
     return true;
   }
