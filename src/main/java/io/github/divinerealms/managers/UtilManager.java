@@ -7,9 +7,12 @@ import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
 
 public class UtilManager {
-  @Getter private final Messages messages;
-  @Getter private final Logger logger;
-  @Getter private final Helper helper;
+  @Getter
+  private final Messages messages;
+  @Getter
+  private final Logger logger;
+  @Getter
+  private final Helper helper;
 
   public UtilManager(final LeagueManager plugin) {
     this.messages = new Messages(plugin);

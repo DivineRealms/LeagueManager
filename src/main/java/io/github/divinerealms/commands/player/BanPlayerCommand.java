@@ -7,6 +7,7 @@ import io.github.divinerealms.utils.Time;
 import lombok.Getter;
 import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.node.types.PermissionNode;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -16,8 +17,10 @@ import org.bukkit.command.CommandSender;
 import java.util.concurrent.TimeUnit;
 
 public class BanPlayerCommand implements CommandExecutor {
-  @Getter private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final Helper helper;
+  @Getter
+  private final Logger logger;
 
   public BanPlayerCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();
@@ -31,10 +34,10 @@ public class BanPlayerCommand implements CommandExecutor {
     } else {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().sendLongMessage(sender, "user.help");
-      } else if (args.length == 4) {
+      } else if (args.length >= 4) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
-        final String reason = args[3], permission = "commandwhitelist.bypass.fc";
+        final String permission = "commandwhitelist.bypass.fc", reason = StringUtils.join(args, ' ', 3, args.length);
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().sendMessage(sender, "user.not-found");
@@ -42,9 +45,7 @@ public class BanPlayerCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          final PermissionNode node = PermissionNode.builder(permission).value(false)
-              .expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS)
-              .withContext("server", "football").build();
+          final PermissionNode node = PermissionNode.builder(permission).value(false).expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).withContext("server", "football").build();
 
           getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
             final DataMutateResult result = user.data().add(node);

@@ -12,14 +12,23 @@ import java.util.logging.Level;
 
 @SuppressWarnings({"unused"})
 public class ConfigManager {
-  @Getter private final Plugin plugin;
-  @Getter @Setter private File file;
-  @Getter @Setter private FileConfiguration configuration;
+  @Getter
+  private final Plugin plugin;
+  @Getter
+  @Setter
+  private File file;
+  @Getter
+  @Setter
+  private FileConfiguration configuration;
 
   public ConfigManager(final Plugin plugin, final String name) {
     this.plugin = plugin;
     this.file = new File(plugin.getDataFolder(), name);
     saveDefaultConfig(name);
+  }
+
+  public static String getNotFound(final String path, final String file) {
+    return "&cString \"&e%path%&c\" in \"&4%file%&c\" not found!".replace("%path%", path).replace("%file%", file).replace('&', '\u00a7');
   }
 
   public void reloadConfig(final String name) {
@@ -43,12 +52,5 @@ public class ConfigManager {
     } catch (final IOException exception) {
       getPlugin().getLogger().log(Level.SEVERE, "Could not save file to " + getFile(), exception);
     }
-  }
-
-  public static String getNotFound(final String path, final String file) {
-    return "&cString \"&e%path%&c\" in \"&4%file%&c\" not found!"
-        .replace("%path%", path)
-        .replace("%file%", file)
-        .replace('&', '\u00a7');
   }
 }

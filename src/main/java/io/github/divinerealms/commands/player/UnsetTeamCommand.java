@@ -13,7 +13,8 @@ import org.bukkit.command.CommandSender;
 public class UnsetTeamCommand implements CommandExecutor {
   @Getter
   private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final Logger logger;
 
   public UnsetTeamCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();

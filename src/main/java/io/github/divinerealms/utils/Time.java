@@ -15,10 +15,6 @@ public class Time {
 
   private static final Map<String, Long> unitMultipliers = new HashMap<>();
 
-  private static void addTimeMultiplier(long multiplier, String... keys) {
-    for(String key : keys) unitMultipliers.put(key, multiplier);
-  }
-
   static {
     addTimeMultiplier(1, "ms", "milli", "millis", "millisecond", "milliseconds");
     addTimeMultiplier(TICK_MS, "t", "tick", "ticks");
@@ -36,10 +32,103 @@ public class Time {
   }
 
   private Time(long milliseconds) {
-    if(milliseconds < 0)
-      throw new IllegalArgumentException("Number of milliseconds cannot be less than 0");
+    if (milliseconds < 0) throw new IllegalArgumentException("Number of milliseconds cannot be less than 0");
 
     this.milliseconds = milliseconds;
+  }
+
+  private static void addTimeMultiplier(long multiplier, String... keys) {
+    for (String key : keys) unitMultipliers.put(key, multiplier);
+  }
+
+  public static Time parseString(String timeString) throws TimeParseException {
+    if (timeString == null) throw new IllegalArgumentException("timeString cannot be null");
+
+    if (timeString.isEmpty()) throw new TimeParseException("Empty time string");
+
+    long totalMilliseconds = 0;
+    boolean readingNumber = true;
+
+    StringBuilder number = new StringBuilder();
+    StringBuilder unit = new StringBuilder();
+
+    for (char c : timeString.toCharArray()) {
+      if (c == ' ' || c == ',') {
+        readingNumber = false;
+        continue;
+      }
+
+      if (c == '.' || (c >= '0' && c <= '9')) {
+        if (!readingNumber) {
+          totalMilliseconds += parseTimeComponent(number.toString(), unit.toString());
+
+          number.setLength(0);
+          unit.setLength(0);
+
+          readingNumber = true;
+        }
+
+        number.append(c);
+      } else {
+        readingNumber = false;
+        unit.append(c);
+      }
+    }
+
+    if (readingNumber) {
+      throw new TimeParseException("Number \"" + number + "\" not matched with unit at end of string");
+    } else {
+      totalMilliseconds += parseTimeComponent(number.toString(), unit.toString());
+    }
+
+    return new Time(totalMilliseconds);
+  }
+
+  private static double parseTimeComponent(String magnitudeString, String unit) throws TimeParseException {
+    if (magnitudeString.isEmpty()) throw new TimeParseException("Missing number for unit \"" + unit + "\"");
+
+    long magnitude;
+
+    try {
+      magnitude = Long.parseLong(magnitudeString);
+    } catch (NumberFormatException e) {
+      throw new TimeParseException("Unable to parse number \"" + magnitudeString + "\"", e);
+    }
+
+    unit = unit.toLowerCase();
+
+    if (unit.length() > 3 && unit.endsWith("and")) unit = unit.substring(0, unit.length() - 3);
+
+    Long unitMultiplier = unitMultipliers.get(unit);
+
+    if (unitMultiplier == null) throw new TimeParseException("Unknown time unit \"" + unit + "\"");
+
+    return magnitude * unitMultiplier;
+  }
+
+  private static long appendTime(long time, long unitInMS, String name, StringBuilder builder) {
+    long timeInUnits = (time - (time % unitInMS)) / unitInMS;
+
+    if (timeInUnits > 0) builder.append(", ").append(timeInUnits).append(' ').append(name);
+
+    return time - timeInUnits * unitInMS;
+  }
+
+  public static String toString(long time) {
+    StringBuilder timeString = new StringBuilder();
+
+    time = appendTime(time, YEAR_MS, "years", timeString);
+    time = appendTime(time, DAY_MS, "days", timeString);
+    time = appendTime(time, HOUR_MS, "hours", timeString);
+    time = appendTime(time, MINUTE_MS, "minutes", timeString);
+    time = appendTime(time, SECOND_MS, "seconds", timeString);
+
+    if (timeString.length() == 0) {
+      if (time == 0) return "0 seconds";
+      else return time + " ms";
+    }
+
+    return timeString.substring(2);
   }
 
   public long toMilliseconds() {
@@ -73,97 +162,6 @@ public class Time {
   @Override
   public String toString() {
     return toString(this.milliseconds);
-  }
-
-  public static Time parseString(String timeString) throws TimeParseException {
-    if(timeString == null) throw new IllegalArgumentException("timeString cannot be null");
-
-    if(timeString.isEmpty()) throw new TimeParseException("Empty time string");
-
-    long totalMilliseconds = 0;
-    boolean readingNumber = true;
-
-    StringBuilder number = new StringBuilder();
-    StringBuilder unit = new StringBuilder();
-
-    for (char c : timeString.toCharArray()) {
-      if (c == ' ' || c == ',') {
-        readingNumber = false;
-        continue;
-      }
-
-      if (c == '.' || (c >='0' && c <= '9')) {
-        if (!readingNumber) {
-          totalMilliseconds += parseTimeComponent(number.toString(), unit.toString());
-
-          number.setLength(0);
-          unit.setLength(0);
-
-          readingNumber = true;
-        }
-
-        number.append(c);
-      } else {
-        readingNumber = false;
-        unit.append(c);
-      }
-    }
-
-    if (readingNumber) {
-      throw new TimeParseException("Number \"" + number + "\" not matched with unit at end of string");
-    } else {
-      totalMilliseconds += parseTimeComponent(number.toString(), unit.toString());
-    }
-
-    return new Time(totalMilliseconds);
-  }
-
-  private static double parseTimeComponent(String magnitudeString, String unit) throws TimeParseException {
-    if (magnitudeString.isEmpty()) throw new TimeParseException("Missing number for unit \"" + unit + "\"");
-
-    long magnitude;
-
-    try {
-      magnitude = Long.parseLong(magnitudeString);
-    } catch(NumberFormatException e) {
-      throw new TimeParseException("Unable to parse number \"" + magnitudeString + "\"", e);
-    }
-
-    unit = unit.toLowerCase();
-
-    if (unit.length() > 3 && unit.endsWith("and"))
-      unit = unit.substring(0, unit.length() - 3);
-
-    Long unitMultiplier = unitMultipliers.get(unit);
-
-    if (unitMultiplier == null) throw new TimeParseException("Unknown time unit \"" + unit + "\"");
-
-    return magnitude * unitMultiplier;
-  }
-
-  private static long appendTime(long time, long unitInMS, String name, StringBuilder builder) {
-    long timeInUnits = (time - (time % unitInMS)) / unitInMS;
-
-    if (timeInUnits > 0) builder.append(", ").append(timeInUnits).append(' ').append(name);
-
-    return time - timeInUnits * unitInMS;
-  }
-
-  public static String toString(long time) {
-    StringBuilder timeString = new StringBuilder();
-
-    time = appendTime(time, YEAR_MS, "years", timeString);
-    time = appendTime(time, DAY_MS, "days", timeString);
-    time = appendTime(time, HOUR_MS, "hours", timeString);
-    time = appendTime(time, MINUTE_MS, "minutes", timeString);
-    time = appendTime(time, SECOND_MS, "seconds", timeString);
-
-    if (timeString.length() == 0) {
-      if (time == 0) return "0 seconds";
-      else return time + " ms";
-    }
-
-    return timeString.substring(2);
   }
 
   public static class TimeParseException extends RuntimeException {

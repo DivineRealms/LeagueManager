@@ -11,8 +11,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class SetTeamCommand implements CommandExecutor {
-  @Getter private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final Helper helper;
+  @Getter
+  private final Logger logger;
 
   public SetTeamCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();

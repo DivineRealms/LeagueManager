@@ -15,9 +15,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class CreateTeamCommand implements CommandExecutor {
-  @Getter private final LuckPerms luckPermsAPI;
-  @Getter private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final LuckPerms luckPermsAPI;
+  @Getter
+  private final Helper helper;
+  @Getter
+  private final Logger logger;
 
   public CreateTeamCommand(final LeagueManager plugin, final UtilManager utilManager) {
     this.luckPermsAPI = plugin.getLuckPermsAPI();
@@ -44,8 +47,7 @@ public class CreateTeamCommand implements CommandExecutor {
             if (isBranch) group.data().add(MetaNode.builder("team-b", "&a B").build());
 
             for (final String permission : getHelper().getPermissions()) {
-              final String branch = isBranch ? name.replaceAll("b$", "") : name,
-                  formattedPermission = permission.replace("%team%", branch);
+              final String branch = isBranch ? name.replaceAll("b$", "") : name, formattedPermission = permission.replace("%team%", branch);
               group.data().add(PermissionNode.builder(formattedPermission).build());
             }
 

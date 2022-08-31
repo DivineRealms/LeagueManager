@@ -9,8 +9,12 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class LeagueManager extends JavaPlugin {
-  @Getter @Setter private LuckPerms luckPermsAPI = null;
-  @Getter @Setter private UtilManager utilManager;
+  @Getter
+  @Setter
+  private LuckPerms luckPermsAPI = null;
+  @Getter
+  @Setter
+  private UtilManager utilManager;
 
   @Override
   public void onEnable() {
@@ -39,8 +43,7 @@ public class LeagueManager extends JavaPlugin {
 
   private boolean setupLuckPermsAPI() {
     RegisteredServiceProvider<LuckPerms> lpp = getServer().getServicesManager().getRegistration(LuckPerms.class);
-    if (lpp != null)
-      setLuckPermsAPI(lpp.getProvider());
+    if (lpp != null) setLuckPermsAPI(lpp.getProvider());
     return getLuckPermsAPI() != null;
   }
 }

@@ -15,9 +15,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class BaseCommand implements CommandExecutor {
-  @Getter private final LeagueManager plugin;
-  @Getter private final UtilManager utilManager;
-  @Getter private final Logger logger;
+  @Getter
+  private final LeagueManager plugin;
+  @Getter
+  private final UtilManager utilManager;
+  @Getter
+  private final Logger logger;
 
   public BaseCommand(final LeagueManager plugin, final UtilManager utilManager) {
     this.plugin = plugin;

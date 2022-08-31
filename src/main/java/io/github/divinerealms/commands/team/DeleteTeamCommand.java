@@ -13,9 +13,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class DeleteTeamCommand implements CommandExecutor {
-  @Getter  private final LuckPerms luckPermsAPI;
-  @Getter private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final LuckPerms luckPermsAPI;
+  @Getter
+  private final Helper helper;
+  @Getter
+  private final Logger logger;
 
   public DeleteTeamCommand(final LeagueManager plugin, final UtilManager utilManager) {
     this.luckPermsAPI = plugin.getLuckPermsAPI();

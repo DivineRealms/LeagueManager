@@ -11,8 +11,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class UpdateStatsCommand implements CommandExecutor {
-  @Getter private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final Helper helper;
+  @Getter
+  private final Logger logger;
 
   public UpdateStatsCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();

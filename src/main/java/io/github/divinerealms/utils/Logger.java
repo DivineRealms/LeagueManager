@@ -17,12 +17,19 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class Logger {
-  @Getter private final Server server;
-  @Getter private final PluginDescriptionFile description;
-  @Getter private final List<String> banner = new ArrayList<>();
-  @Getter private final ConsoleCommandSender consoleSender;
-  @Getter private final Messages messages;
-  @Getter @Setter private String prefix;
+  @Getter
+  private final Server server;
+  @Getter
+  private final PluginDescriptionFile description;
+  @Getter
+  private final List<String> banner = new ArrayList<>();
+  @Getter
+  private final ConsoleCommandSender consoleSender;
+  @Getter
+  private final Messages messages;
+  @Getter
+  @Setter
+  private String prefix;
 
   public Logger(final Plugin plugin, final UtilManager utilManager) {
     this.server = plugin.getServer();

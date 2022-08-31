@@ -9,8 +9,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class ReloadCommand implements CommandExecutor {
-  @Getter private final LeagueManager plugin;
-  @Getter private final Logger logger;
+  @Getter
+  private final LeagueManager plugin;
+  @Getter
+  private final Logger logger;
 
   public ReloadCommand(final LeagueManager leagueManager, final UtilManager utilManager) {
     this.plugin = leagueManager;

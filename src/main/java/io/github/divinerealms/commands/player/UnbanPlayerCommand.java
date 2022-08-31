@@ -1,21 +1,23 @@
-  package io.github.divinerealms.commands.player;
+package io.github.divinerealms.commands.player;
 
-  import io.github.divinerealms.managers.UtilManager;
-  import io.github.divinerealms.utils.Helper;
-  import io.github.divinerealms.utils.Logger;
-  import lombok.Getter;
-  import net.luckperms.api.model.data.DataMutateResult;
-  import net.luckperms.api.model.user.User;
-  import net.luckperms.api.node.Node;
-  import org.bukkit.Bukkit;
-  import org.bukkit.OfflinePlayer;
-  import org.bukkit.command.Command;
-  import org.bukkit.command.CommandExecutor;
-  import org.bukkit.command.CommandSender;
+import io.github.divinerealms.managers.UtilManager;
+import io.github.divinerealms.utils.Helper;
+import io.github.divinerealms.utils.Logger;
+import lombok.Getter;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 
 public class UnbanPlayerCommand implements CommandExecutor {
-  @Getter private final Helper helper;
-  @Getter private final Logger logger;
+  @Getter
+  private final Helper helper;
+  @Getter
+  private final Logger logger;
 
   public UnbanPlayerCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();
@@ -48,8 +50,7 @@ public class UnbanPlayerCommand implements CommandExecutor {
 
               if (result.wasSuccessful()) {
                 getLogger().sendMessage(target.getName(), sender, "user.unban");
-                if (target.isOnline())
-                  getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unbanned");
+                if (target.isOnline()) getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unbanned");
               } else getLogger().sendMessage(target.getName(), sender, "user.not-banned");
             });
           } else getLogger().sendMessage(target.getName(), target.getPlayer(), "user.not-banned");

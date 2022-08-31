@@ -16,16 +16,17 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class Helper {
-  @Getter private final LeagueManager plugin;
-  @Getter @Setter private LuckPerms luckPermsAPI;
-  @Getter private final UserManager userManager;
-  @Getter private final GroupManager groupManager;
-  @Getter private final String[] permissions = new String[] {
-      "chatcontrol.channel.%team%", "chatcontrol.channel.send.%team%", "chatcontrol.channel.join.%team%",
-      "chatcontrol.channel.join.%team%.write", "chatcontrol.channel.join.%team%.read",
-      "chatcontrol.channel.autojoin.%team%", "chatcontrol.channel.autojoin.%team%.read",
-      "chatcontrol.channel.leave.%team%", "tab.group.%team%",
-  };
+  @Getter
+  private final LeagueManager plugin;
+  @Getter
+  private final UserManager userManager;
+  @Getter
+  private final GroupManager groupManager;
+  @Getter
+  private final String[] permissions = new String[]{"chatcontrol.channel.%team%", "chatcontrol.channel.send.%team%", "chatcontrol.channel.join.%team%", "chatcontrol.channel.join.%team%.write", "chatcontrol.channel.join.%team%.read", "chatcontrol.channel.autojoin.%team%", "chatcontrol.channel.autojoin.%team%.read", "chatcontrol.channel.leave.%team%", "tab.group.%team%",};
+  @Getter
+  @Setter
+  private LuckPerms luckPermsAPI;
 
   public Helper(final LeagueManager plugin) {
     this.plugin = plugin;
@@ -57,15 +58,13 @@ public class Helper {
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
     final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
     final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console,
-        "lp u " + player.getName() + " parent add " + groupName + " server=football");
+    getPlugin().getServer().dispatchCommand(console, "lp u " + player.getName() + " parent add " + groupName + " server=football");
   }
 
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
     final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
     final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console,
-        "lp u " + player.getName() + " parent remove " + groupName);
+    getPlugin().getServer().dispatchCommand(console, "lp u " + player.getName() + " parent remove " + groupName);
   }
 
   public Group getGroup(final String groupName) {
@@ -78,13 +77,11 @@ public class Helper {
   }
 
   public void groupAddPermission(final String groupName, final String permission) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().add(
-        PermissionNode.builder(permission).withContext("server", "football").build()));
+    getGroupManager().modifyGroup(groupName, group -> group.data().add(PermissionNode.builder(permission).withContext("server", "football").build()));
   }
 
   public void groupRemovePermission(final String groupName, final String permission) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().remove(
-        PermissionNode.builder(permission).withContext("server", "football").build()));
+    getGroupManager().modifyGroup(groupName, group -> group.data().remove(PermissionNode.builder(permission).withContext("server", "football").build()));
   }
 
   public boolean groupExists(final String groupName) {

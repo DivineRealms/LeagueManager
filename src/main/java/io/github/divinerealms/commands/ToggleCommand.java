@@ -9,8 +9,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class ToggleCommand implements CommandExecutor {
-  @Getter private final Logger logger;
-  @Getter private final Helper helper;
+  @Getter
+  private final Logger logger;
+  @Getter
+  private final Helper helper;
 
   public ToggleCommand(final UtilManager utilManager) {
     this.logger = utilManager.getLogger();

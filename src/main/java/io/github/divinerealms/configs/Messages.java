@@ -14,10 +14,16 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 public class Messages extends ConfigManager {
-  @Getter private final String name = "messages.yml";
-  @Getter private final ConsoleCommandSender consoleSender;
-  @Getter @Setter private FileConfiguration messages;
-  @Getter @Setter private String prefix;
+  @Getter
+  private final String name = "messages.yml";
+  @Getter
+  private final ConsoleCommandSender consoleSender;
+  @Getter
+  @Setter
+  private FileConfiguration messages;
+  @Getter
+  @Setter
+  private String prefix;
 
   public Messages(final Plugin plugin) {
     super(plugin, "messages.yml");
@@ -40,46 +46,32 @@ public class Messages extends ConfigManager {
   }
 
   public String colorize(final String path) {
-    final String message = getString(path)
-        .replace("%prefix%", getPrefix());
+    final String message = getString(path).replace("%prefix%", getPrefix());
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
   public String colorizePlayer(final String path, final String playerName) {
-    final String message = getString(path)
-        .replace("%prefix%", getPrefix())
-        .replace("%player%", playerName);
+    final String message = getString(path).replace("%prefix%", getPrefix()).replace("%player%", playerName);
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
   public String colorize(final String playerName, final String path, final String teamTag) {
-    final String message = getString(path)
-        .replace("%prefix%", getPrefix())
-        .replace("%player%", playerName)
-        .replace("%teamTag%", teamTag);
+    final String message = getString(path).replace("%prefix%", getPrefix()).replace("%player%", playerName).replace("%teamTag%", teamTag);
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
   public String colorize(final String path, final String teamTag) {
-    final String message = getString(path)
-        .replace("%prefix%", getPrefix())
-        .replace("%teamTag%", teamTag);
+    final String message = getString(path).replace("%prefix%", getPrefix()).replace("%teamTag%", teamTag);
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
   public String colorize(final String playerName, final String path, final Time time, final String reason) {
-    final String message = getString(path)
-        .replace("%prefix%", getPrefix())
-        .replace("%player%", playerName)
-        .replace("%duration%", String.valueOf(time))
-        .replace("%reason%", reason);
+    final String message = getString(path).replace("%prefix%", getPrefix()).replace("%player%", playerName).replace("%duration%", String.valueOf(time)).replace("%reason%", reason);
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
   public String colorizeState(final String path, final String state) {
-    final String message = getString(path)
-        .replace("%prefix%", getPrefix())
-        .replace("%state%", state);
+    final String message = getString(path).replace("%prefix%", getPrefix()).replace("%state%", state);
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 

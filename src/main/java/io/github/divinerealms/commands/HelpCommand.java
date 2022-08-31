@@ -8,7 +8,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class HelpCommand implements CommandExecutor {
-  @Getter private final Logger logger;
+  @Getter
+  private final Logger logger;
 
   public HelpCommand(final UtilManager utilManager) {
     this.logger = utilManager.getLogger();
