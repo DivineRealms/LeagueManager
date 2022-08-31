@@ -34,7 +34,7 @@ public class BanPlayerCommand implements CommandExecutor {
       } else if (args.length == 4) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
-        final String reason = args[3], permission = "leaguemanager.banned";
+        final String reason = args[3], permission = "commandwhitelist.bypass.fc";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().sendMessage(sender, "user.not-found");
