@@ -8,13 +8,15 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.ConsoleCommandSender;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class Helper {
+  @Getter private final LeagueManager plugin;
   @Getter @Setter private LuckPerms luckPermsAPI;
   @Getter private final UserManager userManager;
   @Getter private final GroupManager groupManager;
@@ -22,10 +24,11 @@ public class Helper {
       "chatcontrol.channel.%team%", "chatcontrol.channel.send.%team%", "chatcontrol.channel.join.%team%",
       "chatcontrol.channel.join.%team%.write", "chatcontrol.channel.join.%team%.read",
       "chatcontrol.channel.autojoin.%team%", "chatcontrol.channel.autojoin.%team%.read",
-      "chatcontrol.channel.leave.%team%",
+      "chatcontrol.channel.leave.%team%", "tab.group.%team%",
   };
 
   public Helper(final LeagueManager plugin) {
+    this.plugin = plugin;
     this.luckPermsAPI = plugin.getLuckPermsAPI();
     this.userManager = getLuckPermsAPI().getUserManager();
     this.groupManager = getLuckPermsAPI().getGroupManager();
@@ -43,23 +46,26 @@ public class Helper {
   }
 
   public void playerRemoveTeams(final UUID uniqueId) {
-    final User user = getPlayer(uniqueId);
+    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
+    final User user = getPlayer(player.getUniqueId());
     for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
       final int weight = 100, groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
-      if (groupWeight == weight) playerRemoveGroup(uniqueId, group.getName());
+      if (groupWeight == weight) playerRemoveGroup(player.getUniqueId(), group.getName());
     }
   }
 
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
-    final Group group = getGroup(groupName);
-    getUserManager().modifyUser(uniqueId, user -> user.data().add(
-        InheritanceNode.builder(group).withContext("server", "football").build()));
+    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
+    final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
+    getPlugin().getServer().dispatchCommand(console,
+        "lp u " + player.getName() + " parent add " + groupName + " server=football");
   }
 
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
-    final Group group = getGroup(groupName);
-    getUserManager().modifyUser(uniqueId, user -> user.data().remove(
-        InheritanceNode.builder(group).withContext("server", "football").build()));
+    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
+    final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
+    getPlugin().getServer().dispatchCommand(console,
+        "lp u " + player.getName() + " parent remove " + groupName);
   }
 
   public Group getGroup(final String groupName) {

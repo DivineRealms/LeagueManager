@@ -67,11 +67,12 @@ public class Messages extends ConfigManager {
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
-  public String colorize(final String playerName, final String path, final Time time) {
+  public String colorize(final String playerName, final String path, final Time time, final String reason) {
     final String message = getString(path)
         .replace("%prefix%", getPrefix())
         .replace("%player%", playerName)
-        .replace("%duration%", String.valueOf(time));
+        .replace("%duration%", String.valueOf(time))
+        .replace("%reason%", reason);
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 

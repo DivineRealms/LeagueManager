@@ -31,10 +31,10 @@ public class BanPlayerCommand implements CommandExecutor {
     } else {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().sendLongMessage(sender, "user.help");
-      } else if (args.length == 3) {
+      } else if (args.length == 4) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
-        final String permission = "commandwhitelist.bypass.fc";
+        final String reason = args[3], permission = "leaguemanager.banned";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().sendMessage(sender, "user.not-found");
@@ -50,9 +50,9 @@ public class BanPlayerCommand implements CommandExecutor {
             final DataMutateResult result = user.data().add(node);
 
             if (result.wasSuccessful()) {
-              getLogger().sendMessage(sender, target.getName(), "user.ban", time);
+              getLogger().sendMessage(sender, target.getName(), "user.ban", time, reason);
               if (target.isOnline())
-                getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time);
+                getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time, reason);
             } else getLogger().sendMessage(target.getName(), sender, "user.already-banned");
           });
         } else getLogger().sendLongMessage(sender, "user.usage.ban");

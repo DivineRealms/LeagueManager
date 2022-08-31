@@ -60,11 +60,11 @@ public class Logger {
     } else getConsoleSender().sendMessage(getMessages().colorizePlayer(path, playerName));
   }
 
-  public void sendMessage(final CommandSender sender, final String playerName, final String path, final Time time) {
+  public void sendMessage(final CommandSender sender, final String playerName, final String path, final Time time, final String reason) {
     if (sender instanceof Player) {
       final Player player = (Player) sender;
-      player.sendMessage(getMessages().colorize(playerName, path, time));
-    } else getConsoleSender().sendMessage(getMessages().colorize(playerName, path, time));
+      player.sendMessage(getMessages().colorize(playerName, path, time, reason));
+    } else getConsoleSender().sendMessage(getMessages().colorize(playerName, path, time, reason));
   }
 
   public void announceState(final String path, final String state) {
