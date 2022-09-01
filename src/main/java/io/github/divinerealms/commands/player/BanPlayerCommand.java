@@ -37,7 +37,7 @@ public class BanPlayerCommand implements CommandExecutor {
       } else if (args.length >= 4) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
-        final String permission = "commandwhitelist.bypass.fc", reason = StringUtils.join(args, ' ', 3, args.length);
+        final String permission = "commandwhitelist.bypass.fc";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().sendMessage(sender, "user.not-found");
@@ -51,9 +51,16 @@ public class BanPlayerCommand implements CommandExecutor {
             final DataMutateResult result = user.data().add(node);
 
             if (result.wasSuccessful()) {
-              getLogger().sendMessage(sender, target.getName(), "user.ban", time, reason);
-              if (target.isOnline())
-                getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time, reason);
+              if (args.length == 4) {
+                getLogger().sendMessage(sender, target.getName(), "user.ban", time);
+                if (target.isOnline())
+                  getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time);
+              } else {
+                final String reason = StringUtils.join(args, ' ', 3, args.length);
+                getLogger().sendMessage(sender, target.getName(), "user.ban", time, reason);
+                if (target.isOnline())
+                  getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time, reason);
+              }
             } else getLogger().sendMessage(target.getName(), sender, "user.already-banned");
           });
         } else getLogger().sendLongMessage(sender, "user.usage.ban");

@@ -58,13 +58,13 @@ public class Helper {
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
     final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
     final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console, "lp u " + player.getName() + " parent add " + groupName + " server=football");
+    getPlugin().getServer().dispatchCommand(console, command(player.getName(), "add", groupName));
   }
 
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
     final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
     final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console, "lp u " + player.getName() + " parent remove " + groupName);
+    getPlugin().getServer().dispatchCommand(console, command(player.getName(), "remove", groupName));
   }
 
   public Group getGroup(final String groupName) {
@@ -86,5 +86,9 @@ public class Helper {
 
   public boolean groupExists(final String groupName) {
     return getGroup(groupName) != null;
+  }
+
+  private String command(final String playerName, final String action, final String groupName) {
+    return String.join(" ", "lp u", playerName, "parent", action, groupName, "server=football");
   }
 }

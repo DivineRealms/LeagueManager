@@ -70,6 +70,11 @@ public class Messages extends ConfigManager {
     return ChatColor.translateAlternateColorCodes('&', message);
   }
 
+  public String colorize(final String playerName, final String path, final Time time) {
+    final String message = getString(path).replace("%prefix%", getPrefix()).replace("%player%", playerName).replace("%duration%", String.valueOf(time));
+    return ChatColor.translateAlternateColorCodes('&', message);
+  }
+
   public String colorizeState(final String path, final String state) {
     final String message = getString(path).replace("%prefix%", getPrefix()).replace("%state%", state);
     return ChatColor.translateAlternateColorCodes('&', message);
