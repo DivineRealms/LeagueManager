@@ -33,9 +33,9 @@ public class BanPlayerCommand implements CommandExecutor {
     if (!sender.hasPermission("leaguemanager.command.ban")) {
       getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
-      if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
+      if (args.length <= 1 || args[1].equalsIgnoreCase("help")) {
         getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
-      } else if (args.length >= 4) {
+      } else if (args.length >= 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
         final String permission = "commandwhitelist.bypass.fc";
@@ -52,7 +52,7 @@ public class BanPlayerCommand implements CommandExecutor {
             final DataMutateResult result = user.data().add(node);
 
             if (result.wasSuccessful()) {
-              if (args.length == 4) {
+              if (args.length == 3) {
                 getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[] { target.getName(), time.toString() }));
                 if (target.isOnline())
                   getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[] { time.toString() }));
