@@ -1,5 +1,5 @@
 name: LeagueManager
-version: 1.0.9
+version: 1.1.0
 author: Neeonn
 depend:
   - LuckPerms
@@ -9,3 +9,5 @@ commands:
   leaguemanager:
     description: Base command.
     aliases: [lm]
+  var:
+    description: Give/Remove VAR access for players.

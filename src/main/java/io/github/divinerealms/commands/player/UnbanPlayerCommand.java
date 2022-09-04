@@ -1,5 +1,6 @@
 package io.github.divinerealms.commands.player;
 
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
@@ -27,16 +28,16 @@ public class UnbanPlayerCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
     if (!sender.hasPermission("leaguemanager.command.unban")) {
-      getLogger().sendMessage(sender, "insufficient-permission");
+      getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
       if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
-        getLogger().sendLongMessage(sender, "user.help");
+        getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
       } else if (args.length == 2) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final String permission = "commandwhitelist.bypass.fc";
 
         if (target == null || !target.hasPlayedBefore()) {
-          getLogger().sendMessage(sender, "user.not-found");
+          getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
           return true;
         }
 
@@ -49,13 +50,16 @@ public class UnbanPlayerCommand implements CommandExecutor {
               final DataMutateResult result = user1.data().remove(node);
 
               if (result.wasSuccessful()) {
-                getLogger().sendMessage(target.getName(), sender, "user.unban");
-                if (target.isOnline()) getLogger().sendMessage(target.getName(), target.getPlayer(), "user.unbanned");
-              } else getLogger().sendMessage(target.getName(), sender, "user.not-banned");
+                getLogger().send(sender, Lang.USER_UNBAN.getConfigValue(new String[]{target.getName()}));
+                if (target.isOnline())
+                  getLogger().send(target.getPlayer(), Lang.USER_UNBANNED.getConfigValue(null));
+              } else
+                getLogger().send(sender, Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
             });
-          } else getLogger().sendMessage(target.getName(), target.getPlayer(), "user.not-banned");
-        } else getLogger().sendLongMessage(sender, "user.usage.unban");
-      } else getLogger().sendLongMessage(sender, "unknown-command");
+          } else
+            getLogger().send(target.getPlayer(), Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
+        } else getLogger().send(sender, Lang.USER_USAGE_UNBAN.getConfigValue(null));
+      } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
     return true;
   }

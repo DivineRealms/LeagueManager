@@ -7,6 +7,7 @@ import io.github.divinerealms.commands.player.UnbanPlayerCommand;
 import io.github.divinerealms.commands.player.UnsetTeamCommand;
 import io.github.divinerealms.commands.team.CreateTeamCommand;
 import io.github.divinerealms.commands.team.DeleteTeamCommand;
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
@@ -41,7 +42,7 @@ public class BaseCommand implements CommandExecutor {
           reloadCommand.onCommand(sender, cmd, label, args);
           break;
         case "toggle":
-          final ToggleCommand toggleCommand = new ToggleCommand(getUtilManager());
+          final ToggleCommand toggleCommand = new ToggleCommand(getPlugin(), getUtilManager());
           toggleCommand.onCommand(sender, cmd, label, args);
           break;
         case "ban":
@@ -73,7 +74,7 @@ public class BaseCommand implements CommandExecutor {
           deleteTeamCommand.onCommand(sender, cmd, label, args);
           break;
         default:
-          getLogger().sendMessage(sender, "unknown-command");
+          getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
       }
     }
     return true;

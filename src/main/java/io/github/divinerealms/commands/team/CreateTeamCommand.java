@@ -1,6 +1,7 @@
 package io.github.divinerealms.commands.team;
 
 import io.github.divinerealms.LeagueManager;
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
@@ -31,31 +32,27 @@ public class CreateTeamCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
     if (!sender.hasPermission("leaguemanager.command.createteam")) {
-      getLogger().sendMessage(sender, "insufficient-permission");
+      getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
-        getLogger().sendLongMessage(sender, "team.help");
+        getLogger().send(sender, Lang.TEAM_HELP.getConfigValue(null));
       } else if (args.length == 3) {
         final String name = args[1], tag = args[2], nameUppercase = name.toUpperCase();
-        final boolean isBranch = name.endsWith("b");
         final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
 
         if (!groupManager.isLoaded(name)) {
           groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
             group.data().add(WeightNode.builder(100).build());
             group.data().add(MetaNode.builder("team", tag).build());
-            if (isBranch) group.data().add(MetaNode.builder("team-b", "&a B").build());
 
-            for (final String permission : getHelper().getPermissions()) {
-              final String branch = isBranch ? name.replaceAll("b$", "") : name, formattedPermission = permission.replace("%team%", branch);
-              group.data().add(PermissionNode.builder(formattedPermission).build());
-            }
+            for (final String permission : getHelper().getPermissions())
+              group.data().add(PermissionNode.builder(permission).build());
 
-            getLogger().sendMessage(sender, "team.created", nameUppercase);
+            getLogger().send(sender, Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}));
             return group;
           }).thenCompose(groupManager::saveGroup);
-        } else getLogger().sendMessage(sender, "team.already-defined", nameUppercase);
-      } else getLogger().sendLongMessage(sender, "team.usage.create");
+        } else getLogger().send(sender, Lang.TEAM_ALREADY_DEFINED.getConfigValue(new String[]{nameUppercase}));
+      } else getLogger().send(sender, Lang.TEAM_USAGE_CREATE.getConfigValue(null));
     }
     return true;
   }

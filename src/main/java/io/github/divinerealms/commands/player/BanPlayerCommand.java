@@ -1,5 +1,6 @@
 package io.github.divinerealms.commands.player;
 
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
@@ -30,17 +31,17 @@ public class BanPlayerCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
     if (!sender.hasPermission("leaguemanager.command.ban")) {
-      getLogger().sendMessage(sender, "insufficient-permission");
+      getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
-        getLogger().sendLongMessage(sender, "user.help");
+        getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
       } else if (args.length >= 4) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
         final String permission = "commandwhitelist.bypass.fc";
 
         if (target == null || !target.hasPlayedBefore()) {
-          getLogger().sendMessage(sender, "user.not-found");
+          getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
           return true;
         }
 
@@ -52,19 +53,20 @@ public class BanPlayerCommand implements CommandExecutor {
 
             if (result.wasSuccessful()) {
               if (args.length == 4) {
-                getLogger().sendMessage(sender, target.getName(), "user.ban", time);
+                getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[] { target.getName(), time.toString() }));
                 if (target.isOnline())
-                  getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time);
+                  getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[] { time.toString() }));
               } else {
                 final String reason = StringUtils.join(args, ' ', 3, args.length);
-                getLogger().sendMessage(sender, target.getName(), "user.ban", time, reason);
+                getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[] { target.getName(), time.toString(), reason }));
                 if (target.isOnline())
-                  getLogger().sendMessage(target.getPlayer(), target.getName(), "user.banned", time, reason);
+                  getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[] { time.toString(), reason }));
               }
-            } else getLogger().sendMessage(target.getName(), sender, "user.already-banned");
+            } else
+              getLogger().send(sender, Lang.USER_ALREADY_BANNED.getConfigValue(new String[] { target.getName() }));
           });
-        } else getLogger().sendLongMessage(sender, "user.usage.ban");
-      } else getLogger().sendLongMessage(sender, "unknown-command");
+        } else getLogger().send(sender, Lang.USER_USAGE_BAN.getConfigValue(null));
+      } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
     return true;
   }

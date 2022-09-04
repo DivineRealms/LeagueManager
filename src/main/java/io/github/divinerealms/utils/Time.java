@@ -31,7 +31,7 @@ public class Time {
     this(TimeUnit.MILLISECONDS.convert(time, timeUnit));
   }
 
-  private Time(long milliseconds) {
+  public Time(long milliseconds) {
     if (milliseconds < 0) throw new IllegalArgumentException("Number of milliseconds cannot be less than 0");
 
     this.milliseconds = milliseconds;

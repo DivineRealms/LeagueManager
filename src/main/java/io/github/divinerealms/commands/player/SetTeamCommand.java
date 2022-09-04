@@ -1,5 +1,6 @@
 package io.github.divinerealms.commands.player;
 
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
@@ -24,29 +25,31 @@ public class SetTeamCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
     if (!sender.hasPermission("leaguemanager.command.setteam")) {
-      getLogger().sendMessage(sender, "insufficient-permission");
+      getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
-        getLogger().sendLongMessage(sender, "user.help");
+        getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
       } else if (args.length == 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final String name = args[2], nameUppercase = name.toUpperCase();
 
         if (target == null || !target.hasPlayedBefore()) {
-          getLogger().sendMessage(sender, "user.not-found");
+          getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
           return true;
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
           if (getHelper().groupExists(name)) {
             if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-              getHelper().playerRemoveTeams(target.getUniqueId());
-              getHelper().playerAddGroup(target.getUniqueId(), name);
-              getLogger().sendMessage(sender, target.getName(), "user.added-to-team", nameUppercase);
-            } else getLogger().sendMessage(sender, target.getName(), "user.already-in-that-team", nameUppercase);
-          } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
-        } else getLogger().sendLongMessage(sender, "user.usage.set");
-      } else getLogger().sendLongMessage(sender, "unknown-command");
+              getHelper().playerRemoveTeams(target.getUniqueId(), "football");
+              getHelper().playerAddGroup(target.getUniqueId(), name, "football");
+              getLogger().send(sender, Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
+            } else
+              getLogger().send(sender, Lang.USER_ALREADY_IN_THAT_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
+          } else
+            getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[] { nameUppercase }));
+        } else getLogger().send(sender, Lang.USER_USAGE_SET.getConfigValue(null));
+      } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
     return true;
   }

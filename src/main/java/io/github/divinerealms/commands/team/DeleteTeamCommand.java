@@ -1,6 +1,7 @@
 package io.github.divinerealms.commands.team;
 
 import io.github.divinerealms.LeagueManager;
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
@@ -29,10 +30,10 @@ public class DeleteTeamCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
     if (!sender.hasPermission("leaguemanager.command.deleteteam")) {
-      getLogger().sendMessage(sender, "insufficient-permission");
+      getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
       if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
-        getLogger().sendLongMessage(sender, "team.help");
+        getLogger().send(sender, Lang.TEAM_HELP.getConfigValue(null));
       } else if (args.length == 2) {
         final String name = args[1], nameUppercase = name.toUpperCase();
         final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
@@ -40,9 +41,9 @@ public class DeleteTeamCommand implements CommandExecutor {
         if (groupManager.isLoaded(name)) {
           final Group group = getHelper().getGroup(name);
           groupManager.deleteGroup(group);
-          getLogger().sendMessage(sender, "team.deleted", nameUppercase);
-        } else getLogger().sendMessage(sender, "team.not-found", nameUppercase);
-      } else getLogger().sendLongMessage(sender, "team.usage.delete");
+          getLogger().send(sender, Lang.TEAM_DELETED.getConfigValue(new String[]{nameUppercase}));
+        } else getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
+      } else getLogger().send(sender, Lang.TEAM_USAGE_DELETE.getConfigValue(null));
     }
     return true;
   }

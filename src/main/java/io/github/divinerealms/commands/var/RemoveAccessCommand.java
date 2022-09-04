@@ -1,4 +1,4 @@
-package io.github.divinerealms.commands.player;
+package io.github.divinerealms.commands.var;
 
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
@@ -11,27 +11,26 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class UnsetTeamCommand implements CommandExecutor {
+public class RemoveAccessCommand implements CommandExecutor {
   @Getter
   private final Helper helper;
   @Getter
   private final Logger logger;
 
-  public UnsetTeamCommand(final UtilManager utilManager) {
+  public RemoveAccessCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();
     this.logger = utilManager.getLogger();
   }
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (!sender.hasPermission("leaguemanager.command.unsetteam")) {
+    if (!sender.hasPermission("leaguemanager.command.var.remove")) {
       getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
-      if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
-        getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
-      } else if (args.length == 3) {
+      if (args.length < 2 || args[1].equalsIgnoreCase("help")) {
+        getLogger().send(sender, Lang.VAR_HELP.getConfigValue(null));
+      } else if (args.length == 2) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-        final String name = args[2], nameUppercase = name.toUpperCase();
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
@@ -39,15 +38,13 @@ public class UnsetTeamCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (getHelper().groupExists(name)) {
-            if (getHelper().playerInGroup(target.getUniqueId(), name)) {
-              getHelper().playerRemoveGroup(target.getUniqueId(), name, "football");
-              getLogger().send(sender, Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
-            } else
-              getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
-          } else
-            getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
-        } else getLogger().send(sender, Lang.USER_USAGE_UNSET.getConfigValue(null));
+          if (getHelper().playerInGroup(target.getUniqueId(), "var")) {
+            getHelper().playerRemoveGroup(target.getUniqueId(), "var", "global");
+            getLogger().send(sender, Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
+          } else {
+            getLogger().send(sender, Lang.VAR_NO_ACCESS.getConfigValue(new String[]{target.getName()}));
+          }
+        } else getLogger().send(sender, Lang.VAR_USAGE_REMOVE.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
     return true;
