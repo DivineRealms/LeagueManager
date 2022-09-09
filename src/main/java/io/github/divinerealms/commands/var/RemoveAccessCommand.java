@@ -39,7 +39,7 @@ public class RemoveAccessCommand implements CommandExecutor {
 
         if (args[1].equalsIgnoreCase(target.getName())) {
           if (getHelper().playerInGroup(target.getUniqueId(), "var")) {
-            getHelper().playerRemoveGroup(target.getUniqueId(), "var", "global");
+            getHelper().playerRemoveTempGroup(target.getUniqueId(), "var", "global");
             getLogger().send(sender, Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
           } else {
             getLogger().send(sender, Lang.VAR_NO_ACCESS.getConfigValue(new String[]{target.getName()}));
