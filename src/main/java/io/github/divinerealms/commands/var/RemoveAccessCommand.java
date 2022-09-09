@@ -5,6 +5,9 @@ import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -38,12 +41,22 @@ public class RemoveAccessCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (getHelper().playerInGroup(target.getUniqueId(), "var")) {
-            getHelper().playerRemoveTempGroup(target.getUniqueId(), "var", "global");
-            getLogger().send(sender, Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
-          } else {
-            getLogger().send(sender, Lang.VAR_NO_ACCESS.getConfigValue(new String[]{target.getName()}));
-          }
+          final User user = getHelper().getPlayer(target.getUniqueId());
+          final Node node = user.getCachedData().getPermissionData().queryPermission("group.var").node();
+
+          if (node != null) {
+            getHelper().getUserManager().modifyUser(target.getUniqueId(), user1 -> {
+              final DataMutateResult result = user1.data().remove(node);
+
+              if (result.wasSuccessful()) {
+                getLogger().send(sender, Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
+                if (target.isOnline())
+                  getLogger().send(target.getPlayer(), Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{"You"}));
+              } else
+                getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
+            });
+          } else
+            getLogger().send(target.getPlayer(), Lang.VAR_NO_ACCESS.getConfigValue(new String[]{target.getName()}));
         } else getLogger().send(sender, Lang.VAR_USAGE_REMOVE.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }

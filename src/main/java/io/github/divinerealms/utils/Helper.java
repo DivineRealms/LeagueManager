@@ -69,22 +69,10 @@ public class Helper {
     getPlugin().getServer().dispatchCommand(console, command(player.getName(), "add", groupName, "server=" + server));
   }
 
-  public void playerAddTempGroup(final UUID uniqueId, final String groupName, final Time time) {
-    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
-    final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console, command(player.getName(), "addtemp", groupName, time));
-  }
-
   public void playerRemoveGroup(final UUID uniqueId, final String groupName, final String server) {
     final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
     final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
     getPlugin().getServer().dispatchCommand(console, command(player.getName(), "remove", groupName, "server=" + server));
-  }
-  
-  public void playerRemoveTempGroup(final UUID uniqueId, final String groupName, final String server) {
-    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
-    final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console, command(player.getName(), "removetemp", groupName, "server=" + server));
   }
   
   public Group getGroup(final String groupName) {

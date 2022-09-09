@@ -6,11 +6,15 @@ import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import io.github.divinerealms.utils.Time;
 import lombok.Getter;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import java.util.concurrent.TimeUnit;
 
 public class GiveAccessCommand implements CommandExecutor {
   @Getter
@@ -39,17 +43,34 @@ public class GiveAccessCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (!getHelper().playerInGroup(target.getUniqueId(), "var")) {
-            if (args.length == 2) {
-              getHelper().playerAddGroup(target.getUniqueId(), "var", "global");
-              getLogger().send(sender, Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
-            } else {
-              final Time time = Time.parseString(args[2]);
-              getHelper().playerAddTempGroup(target.getUniqueId(), "var", time);
-              getLogger().send(sender, Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName(), time.toString()}));
-            }
-          } else
-            getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
+          if (args.length == 2) {
+            final Node node = Node.builder("group.var").build();
+
+            getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+              final DataMutateResult result = user.data().add(node);
+
+              if (result.wasSuccessful()) {
+                getLogger().send(sender, Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
+                if (target.isOnline())
+                  getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{"You"}));
+              } else
+                getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
+            });
+          } else {
+            final Time time = Time.parseString(args[2]);
+            final Node node = Node.builder("group.var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
+
+            getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+              final DataMutateResult result = user.data().add(node);
+
+              if (result.wasSuccessful()) {
+                getLogger().send(sender, Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
+                if (target.isOnline())
+                  getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{"You", time.toString()}));
+              } else
+                getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
+            });
+          }
         } else getLogger().send(sender, Lang.VAR_USAGE_ADD.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
