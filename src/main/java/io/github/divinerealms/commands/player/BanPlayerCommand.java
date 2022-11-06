@@ -53,9 +53,9 @@ public class BanPlayerCommand implements CommandExecutor {
 
             if (result.wasSuccessful()) {
               if (args.length == 3) {
-                getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[] { target.getName(), time.toString() }));
+                getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[] { target.getName(), time.toString(), "Rule Breaking" }));
                 if (target.isOnline())
-                  getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[] { time.toString() }));
+                  getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[] { time.toString(), "Rule Breaking" }));
               } else {
                 final String reason = StringUtils.join(args, ' ', 3, args.length);
                 getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[] { target.getName(), time.toString(), reason }));

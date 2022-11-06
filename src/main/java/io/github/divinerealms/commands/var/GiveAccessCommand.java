@@ -43,33 +43,35 @@ public class GiveAccessCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (args.length == 2) {
-            final Node node = Node.builder("group.var").build();
+          if (!getHelper().playerInGroup(target.getUniqueId(), "group.var")) {
+            if (args.length == 2) {
+              final Node node = Node.builder("group.var").build();
 
-            getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
-              final DataMutateResult result = user.data().add(node);
+              getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+                final DataMutateResult result = user.data().add(node);
 
-              if (result.wasSuccessful()) {
-                getLogger().send(sender, Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
-                if (target.isOnline())
-                  getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{"You"}));
-              } else
-                getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
-            });
-          } else {
-            final Time time = Time.parseString(args[2]);
-            final Node node = Node.builder("group.var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
+                if (result.wasSuccessful()) {
+                  getLogger().send(sender, Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
+                  if (target.isOnline())
+                    getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{"You"}));
+                } else
+                  getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
+              });
+            } else {
+              final Time time = Time.parseString(args[2]);
+              final Node node = Node.builder("group.var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
 
-            getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
-              final DataMutateResult result = user.data().add(node);
+              getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+                final DataMutateResult result = user.data().add(node);
 
-              if (result.wasSuccessful()) {
-                getLogger().send(sender, Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
-                if (target.isOnline())
-                  getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{"You", time.toString()}));
-              } else
-                getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
-            });
+                if (result.wasSuccessful()) {
+                  getLogger().send(sender, Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
+                  if (target.isOnline())
+                    getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{"You", time.toString()}));
+                } else
+                  getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
+              });
+            }
           }
         } else getLogger().send(sender, Lang.VAR_USAGE_ADD.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
