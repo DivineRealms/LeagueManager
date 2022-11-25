@@ -5,6 +5,8 @@ import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import net.luckperms.api.model.data.DataMutateResult;
+import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -40,11 +42,13 @@ public class UnsetTeamCommand implements CommandExecutor {
 
         if (args[1].equalsIgnoreCase(target.getName())) {
           if (getHelper().groupExists(name)) {
-            if (getHelper().playerInGroup(target.getUniqueId(), name)) {
-              getHelper().playerRemoveGroup(target.getUniqueId(), name);
-              getLogger().log(Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
-            } else
-              getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+            getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+              final DataMutateResult result = user.data().remove(InheritanceNode.builder(name).withContext("server", "football").build());
+              if (result.wasSuccessful())
+                getLogger().log(Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+              else
+                getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+            });
           } else
             getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
         } else getLogger().send(sender, Lang.USER_USAGE_UNSET.getConfigValue(null));

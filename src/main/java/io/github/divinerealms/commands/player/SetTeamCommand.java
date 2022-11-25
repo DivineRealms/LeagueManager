@@ -5,6 +5,8 @@ import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.node.types.InheritanceNode;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -41,13 +43,17 @@ public class SetTeamCommand implements CommandExecutor {
         if (args[1].equalsIgnoreCase(target.getName())) {
           if (getHelper().groupExists(name)) {
             if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-              getHelper().playerRemoveTeams(target.getUniqueId());
-              getHelper().playerAddGroup(target.getUniqueId(), name);
-              getLogger().log(Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
+              getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+                for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
+                  final int weight = 100, groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+                  if (groupWeight == weight) user.data().remove(InheritanceNode.builder(group.getName()).withContext("server", "football").build());
+                }
+
+                user.data().add(InheritanceNode.builder(name).withContext("server", "football").build());
+              }).whenComplete((v, th) -> getLogger().log(Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase})));
             } else
-              getLogger().send(sender, Lang.USER_ALREADY_IN_THAT_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
-          } else
-            getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[] { nameUppercase }));
+              getLogger().send(sender, Lang.USER_ALREADY_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+          } else getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
         } else getLogger().send(sender, Lang.USER_USAGE_SET.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
