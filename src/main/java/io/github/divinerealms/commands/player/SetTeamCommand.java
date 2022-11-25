@@ -41,9 +41,9 @@ public class SetTeamCommand implements CommandExecutor {
         if (args[1].equalsIgnoreCase(target.getName())) {
           if (getHelper().groupExists(name)) {
             if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-              getHelper().playerRemoveTeams(target.getUniqueId(), "football");
-              getHelper().playerAddGroup(target.getUniqueId(), name, "football");
-              getLogger().send(sender, Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
+              getHelper().playerRemoveTeams(target.getUniqueId());
+              getHelper().playerAddGroup(target.getUniqueId(), name);
+              getLogger().log(Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
             } else
               getLogger().send(sender, Lang.USER_ALREADY_IN_THAT_TEAM.getConfigValue(new String[] { target.getName(), nameUppercase }));
           } else

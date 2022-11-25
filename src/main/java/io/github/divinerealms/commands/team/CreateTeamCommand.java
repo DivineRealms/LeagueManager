@@ -48,7 +48,7 @@ public class CreateTeamCommand implements CommandExecutor {
             for (final String permission : getHelper().getPermissions())
               group.data().add(PermissionNode.builder(permission).build());
 
-            getLogger().send(sender, Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}));
+            getLogger().log(Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}));
             return group;
           }).thenCompose(groupManager::saveGroup);
         } else getLogger().send(sender, Lang.TEAM_ALREADY_DEFINED.getConfigValue(new String[]{nameUppercase}));

@@ -48,11 +48,9 @@ public class RemoveAccessCommand implements CommandExecutor {
             getHelper().getUserManager().modifyUser(target.getUniqueId(), user1 -> {
               final DataMutateResult result = user1.data().remove(node);
 
-              if (result.wasSuccessful()) {
-                getLogger().send(sender, Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
-                if (target.isOnline())
-                  getLogger().send(target.getPlayer(), Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{"You"}));
-              } else
+              if (result.wasSuccessful())
+                getLogger().log(Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
+              else
                 getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
             });
           } else

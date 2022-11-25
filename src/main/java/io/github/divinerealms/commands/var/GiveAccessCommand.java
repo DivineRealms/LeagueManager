@@ -50,11 +50,9 @@ public class GiveAccessCommand implements CommandExecutor {
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);
 
-                if (result.wasSuccessful()) {
-                  getLogger().send(sender, Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
-                  if (target.isOnline())
-                    getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{"You"}));
-                } else
+                if (result.wasSuccessful())
+                  getLogger().log(Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
+                else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });
             } else {
@@ -64,11 +62,9 @@ public class GiveAccessCommand implements CommandExecutor {
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);
 
-                if (result.wasSuccessful()) {
-                  getLogger().send(sender, Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
-                  if (target.isOnline())
-                    getLogger().send(target.getPlayer(), Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{"You", time.toString()}));
-                } else
+                if (result.wasSuccessful())
+                  getLogger().log(Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
+                else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });
             }

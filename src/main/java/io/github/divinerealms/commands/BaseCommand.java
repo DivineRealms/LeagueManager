@@ -1,10 +1,7 @@
 package io.github.divinerealms.commands;
 
 import io.github.divinerealms.LeagueManager;
-import io.github.divinerealms.commands.player.BanPlayerCommand;
-import io.github.divinerealms.commands.player.SetTeamCommand;
-import io.github.divinerealms.commands.player.UnbanPlayerCommand;
-import io.github.divinerealms.commands.player.UnsetTeamCommand;
+import io.github.divinerealms.commands.player.*;
 import io.github.divinerealms.commands.team.CreateTeamCommand;
 import io.github.divinerealms.commands.team.DeleteTeamCommand;
 import io.github.divinerealms.configs.Lang;
@@ -62,6 +59,16 @@ public class BaseCommand implements CommandExecutor {
         case "ut":
           final UnsetTeamCommand unsetTeamCommand = new UnsetTeamCommand(getUtilManager());
           unsetTeamCommand.onCommand(sender, cmd, label, args);
+          break;
+        case "setmanager":
+        case "sm":
+          final SetManagerCommand setManagerCommand = new SetManagerCommand(getUtilManager());
+          setManagerCommand.onCommand(sender, cmd, label, args);
+          break;
+        case "unsetmanager":
+        case "um":
+          final UnsetManagerCommand unsetManagerCommand = new UnsetManagerCommand(getUtilManager());
+          unsetManagerCommand.onCommand(sender, cmd, label, args);
           break;
         case "createteam":
         case "ct":

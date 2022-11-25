@@ -8,9 +8,8 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.ConsoleCommandSender;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -54,27 +53,34 @@ public class Helper {
     return user.getInheritedGroups(user.getQueryOptions()).contains(group);
   }
 
-  public void playerRemoveTeams(final UUID uniqueId, final String server) {
-    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
-    final User user = getPlayer(player.getUniqueId());
+  public void playerRemoveTeams(final UUID uniqueId) {
+    final User user = getPlayer(uniqueId);
     for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
       final int weight = 100, groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
-      if (groupWeight == weight) playerRemoveGroup(player.getUniqueId(), group.getName(), server);
+      if (groupWeight == weight) playerRemoveGroup(uniqueId, group.getName());
     }
   }
 
-  public void playerAddGroup(final UUID uniqueId, final String groupName, final String server) {
-    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
-    final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console, command(player.getName(), "add", groupName, "server=" + server));
+  public void playerAddGroup(final UUID uniqueId, final String groupName) {
+    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
+    getUserManager().modifyUser(uniqueId, user -> user.data().add(inheritanceNode));
   }
 
-  public void playerRemoveGroup(final UUID uniqueId, final String groupName, final String server) {
-    final OfflinePlayer player = getPlugin().getServer().getOfflinePlayer(uniqueId);
-    final ConsoleCommandSender console = getPlugin().getServer().getConsoleSender();
-    getPlugin().getServer().dispatchCommand(console, command(player.getName(), "remove", groupName, "server=" + server));
+  public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
+    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
+    getUserManager().modifyUser(uniqueId, user -> user.data().remove(inheritanceNode));
   }
-  
+
+  public void playerAddPermission(final UUID uniqueId, final String permission) {
+    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    getUserManager().modifyUser(uniqueId, user -> user.data().add(permissionNode));
+  }
+
+  public void playerRemovePermission(final UUID uniqueId, final String permission) {
+    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    getUserManager().modifyUser(uniqueId, user -> user.data().remove(permissionNode));
+  }
+
   public Group getGroup(final String groupName) {
     return getGroupManager().getGroup(groupName);
   }
@@ -85,22 +91,16 @@ public class Helper {
   }
 
   public void groupAddPermission(final String groupName, final String permission) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().add(PermissionNode.builder(permission).withContext("server", "football").build()));
+    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    getGroupManager().modifyGroup(groupName, group -> group.data().add(permissionNode));
   }
 
   public void groupRemovePermission(final String groupName, final String permission) {
-    getGroupManager().modifyGroup(groupName, group -> group.data().remove(PermissionNode.builder(permission).withContext("server", "football").build()));
+    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    getGroupManager().modifyGroup(groupName, group -> group.data().remove(permissionNode));
   }
 
   public boolean groupExists(final String groupName) {
     return getGroup(groupName) != null;
-  }
-
-  public String command(final String playerName, final String action, final String groupName, final String context) {
-    return String.join(" ", "lp u", playerName, "parent", action, groupName, context);
-  }
-
-  public String command(final String playerName, final String action, final String groupName, final Time time) {
-    return String.join(" ", "lp u", playerName, "parent", action, groupName, String.valueOf(time.toMilliseconds()));
   }
 }

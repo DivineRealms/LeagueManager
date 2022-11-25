@@ -36,6 +36,11 @@ public class Logger {
     else getConsoleSender().sendMessage(message);
   }
 
+  public void log(final String message) {
+    getServer().broadcast(message, "group.fcfa");
+    getConsoleSender().sendMessage(message);
+  }
+
   public void sendBanner() {
     final List<String> authors = getDescription().getAuthors();
     final String formattedAuthors = authors.stream().map(String::valueOf).collect(Collectors.joining(", "));

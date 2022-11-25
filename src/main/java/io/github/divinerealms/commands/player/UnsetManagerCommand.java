@@ -11,27 +11,28 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class UnsetTeamCommand implements CommandExecutor {
+public class UnsetManagerCommand implements CommandExecutor {
   @Getter
   private final Helper helper;
   @Getter
   private final Logger logger;
 
-  public UnsetTeamCommand(final UtilManager utilManager) {
+  public UnsetManagerCommand(final UtilManager utilManager) {
     this.helper = utilManager.getHelper();
     this.logger = utilManager.getLogger();
   }
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (!sender.hasPermission("leaguemanager.command.unsetteam")) {
+    if (!sender.hasPermission("leaguemanager.command.unsetmanager")) {
       getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
       } else if (args.length == 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-        final String name = args[2], nameUppercase = name.toUpperCase();
+        final String name = args[2], nameUppercase = name.toUpperCase(),
+            permission = "tab.group." + name + "-director";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
@@ -39,15 +40,16 @@ public class UnsetTeamCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (getHelper().groupExists(name)) {
-            if (getHelper().playerInGroup(target.getUniqueId(), name)) {
-              getHelper().playerRemoveGroup(target.getUniqueId(), name);
-              getLogger().log(Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+          if (getHelper().groupExists("director")) {
+            if (getHelper().playerInGroup(target.getUniqueId(), "director")) {
+              getHelper().playerRemovePermission(target.getUniqueId(), permission);
+              getHelper().playerRemoveGroup(target.getUniqueId(), "director");
+              getLogger().log(Lang.USER_UNSET_MANAGER.getConfigValue(new String[]{target.getName(), nameUppercase}));
             } else
-              getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+              getLogger().send(sender, Lang.USER_NOT_MANAGER.getConfigValue(new String[]{target.getName(), nameUppercase}));
           } else
             getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
-        } else getLogger().send(sender, Lang.USER_USAGE_UNSET.getConfigValue(null));
+        } else getLogger().send(sender, Lang.USER_USAGE_UNSET_MANAGER.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }
     return true;
