@@ -45,8 +45,10 @@ public class CreateTeamCommand implements CommandExecutor {
             group.data().add(WeightNode.builder(100).build());
             group.data().add(MetaNode.builder("team", tag).build());
 
-            for (final String permission : getHelper().getPermissions())
-              group.data().add(PermissionNode.builder(permission).build());
+            for (String permission : getHelper().getPermissions()) {
+              permission = permission.replace("%team%", tag);
+              group.data().add(PermissionNode.builder(permission).withContext("server", "football").build());
+            }
 
             getLogger().log(Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}));
             return group;
