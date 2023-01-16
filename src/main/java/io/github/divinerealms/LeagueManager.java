@@ -1,9 +1,9 @@
 package io.github.divinerealms;
 
 import io.github.divinerealms.commands.BaseCommand;
-import io.github.divinerealms.commands.VARCommand;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.ConfigManager;
+import io.github.divinerealms.managers.ListenerManager;
 import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +20,9 @@ public class LeagueManager extends JavaPlugin {
   @Getter
   @Setter
   private UtilManager utilManager;
+  @Getter
+  @Setter
+  private ListenerManager listenerManager;
 
   @Override
   public void onEnable() {
@@ -32,6 +35,7 @@ public class LeagueManager extends JavaPlugin {
     }
 
     setUtilManager(new UtilManager(this));
+    setListenerManager(new ListenerManager(this, getUtilManager()));
     getUtilManager().getLogger().sendBanner();
     getLogger().info("Loading commands...");
     setup();
@@ -39,9 +43,16 @@ public class LeagueManager extends JavaPlugin {
     getLogger().info("Successfully enabled!");
   }
 
+  @Override
+  public void onDisable() {
+    getListenerManager().unregisterListeners();
+  }
+
   public void setup() {
     getCommand("leagueManager").setExecutor(new BaseCommand(this, getUtilManager()));
-    getCommand("var").setExecutor(new VARCommand(this, getUtilManager()));
+
+    if (getListenerManager().isRegistered()) getListenerManager().unregisterListeners();
+    getListenerManager().registerListeners();
   }
 
   private boolean setupLuckPermsAPI() {

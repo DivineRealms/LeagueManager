@@ -90,8 +90,8 @@ public class Helper {
     return group.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
   }
 
-  public void groupAddPermission(final String groupName, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+  public void groupAddPermission(final String groupName, final String permission, final boolean toggle) {
+    final PermissionNode permissionNode = PermissionNode.builder(permission).value(toggle).withContext("server", "football").build();
     getGroupManager().modifyGroup(groupName, group -> group.data().add(permissionNode));
   }
 

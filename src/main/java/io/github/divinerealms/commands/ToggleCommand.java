@@ -32,10 +32,10 @@ public class ToggleCommand implements CommandExecutor {
       String groupName = "default", permission = "commandwhitelist.bypass.fc", state;
       if (getHelper().groupHasPermission(groupName, permission)) {
         state = "off";
-        getHelper().groupRemovePermission(groupName, permission);
+        getHelper().groupAddPermission(groupName, permission, false);
       } else {
         state = "on";
-        getHelper().groupAddPermission(groupName, permission);
+        getHelper().groupAddPermission(groupName, permission, true);
       }
       getPlugin().getServer().broadcastMessage(Lang.TOGGLE.getConfigValue(new String[]{state}));
     }

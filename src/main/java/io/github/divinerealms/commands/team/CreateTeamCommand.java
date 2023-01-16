@@ -40,7 +40,7 @@ public class CreateTeamCommand implements CommandExecutor {
         final String name = args[1], tag = args[2], nameUppercase = name.toUpperCase();
         final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
 
-        if (!groupManager.isLoaded(name)) {
+        if (!groupManager.isLoaded(name.toLowerCase())) {
           groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
             group.data().add(WeightNode.builder(100).withContext("server", "football").build());
             group.data().add(MetaNode.builder("team", tag).withContext("server", "football").build());

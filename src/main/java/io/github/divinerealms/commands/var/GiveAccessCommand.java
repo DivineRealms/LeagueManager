@@ -43,9 +43,9 @@ public class GiveAccessCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (!getHelper().playerInGroup(target.getUniqueId(), "group.var")) {
+          if (!getHelper().playerInGroup(target.getUniqueId(), "group._var")) {
             if (args.length == 2) {
-              final Node node = Node.builder("group.var").build();
+              final Node node = Node.builder("group._var").build();
 
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);
@@ -57,7 +57,7 @@ public class GiveAccessCommand implements CommandExecutor {
               });
             } else {
               final Time time = Time.parseString(args[2]);
-              final Node node = Node.builder("group.var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
+              final Node node = Node.builder("group._var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
 
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);

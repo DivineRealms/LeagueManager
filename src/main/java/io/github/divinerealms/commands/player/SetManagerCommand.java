@@ -32,7 +32,7 @@ public class SetManagerCommand implements CommandExecutor {
       } else if (args.length == 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final String name = args[2], nameUppercase = name.toUpperCase(),
-            permission = "tab.group." + name + "-director";
+            permission = "tab.group." + name.toLowerCase() + "-director";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));

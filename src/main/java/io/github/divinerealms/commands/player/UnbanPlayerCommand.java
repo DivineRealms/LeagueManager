@@ -34,7 +34,7 @@ public class UnbanPlayerCommand implements CommandExecutor {
         getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
       } else if (args.length == 2) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-        final String permission = "commandwhitelist.bypass.fc";
+        final String permission = "footcube.banned";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));

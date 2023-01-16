@@ -1,6 +1,7 @@
 package io.github.divinerealms.managers;
 
 import io.github.divinerealms.LeagueManager;
+import io.github.divinerealms.listeners.ChatListener;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;

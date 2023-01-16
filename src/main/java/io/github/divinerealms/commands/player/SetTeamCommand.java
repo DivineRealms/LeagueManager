@@ -41,15 +41,15 @@ public class SetTeamCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (getHelper().groupExists(name)) {
-            if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
+          if (getHelper().groupExists(name.toLowerCase())) {
+            if (!getHelper().playerInGroup(target.getUniqueId(), name.toLowerCase())) {
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
                   final int weight = 100, groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
                   if (groupWeight == weight) user.data().remove(InheritanceNode.builder(group.getName()).withContext("server", "football").build());
                 }
 
-                user.data().add(InheritanceNode.builder(name).withContext("server", "football").build());
+                user.data().add(InheritanceNode.builder(name.toLowerCase()).withContext("server", "football").build());
               }).whenComplete((v, th) -> getLogger().log(Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase})));
             } else
               getLogger().send(sender, Lang.USER_ALREADY_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));

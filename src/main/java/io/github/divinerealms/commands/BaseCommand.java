@@ -4,6 +4,8 @@ import io.github.divinerealms.LeagueManager;
 import io.github.divinerealms.commands.player.*;
 import io.github.divinerealms.commands.team.CreateTeamCommand;
 import io.github.divinerealms.commands.team.DeleteTeamCommand;
+import io.github.divinerealms.commands.var.GiveAccessCommand;
+import io.github.divinerealms.commands.var.RemoveAccessCommand;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
@@ -79,6 +81,16 @@ public class BaseCommand implements CommandExecutor {
         case "dt":
           final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getPlugin(), getUtilManager());
           deleteTeamCommand.onCommand(sender, cmd, label, args);
+          break;
+        case "varadd":
+        case "va":
+          final GiveAccessCommand giveAccessCommand = new GiveAccessCommand(getUtilManager());
+          giveAccessCommand.onCommand(sender, cmd, label, args);
+          break;
+        case "varremove":
+        case "vr":
+          final RemoveAccessCommand removeAccessCommand = new RemoveAccessCommand(getUtilManager());
+          removeAccessCommand.onCommand(sender, cmd, label, args);
           break;
         default:
           getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));

@@ -41,9 +41,9 @@ public class UnsetTeamCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (getHelper().groupExists(name)) {
+          if (getHelper().groupExists(name.toLowerCase())) {
             getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
-              final DataMutateResult result = user.data().remove(InheritanceNode.builder(name).withContext("server", "football").build());
+              final DataMutateResult result = user.data().remove(InheritanceNode.builder(name.toLowerCase()).withContext("server", "football").build());
               if (result.wasSuccessful())
                 getLogger().log(Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
               else

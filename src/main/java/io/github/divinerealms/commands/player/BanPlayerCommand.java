@@ -38,7 +38,7 @@ public class BanPlayerCommand implements CommandExecutor {
       } else if (args.length >= 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
         final Time time = Time.parseString(args[2]);
-        final String permission = "commandwhitelist.bypass.fc";
+        final String permission = "footcube.banned";
 
         if (target == null || !target.hasPlayedBefore()) {
           getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
@@ -46,7 +46,7 @@ public class BanPlayerCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          final PermissionNode node = PermissionNode.builder(permission).value(false).expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).withContext("server", "football").build();
+          final PermissionNode node = PermissionNode.builder(permission).value(true).expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).withContext("server", "football").build();
 
           getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
             final DataMutateResult result = user.data().add(node);
