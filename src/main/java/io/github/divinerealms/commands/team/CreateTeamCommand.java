@@ -42,11 +42,11 @@ public class CreateTeamCommand implements CommandExecutor {
 
         if (!groupManager.isLoaded(name)) {
           groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
-            group.data().add(WeightNode.builder(100).build());
-            group.data().add(MetaNode.builder("team", tag).build());
+            group.data().add(WeightNode.builder(100).withContext("server", "football").build());
+            group.data().add(MetaNode.builder("team", tag).withContext("server", "football").build());
 
             for (String permission : getHelper().getPermissions()) {
-              permission = permission.replace("%team%", tag);
+              permission = permission.replace("%team%", name.toLowerCase());
               group.data().add(PermissionNode.builder(permission).withContext("server", "football").build());
             }
 
