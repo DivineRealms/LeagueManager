@@ -13,10 +13,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class SetTeamCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public SetTeamCommand(final UtilManager utilManager) {
@@ -50,7 +49,7 @@ public class SetTeamCommand implements CommandExecutor {
                 }
 
                 user.data().add(InheritanceNode.builder(name.toLowerCase()).withContext("server", "football").build());
-              }).whenComplete((v, th) -> getLogger().log(Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase})));
+              }).whenComplete((v, th) -> getLogger().log(Lang.USER_ADDED_TO_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}), "fcfa"));
             } else
               getLogger().send(sender, Lang.USER_ALREADY_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
           } else getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));

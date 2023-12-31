@@ -8,20 +8,20 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
+import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@Getter
 public class Helper {
-  @Getter
   private final LeagueManager plugin;
-  @Getter
   private final UserManager userManager;
-  @Getter
   private final GroupManager groupManager;
-  @Getter
   private final String[] permissions = new String[]{"chatcontrol.channel.%team%",
       "chatcontrol.channel.send.%team%",
       "chatcontrol.channel.join.%team%",
@@ -31,7 +31,6 @@ public class Helper {
       "chatcontrol.channel.autojoin.%team%.read",
       "chatcontrol.channel.leave.%team%",
       "tab.group.%team%"};
-  @Getter
   @Setter
   private LuckPerms luckPermsAPI;
 
@@ -45,6 +44,13 @@ public class Helper {
   public User getPlayer(final UUID uniqueId) {
     final CompletableFuture<User> userFuture = getUserManager().loadUser(uniqueId);
     return userFuture.join();
+  }
+
+  public Duration getPermissionExpireTime(final UUID uniqueId, final String permission) {
+    final User user = getPlayer(uniqueId);
+    final Node node = user.getCachedData().getPermissionData().queryPermission(permission).node();
+    assert node != null;
+    return node.getExpiryDuration();
   }
 
   public boolean playerInGroup(final UUID uniqueId, final String groupName) {

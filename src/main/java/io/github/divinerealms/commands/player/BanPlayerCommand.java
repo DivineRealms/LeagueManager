@@ -15,12 +15,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.time.format.DateTimeParseException;
 import java.util.concurrent.TimeUnit;
 
+@Getter
 public class BanPlayerCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public BanPlayerCommand(final UtilManager utilManager) {
@@ -37,7 +37,15 @@ public class BanPlayerCommand implements CommandExecutor {
         getLogger().send(sender, Lang.USER_HELP.getConfigValue(null));
       } else if (args.length >= 3) {
         final OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-        final Time time = Time.parseString(args[2]);
+        Time time;
+
+        try {
+          time = Time.parseString(args[2]);
+        } catch (Time.TimeParseException | NullPointerException e) {
+          getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
+          return true;
+        }
+
         final String permission = "footcube.banned";
 
         if (target == null || !target.hasPlayedBefore()) {

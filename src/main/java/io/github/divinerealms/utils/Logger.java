@@ -14,15 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 @SuppressWarnings("unused")
 public class Logger {
-  @Getter
   private final Server server;
-  @Getter
   private final PluginDescriptionFile description;
-  @Getter
   private final List<String> banner = new ArrayList<>();
-  @Getter
   private final ConsoleCommandSender consoleSender;
 
   public Logger(final Plugin plugin, final UtilManager utilManager) {
@@ -36,8 +33,8 @@ public class Logger {
     else getConsoleSender().sendMessage(message);
   }
 
-  public void log(final String message) {
-    getServer().broadcast(message, "group.fcfa");
+  public void log(final String message, final String rank) {
+    getServer().broadcast(message, "group." + rank);
     getConsoleSender().sendMessage(message);
   }
 

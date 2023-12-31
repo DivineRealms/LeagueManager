@@ -16,10 +16,9 @@ import org.bukkit.command.CommandSender;
 
 import java.util.concurrent.TimeUnit;
 
+@Getter
 public class GiveAccessCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public GiveAccessCommand(final UtilManager utilManager) {
@@ -51,19 +50,27 @@ public class GiveAccessCommand implements CommandExecutor {
                 final DataMutateResult result = user.data().add(node);
 
                 if (result.wasSuccessful())
-                  getLogger().log(Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
+                  getLogger().log(Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}), "fcfa");
                 else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });
             } else {
-              final Time time = Time.parseString(args[2]);
+              Time time;
+
+              try {
+                time = Time.parseString(args[2]);
+              } catch (Time.TimeParseException | NullPointerException e) {
+                getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
+                return true;
+              }
+
               final Node node = Node.builder("group._var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
 
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);
 
                 if (result.wasSuccessful())
-                  getLogger().log(Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
+                  getLogger().log(Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}), "fcfa");
                 else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });

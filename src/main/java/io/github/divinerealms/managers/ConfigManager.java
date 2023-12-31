@@ -10,47 +10,45 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 public class ConfigManager {
-  @Getter
-  private final JavaPlugin plugin;
-  private final String folderName, fileName;
+  @Getter private final JavaPlugin plugin;
+  private final String folderName;
   private FileConfiguration config;
   private File configFile;
 
-  public ConfigManager(final JavaPlugin plugin, final String folderName, final String fileName) {
+  public ConfigManager(final JavaPlugin plugin, final String folderName) {
     this.plugin = plugin;
     this.folderName = folderName;
-    this.fileName = fileName;
   }
 
-  public void createNewFile(final String message, final String header) {
-    reloadConfig();
-    saveConfig();
-    loadConfig(header);
+  public void createNewFile(final String name, final String message, final String header) {
+    reloadConfig(name);
+    saveConfig(name);
+    loadConfig(name, header);
 
     if (message != null) getPlugin().getLogger().info(message);
   }
 
-  public FileConfiguration getConfig() {
-    if (config == null) reloadConfig();
+  public FileConfiguration getConfig(final String name) {
+    if (config == null) reloadConfig(name);
     return config;
   }
 
-  public void loadConfig(final String header) {
+  public void loadConfig(final String header, final String name) {
     config.options().header(header);
     config.options().copyDefaults(true);
-    saveConfig();
+    saveConfig(name);
   }
 
-  public void reloadConfig() {
-    if (configFile == null) configFile = new File(plugin.getDataFolder() + folderName, fileName);
+  public void reloadConfig(final String name) {
+    if (configFile == null) configFile = new File(plugin.getDataFolder() + folderName, name);
     config = YamlConfiguration.loadConfiguration(configFile);
   }
 
-  public void saveConfig() {
+  public void saveConfig(final String name) {
     if (config == null || configFile == null) return;
 
     try {
-      getConfig().save(configFile);
+      getConfig(name).save(configFile);
     } catch (final IOException exception) {
       plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, exception);
     }

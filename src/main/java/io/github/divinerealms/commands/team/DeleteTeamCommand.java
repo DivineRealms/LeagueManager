@@ -13,12 +13,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class DeleteTeamCommand implements CommandExecutor {
-  @Getter
   private final LuckPerms luckPermsAPI;
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public DeleteTeamCommand(final LeagueManager plugin, final UtilManager utilManager) {
@@ -41,7 +39,7 @@ public class DeleteTeamCommand implements CommandExecutor {
         if (groupManager.isLoaded(name.toLowerCase())) {
           final Group group = getHelper().getGroup(name.toLowerCase());
           groupManager.deleteGroup(group);
-          getLogger().log(Lang.TEAM_DELETED.getConfigValue(new String[]{nameUppercase}));
+          getLogger().log(Lang.TEAM_DELETED.getConfigValue(new String[]{nameUppercase}), "fcfa");
         } else getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
       } else getLogger().send(sender, Lang.TEAM_USAGE_DELETE.getConfigValue(null));
     }

@@ -14,12 +14,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class BaseCommand implements CommandExecutor {
-  @Getter
   private final LeagueManager plugin;
-  @Getter
   private final UtilManager utilManager;
-  @Getter
   private final Logger logger;
 
   public BaseCommand(final LeagueManager plugin, final UtilManager utilManager) {
@@ -91,6 +89,10 @@ public class BaseCommand implements CommandExecutor {
         case "vr":
           final RemoveAccessCommand removeAccessCommand = new RemoveAccessCommand(getUtilManager());
           removeAccessCommand.onCommand(sender, cmd, label, args);
+          break;
+        case "timer":
+          final TimerCommand timerCommand = new TimerCommand(plugin, getUtilManager());
+          timerCommand.onCommand(sender, cmd, label, args);
           break;
         default:
           getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));

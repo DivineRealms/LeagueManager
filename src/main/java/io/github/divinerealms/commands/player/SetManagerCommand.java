@@ -11,10 +11,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class SetManagerCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public SetManagerCommand(final UtilManager utilManager) {
@@ -44,7 +43,7 @@ public class SetManagerCommand implements CommandExecutor {
             if (!getHelper().playerInGroup(target.getUniqueId(), "director")) {
               getHelper().playerAddPermission(target.getUniqueId(), permission);
               getHelper().playerAddGroup(target.getUniqueId(), "director");
-              getLogger().log(Lang.USER_SET_MANAGER.getConfigValue(new String[] { target.getName(), nameUppercase }));
+              getLogger().log(Lang.USER_SET_MANAGER.getConfigValue(new String[] { target.getName(), nameUppercase }), "fcfa");
             } else
               getLogger().send(sender, Lang.USER_ALREADY_MANAGER.getConfigValue(new String[] { target.getName(), nameUppercase }));
           } else

@@ -11,23 +11,16 @@ import net.luckperms.api.LuckPerms;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@Getter
 public class LeagueManager extends JavaPlugin {
-  @Getter
-  private final ConfigManager messagesFile = new ConfigManager(this, "", "messages.yml");
-  @Getter
-  @Setter
-  private LuckPerms luckPermsAPI = null;
-  @Getter
-  @Setter
-  private UtilManager utilManager;
-  @Getter
-  @Setter
-  private ListenerManager listenerManager;
+  private final ConfigManager messagesFile = new ConfigManager(this, "");
+  @Setter private LuckPerms luckPermsAPI = null;
+  @Setter private UtilManager utilManager;
+  @Setter private ListenerManager listenerManager;
 
   @Override
   public void onEnable() {
-    getMessagesFile().createNewFile("Loading messages.yml", "LeagueManager Messages");
-    loadMessages();
+    setupMessages();
 
     if (!setupLuckPermsAPI()) {
       getLogger().info("&cDisabled due to no LuckPerms dependency found!");
@@ -36,6 +29,7 @@ public class LeagueManager extends JavaPlugin {
 
     setUtilManager(new UtilManager(this));
     setListenerManager(new ListenerManager(this, getUtilManager()));
+    getUtilManager().reloadUtils();
     getUtilManager().getLogger().sendBanner();
     getLogger().info("Loading commands...");
     setup();
@@ -53,6 +47,13 @@ public class LeagueManager extends JavaPlugin {
 
     if (getListenerManager().isRegistered()) getListenerManager().unregisterListeners();
     getListenerManager().registerListeners();
+
+    getServer().getScheduler().runTaskTimer(this, getUtilManager().getLineChecker(), 20L, 1L);
+  }
+
+  public void setupMessages() {
+    getMessagesFile().createNewFile("messages.yml", "Loading messages.yml", "LeagueManager Messages");
+    loadMessages();
   }
 
   private boolean setupLuckPermsAPI() {
@@ -62,12 +63,12 @@ public class LeagueManager extends JavaPlugin {
   }
 
   private void loadMessages() {
-    Lang.setFile(getMessagesFile().getConfig());
+    Lang.setFile(getMessagesFile().getConfig("libs/messages.yml"));
 
     for (final Lang value : Lang.values())
-      getMessagesFile().getConfig().addDefault(value.getPath(), value.getDefault());
+      getMessagesFile().getConfig("libs/messages.yml").addDefault(value.getPath(), value.getDefault());
 
-    getMessagesFile().getConfig().options().copyDefaults(true);
-    getMessagesFile().saveConfig();
+    getMessagesFile().getConfig("libs/messages.yml").options().copyDefaults(true);
+    getMessagesFile().saveConfig("libs/messages.yml");
   }
 }

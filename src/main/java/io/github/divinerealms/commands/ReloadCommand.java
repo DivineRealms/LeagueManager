@@ -9,10 +9,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class ReloadCommand implements CommandExecutor {
-  @Getter
   private final LeagueManager plugin;
-  @Getter
   private final Logger logger;
 
   public ReloadCommand(final LeagueManager leagueManager, final UtilManager utilManager) {
@@ -25,6 +24,7 @@ public class ReloadCommand implements CommandExecutor {
     if (!sender.hasPermission("leaguemanager.command.reload")) {
       getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
+      getPlugin().setupMessages();
       getPlugin().setup();
       getLogger().send(sender, Lang.RELOAD.getConfigValue(null));
     }

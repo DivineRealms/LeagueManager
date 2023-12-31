@@ -13,10 +13,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class UnsetTeamCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public UnsetTeamCommand(final UtilManager utilManager) {
@@ -45,7 +44,7 @@ public class UnsetTeamCommand implements CommandExecutor {
             getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
               final DataMutateResult result = user.data().remove(InheritanceNode.builder(name.toLowerCase()).withContext("server", "football").build());
               if (result.wasSuccessful())
-                getLogger().log(Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
+                getLogger().log(Lang.USER_REMOVED_FROM_A_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}), "fcfa");
               else
                 getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), nameUppercase}));
             });

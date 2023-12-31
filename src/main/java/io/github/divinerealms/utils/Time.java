@@ -60,7 +60,7 @@ public class Time {
 
       if (c == '.' || (c >= '0' && c <= '9')) {
         if (!readingNumber) {
-          totalMilliseconds += parseTimeComponent(number.toString(), unit.toString());
+          totalMilliseconds += (long) parseTimeComponent(number.toString(), unit.toString());
 
           number.setLength(0);
           unit.setLength(0);
@@ -78,7 +78,7 @@ public class Time {
     if (readingNumber) {
       throw new TimeParseException("Number \"" + number + "\" not matched with unit at end of string");
     } else {
-      totalMilliseconds += parseTimeComponent(number.toString(), unit.toString());
+      totalMilliseconds += (long) parseTimeComponent(number.toString(), unit.toString());
     }
 
     return new Time(totalMilliseconds);

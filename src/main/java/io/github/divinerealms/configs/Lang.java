@@ -1,15 +1,18 @@
 package io.github.divinerealms.configs;
 
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
+@Getter
 public enum Lang {
   RELOAD("reload", "&a▎ &fPlugin reloaded!"),
   UNKNOWN_COMMAND("unknown-command", "&4▎ &cUnknown command."),
   INSUFFICIENT_PERMISSION("insufficient-permission", "&4▎ &cInsufficient permission."),
   INGAME_ONLY("ingame-only", "&4▎ &cThis command can be used only in game."),
-  TOGGLE("toggle", "&a▎ &fFootCube toggled &e{0}&f."),
+  TOGGLE("toggle", "&a▎ &fFootcube toggled &e{0} &fby &b{1}&f."),
   FOOTCUBE_DISABLED("footcube-disabled", "&4▎ &cFootcube is currently disabled."),
+  INVALID_TIME("invalid-time", "&4▎ &cYour time argument is invalid."),
   HELP("help", String.join(System.getProperty("line.separator"),
       "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r",
       "&d &lLeague&e&lManager &7- &rHelp command.",
@@ -75,7 +78,9 @@ public enum Lang {
   USER_ALREADY_MANAGER("user.already-manager", "&4▎ &cPlayer &b{0} &cis already a manager of the &e{1} &cteam!"),
   USER_BAN("user.ban", "&a▎ &fPlayer &b{0} &fhas been successfully banned for &e{1}&f for '&4{2}&f'!"),
   USER_BANNED("user.banned", "&4▎ &cYou have been banned from FC for &e{0} &cfor '&4{1}&c'!"),
-  USER_STILL_BANNED("user.still-banned", "&4▎ &cYou are banned from FC!"),
+  USER_STILL_BANNED("user.still-banned", String.join(System.getProperty("line.separator"),
+      "&4▎ &cYou are banned from FC!",
+      "&4▎ &cYour ban will expire in: &e{0}&c.")),
   USER_UNBAN("user.unban", "&a▎ &fPlayer &b{0} &fhas been successfully unbanned!"),
   USER_UNBANNED("user.unbanned", "&8▎ &aYou've been unbanned from FC!"),
   USER_NOT_BANNED("user.not-banned", "&4▎ &cPlayer &b{0} &cis not banned from FC!"),
@@ -140,7 +145,25 @@ public enum Lang {
       "&7   - &fGive access to VAR.",
       "&6 /&elm varremove&6|&evr &2<&aplayer-name&2>",
       "&7   - &fRemove access to VAR.",
-      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"));
+      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
+  TIMER_HELP("timer.help", String.join(System.getProperty("line.separator"),
+          "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r",
+          "&d &lLeague&e&lManager &7- &rTimer Commands.",
+          "&r &r",
+          "&6 /&elm timer add &2<&aHH:MM:SS&2> <&aID&2> <&aprefix&2>",
+          "&6 /&elm timer remove &2<&aID&2>",
+          "&6 /&elm timer pause &2<&aID&2>",
+          "&6 /&elm timer resume &2<&aID&2>",
+          "&6 /&elm timer reset &2<&aID&2>",
+          "&6 /&elm timer list",
+          "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
+  TIMER_ADD("timer.add", "&a▎ &fSuccessfully started timer with id &e{0}&f."),
+  TIMER_REMOVE("timer.remove", "&a▎ &fSuccessfully removed timer with id &e{0}&f."),
+  TIMER_PAUSE("timer.pause", "&a▎ &fSuccessfully paused timer with id &e{0}&f."),
+  TIMER_RESUME("timer.resume", "&a▎ &fSuccessfully resumed timer with id &e{0}&f."),
+  TIMER_RESET("timer.reset", "&a▎ &fSuccessfully reset timer with id &e{0}&f."),
+  TIMER_LIST("timer.list", "&a▎ &fList of timers: {0}"),
+  TIMER_OVER("timer.over", "&a▎ &fTimer with id &e{0} &fis over!");
 
   private static FileConfiguration LANG;
   private final String path, def;
@@ -152,10 +175,6 @@ public enum Lang {
 
   public static void setFile(final FileConfiguration config) {
     LANG = config;
-  }
-
-  public String getPath() {
-    return this.path;
   }
 
   public String getDefault() {

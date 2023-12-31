@@ -11,10 +11,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class UnsetManagerCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public UnsetManagerCommand(final UtilManager utilManager) {
@@ -44,7 +43,7 @@ public class UnsetManagerCommand implements CommandExecutor {
             if (getHelper().playerInGroup(target.getUniqueId(), "director")) {
               getHelper().playerRemovePermission(target.getUniqueId(), permission);
               getHelper().playerRemoveGroup(target.getUniqueId(), "director");
-              getLogger().log(Lang.USER_UNSET_MANAGER.getConfigValue(new String[]{target.getName(), nameUppercase}));
+              getLogger().log(Lang.USER_UNSET_MANAGER.getConfigValue(new String[]{target.getName(), nameUppercase}), "fcfa");
             } else
               getLogger().send(sender, Lang.USER_NOT_MANAGER.getConfigValue(new String[]{target.getName(), nameUppercase}));
           } else

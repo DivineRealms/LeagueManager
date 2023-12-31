@@ -10,12 +10,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class ToggleCommand implements CommandExecutor {
-  @Getter
   private final LeagueManager plugin;
-  @Getter
   private final Logger logger;
-  @Getter
   private final Helper helper;
 
   public ToggleCommand(final LeagueManager plugin, final UtilManager utilManager) {
@@ -37,7 +35,7 @@ public class ToggleCommand implements CommandExecutor {
         state = "on";
         getHelper().groupAddPermission(groupName, permission, true);
       }
-      getPlugin().getServer().broadcastMessage(Lang.TOGGLE.getConfigValue(new String[]{state}));
+      getPlugin().getServer().broadcastMessage(Lang.TOGGLE.getConfigValue(new String[]{state, sender.getName()}));
     }
     return true;
   }

@@ -14,10 +14,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class RemoveAccessCommand implements CommandExecutor {
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public RemoveAccessCommand(final UtilManager utilManager) {
@@ -49,7 +48,7 @@ public class RemoveAccessCommand implements CommandExecutor {
               final DataMutateResult result = user1.data().remove(node);
 
               if (result.wasSuccessful())
-                getLogger().log(Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
+                getLogger().log(Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}), "fcfa");
               else
                 getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
             });

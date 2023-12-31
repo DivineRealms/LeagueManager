@@ -15,12 +15,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@Getter
 public class CreateTeamCommand implements CommandExecutor {
-  @Getter
   private final LuckPerms luckPermsAPI;
-  @Getter
   private final Helper helper;
-  @Getter
   private final Logger logger;
 
   public CreateTeamCommand(final LeagueManager plugin, final UtilManager utilManager) {
@@ -50,7 +48,7 @@ public class CreateTeamCommand implements CommandExecutor {
               group.data().add(PermissionNode.builder(permission).withContext("server", "football").build());
             }
 
-            getLogger().log(Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}));
+            getLogger().log(Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}), "fcfa");
             return group;
           }).thenCompose(groupManager::saveGroup);
         } else getLogger().send(sender, Lang.TEAM_ALREADY_DEFINED.getConfigValue(new String[]{nameUppercase}));

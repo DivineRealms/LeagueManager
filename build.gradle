@@ -3,7 +3,12 @@ plugins {
 }
 
 group 'io.github.divinerealms'
-version '1.2.3'
+version '1.2.4'
+
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
 
 repositories {
     mavenCentral()
@@ -21,6 +26,9 @@ dependencies {
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    implementation files('libs/WorldEdit.jar')
+    implementation files('libs/worldguard-6.2.jar')
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'

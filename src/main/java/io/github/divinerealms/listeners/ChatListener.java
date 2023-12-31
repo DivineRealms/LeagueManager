@@ -2,7 +2,9 @@ package io.github.divinerealms.listeners;
 
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
+import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
+import io.github.divinerealms.utils.Time;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,18 +12,23 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Getter
 public class ChatListener implements Listener {
-  @Getter
   private final UtilManager utilManager;
-  @Getter
   private final Logger logger;
+  private final Helper helper;
 
   public ChatListener(final UtilManager utilManager) {
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
+    this.helper = utilManager.getHelper();
   }
 
   @EventHandler(priority = EventPriority.LOWEST)
@@ -30,10 +37,12 @@ public class ChatListener implements Listener {
     final String message = event.getMessage().toLowerCase();
 
     final Pattern FC_STORE = Pattern.compile("^/(fc|footcube(:footcube|:fc|)) store");
-    final Pattern FC_COMMANDS = Pattern.compile("^/(footcube(:footcube|:fc|)|fc|tkp|takeplace|best|stats|leave|2v2|3v3|4v4)");
+    final Pattern FC_COMMANDS = Pattern.compile("^/(footcube(:footcube|:fc|)|fc|tkp|takeplace|best|stats|2v2|3v3|4v4)");
+    final Pattern FC_ADMIN = Pattern.compile("^/((clear|)cube(s|))");
 
     final Matcher matcherStore = FC_STORE.matcher(message);
     final Matcher matcherCommands = FC_COMMANDS.matcher(message);
+    final Matcher matcherAdmin = FC_ADMIN.matcher(message);
 
     if (event.isCancelled()) return;
 
@@ -44,12 +53,24 @@ public class ChatListener implements Listener {
 
     if (matcherCommands.find()) {
       if (!player.hasPermission("commandwhitelist.bypass.fc")) {
-        getLogger().send(player, Lang.FOOTCUBE_DISABLED.getConfigValue(null));
-        event.setCancelled(true);
+        if (player.hasPermission("group.fcfa")) return;
+        else {
+          getLogger().send(player, Lang.FOOTCUBE_DISABLED.getConfigValue(null));
+          event.setCancelled(true);
+        }
       }
 
       if (player.hasPermission("footcube.banned")) {
-        getLogger().send(player, Lang.USER_STILL_BANNED.getConfigValue(null));
+        final Duration expiry = getHelper().getPermissionExpireTime(player.getUniqueId(), "footcube.banned");
+        String duration = new Time(expiry.toMillis()).toString();
+        getLogger().send(player, Lang.USER_STILL_BANNED.getConfigValue(new String[]{duration}));
+        event.setCancelled(true);
+      }
+    }
+
+    if (matcherAdmin.find()) {
+      if (!player.hasPermission("group.hoster")) {
+        getLogger().send(player, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
         event.setCancelled(true);
       }
     }
