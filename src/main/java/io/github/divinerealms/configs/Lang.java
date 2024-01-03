@@ -147,30 +147,29 @@ public enum Lang {
       "&7   - &fRemove access to VAR.",
       "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
   TIMER_HELP("timer.help", String.join(System.lineSeparator(),
-          "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r",
-          "&d &lLeague&e&lManager &7- &rTimer Commands.",
-          "&r &r",
-          "&6 /&elm timer add &2<&aHH:MM:SS&2> <&aID&2> <&aprefix&2>",
-          "&6 /&elm timer remove &2<&aID&2>",
-          "&6 /&elm timer pause &2<&aID&2>",
-          "&6 /&elm timer resume &2<&aID&2>",
-          "&6 /&elm timer reset &2<&aID&2>",
-          "&6 /&elm timer list",
-          "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
-  TIMER_ADD("timer.add", "&a▎ &fSuccessfully started timer with id &e{0}&f."),
-  TIMER_REMOVE("timer.remove", "&a▎ &fSuccessfully removed timer with id &e{0}&f."),
-  TIMER_PAUSE("timer.pause", "&a▎ &fSuccessfully paused timer with id &e{0}&f."),
-  TIMER_RESUME("timer.resume", "&a▎ &fSuccessfully resumed timer with id &e{0}&f."),
-  TIMER_RESET("timer.reset", "&a▎ &fSuccessfully reset timer with id &e{0}&f."),
-  TIMER_LIST("timer.list", "&a▎ &fList of timers: {0}"),
+      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r",
+      "&d &lLeague&e&lManager &7- &rTimer Commands.",
+      "&r &r",
+      "&6 /&elm timer create &2<&atime&2> &3[&bprefix&3]",
+      "&6 /&elm timer stop &2<&aid&2>",
+      "&6 /&elm timer result setteams &2<&ateam1&2> <&ateam2&2>",
+      "&7   - &fExample: &6/&elm timer result setteams &bBlue &cRed",
+      "&6 /&elm timer result add 1",
+      "&6 /&elm timer result add 2",
+      "&7   - &fAdd one goal to team 1 or 2.",
+      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
+  TIMER_CREATE("timer.create", "&a▎ &fSuccessfully started timer with id &e{0}&f."),
+  TIMER_STOP("timer.stop", "&a▎ &fSuccessfully stopped timer with id &e{0}&f."),
+  TIMER_STARTING("timer.starting", "&6▎ {0} &6┃ &fHost starting!"),
   TIMER_OVER("timer.over", "&a▎ &fTimer with id &e{0} &fis over!"),
+  TIMER_CURRENT_TIME("timer.current-time", "{0} &7┃ &fCurrent Time: &e{1}/{2}"),
+  TIMER_END("timer.end", "&6▎ {0} &6┃ &fMatch finished! End result is: {1} &e{2} &f- &e{3} {4}&f."),
+  TIMER_RESULT_TEAMS_SET("timer.result.teams-set", "&a▎ &fTeams successfully set to {0} &fand {1}&f."),
   TIMER_RESULT_ADD("timer.result.add", "&a▎ &fAdded one goal for the team {0}&f."),
   TIMER_RESULT_ADD_USAGE("timer.result.add-usage", "&4▎ &cYou need to specify a team (1 or 2)."),
-  TIMER_RESULT_TEAMS_SET("timer.result.teams-set", "&a▎ &fTeams successfully set to {0} and {1}."),
-  TIMER_STARTING("timer.starting", "{0}Host starting!"),
-  TIMER_CURRENT_TIME("timer.current-time", "{0}Current Time: &e{0}/{1}"),
-  TIMER_RESULT("timer.result.actionbar", "{0}{1} &e{2} - {3} {4} &7┃ &fTimer: &a{5}/{6}"),
-  TIMER_END("timer.result.end", "{0}Match finished! End result is: {1} &e{2} &f- &e{3} {4}&f.");
+  TIMER_RESULT_STARTING("timer.result.starting", "{0} &7┃ &fHost starting!"),
+  TIMER_RESULT("timer.result.actionbar", "{0} &7┃ {1} &e{2} - {3} {4} &7┃ &fTimer: &a{5}/{6}"),
+  TIMER_RESULT_END("timer.result.end", "{0} &7┃ &fMatch finished! Result: {1} &e{2} &f- &e{3} {4}&f.");
 
   private static FileConfiguration LANG;
   private final String path, def;
@@ -195,6 +194,7 @@ public enum Lang {
     else {
       if (args.length == 0) return value;
       for (int i = 0; i < args.length; i++) value = value.replace("{" + i + "}", args[i]);
+      value = ChatColor.translateAlternateColorCodes('&', value);
     }
 
     return value;

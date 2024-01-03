@@ -1,7 +1,6 @@
 package io.github.divinerealms.utils;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
@@ -11,7 +10,7 @@ import java.util.function.Consumer;
 public class Timer implements Runnable {
   private final Plugin plugin;
   private final BukkitScheduler scheduler;
-  @Setter private Integer assignedTaskId;
+  private Integer assignedTaskId;
   private final int seconds;
   private int secondsParsed;
   private final Consumer<Timer> everySecond;
@@ -44,7 +43,7 @@ public class Timer implements Runnable {
   }
 
   public void scheduleTimer() {
-    setAssignedTaskId(getScheduler().scheduleSyncRepeatingTask(getPlugin(), this, 20L, 20L));
+    assignedTaskId = getScheduler().scheduleSyncRepeatingTask(getPlugin(), this, 20L, 20L);
   }
 
   public void cancelTask(final int taskId) {
