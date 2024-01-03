@@ -1,22 +1,26 @@
 package io.github.divinerealms.utils;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import lombok.Setter;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.function.Consumer;
 
+@Getter
 public class Timer implements Runnable {
   private final Plugin plugin;
-  @Getter private Integer assignedTaskId;
-  @Getter private int seconds;
-  @Getter private int secondsParsed;
+  private final BukkitScheduler scheduler;
+  @Setter private Integer assignedTaskId;
+  private final int seconds;
+  private int secondsParsed;
   private final Consumer<Timer> everySecond;
   private final Runnable beforeTimer;
   private final Runnable afterTimer;
 
-  public Timer(Plugin plugin, int seconds, Runnable beforeTimer, Runnable afterTimer, Consumer<Timer> everySecond) {
+  public Timer(final Plugin plugin, int seconds, Runnable beforeTimer, Runnable afterTimer, Consumer<Timer> everySecond) {
     this.plugin = plugin;
+    this.scheduler = plugin.getServer().getScheduler();
     this.seconds = seconds;
     this.secondsParsed = 0;
     this.beforeTimer = beforeTimer;
@@ -26,20 +30,24 @@ public class Timer implements Runnable {
 
   @Override
   public void run() {
-    if (secondsParsed == seconds + 1) {
-      afterTimer.run();
-
-      if (assignedTaskId != null) Bukkit.getScheduler().cancelTask(assignedTaskId);
+    if (getSecondsParsed() == getSeconds() + 1) {
+      getAfterTimer().run();
+      if (getAssignedTaskId() != null)
+        cancelTask(getAssignedTaskId());
       return;
     }
 
-    if (secondsParsed < 1) beforeTimer.run();
+    if (getSecondsParsed() < 1) getBeforeTimer().run();
 
-    everySecond.accept(this);
+    getEverySecond().accept(this);
     secondsParsed++;
   }
 
   public void scheduleTimer() {
-    this.assignedTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this, 20L, 20L);
+    setAssignedTaskId(getScheduler().scheduleSyncRepeatingTask(getPlugin(), this, 20L, 20L));
+  }
+
+  public void cancelTask(final int taskId) {
+    getScheduler().cancelTask(taskId);
   }
 }

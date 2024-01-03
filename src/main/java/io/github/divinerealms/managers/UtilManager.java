@@ -16,7 +16,7 @@ public class UtilManager {
 
   public UtilManager(final LeagueManager plugin) {
     this.config = new Config(plugin);
-    this.logger = new Logger(plugin, this);
+    this.logger = new Logger(plugin);
     this.helper = new Helper(plugin);
     this.lineChecker = new LineChecker(this);
   }

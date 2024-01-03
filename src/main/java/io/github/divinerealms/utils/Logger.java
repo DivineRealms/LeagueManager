@@ -1,11 +1,13 @@
 package io.github.divinerealms.utils;
 
-import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -22,7 +24,7 @@ public class Logger {
   private final List<String> banner = new ArrayList<>();
   private final ConsoleCommandSender consoleSender;
 
-  public Logger(final Plugin plugin, final UtilManager utilManager) {
+  public Logger(final Plugin plugin) {
     this.server = plugin.getServer();
     this.description = plugin.getDescription();
     this.consoleSender = server.getConsoleSender();
@@ -36,6 +38,19 @@ public class Logger {
   public void log(final String message, final String rank) {
     getServer().broadcast(message, "group." + rank);
     getConsoleSender().sendMessage(message);
+  }
+
+  public void sendActionBar(final Player player, final String message) {
+    IChatBaseComponent iChatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
+    PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(iChatBaseComponent, (byte) 2);
+    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
+  }
+
+  public void broadcastBar(final String message) {
+    IChatBaseComponent iChatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
+    PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(iChatBaseComponent, (byte) 2);
+    for (Player player : getServer().getOnlinePlayers())
+      ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
   }
 
   public void sendBanner() {
