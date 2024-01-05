@@ -89,11 +89,6 @@ public class BaseCommand implements CommandExecutor {
         case "vr":
           final RemoveAccessCommand removeAccessCommand = new RemoveAccessCommand(getUtilManager());
           removeAccessCommand.onCommand(sender, cmd, label, args);
-          break;
-        case "timer":
-          final TimerCommand timerCommand = new TimerCommand(plugin, getUtilManager());
-          timerCommand.onCommand(sender, cmd, label, args);
-          break;
         default:
           getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
       }

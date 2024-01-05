@@ -10,3 +10,9 @@ commands:
   leaguemanager:
     description: Base command.
     aliases: [lm]
+  timer:
+    description: Timer command.
+    aliases: [tm]
+  result:
+    description: Result command.
+    aliases: [rs]

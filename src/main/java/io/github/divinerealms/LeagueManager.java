@@ -1,6 +1,8 @@
 package io.github.divinerealms;
 
 import io.github.divinerealms.commands.BaseCommand;
+import io.github.divinerealms.commands.ResultCommand;
+import io.github.divinerealms.commands.TimerCommand;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.ConfigManager;
 import io.github.divinerealms.managers.ListenerManager;
@@ -44,6 +46,8 @@ public class LeagueManager extends JavaPlugin {
 
   public void setup() {
     getCommand("leagueManager").setExecutor(new BaseCommand(this, getUtilManager()));
+    getCommand("timer").setExecutor(new TimerCommand(this, getUtilManager()));
+    getCommand("result").setExecutor(new ResultCommand(this, getUtilManager()));
 
     if (getListenerManager().isRegistered()) getListenerManager().unregisterListeners();
     getListenerManager().registerListeners();

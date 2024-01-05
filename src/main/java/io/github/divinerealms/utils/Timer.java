@@ -6,13 +6,12 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.function.Consumer;
 
-@Getter
 public class Timer implements Runnable {
-  private final Plugin plugin;
-  private final BukkitScheduler scheduler;
+  @Getter private final Plugin plugin;
+  @Getter private final BukkitScheduler scheduler;
   private Integer assignedTaskId;
-  private final int seconds;
-  private int secondsParsed;
+  @Getter private final int seconds;
+  @Getter private int secondsParsed;
   private final Consumer<Timer> everySecond;
   private final Runnable beforeTimer;
   private final Runnable afterTimer;
@@ -29,21 +28,21 @@ public class Timer implements Runnable {
 
   @Override
   public void run() {
-    if (getSecondsParsed() == getSeconds() + 1) {
-      getAfterTimer().run();
-      if (getAssignedTaskId() != null)
-        cancelTask(getAssignedTaskId());
+    if (secondsParsed == seconds + 1) {
+      afterTimer.run();
+
+      if (assignedTaskId != null) cancelTask(assignedTaskId);
       return;
     }
 
-    if (getSecondsParsed() < 1) getBeforeTimer().run();
+    if (secondsParsed < 1) beforeTimer.run();
 
-    getEverySecond().accept(this);
+    everySecond.accept(this);
     secondsParsed++;
   }
 
-  public void scheduleTimer() {
-    assignedTaskId = getScheduler().scheduleSyncRepeatingTask(getPlugin(), this, 20L, 20L);
+  public int startTask() {
+    return assignedTaskId = getScheduler().runTaskTimerAsynchronously(getPlugin(), this, 20L, 20L).getTaskId();
   }
 
   public void cancelTask(final int taskId) {
