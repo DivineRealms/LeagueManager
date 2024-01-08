@@ -10,17 +10,17 @@ public class Timer implements Runnable {
   @Getter private final Plugin plugin;
   @Getter private final BukkitScheduler scheduler;
   private Integer assignedTaskId;
-  @Getter private final int seconds;
-  @Getter private int secondsParsed;
+  @Getter public static int seconds;
+  @Getter public static int secondsParsed = 0;
   private final Consumer<Timer> everySecond;
-  private final Runnable beforeTimer;
-  private final Runnable afterTimer;
+  @Getter private final Runnable beforeTimer;
+  @Getter private final Runnable afterTimer;
 
   public Timer(final Plugin plugin, int seconds, Runnable beforeTimer, Runnable afterTimer, Consumer<Timer> everySecond) {
     this.plugin = plugin;
     this.scheduler = plugin.getServer().getScheduler();
-    this.seconds = seconds;
-    this.secondsParsed = 0;
+    Timer.seconds = seconds;
+    secondsParsed = 0;
     this.beforeTimer = beforeTimer;
     this.afterTimer = afterTimer;
     this.everySecond = everySecond;

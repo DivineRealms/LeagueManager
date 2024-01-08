@@ -12,7 +12,9 @@ commands:
     aliases: [lm]
   timer:
     description: Timer command.
-    aliases: [tm]
+    aliases: [ts]
   result:
     description: Result command.
     aliases: [rs]
+  2x4:
+    description: 2x4 Result command.

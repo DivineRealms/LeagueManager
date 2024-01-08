@@ -117,14 +117,14 @@ public class Time {
   public static String toString(long time) {
     StringBuilder timeString = new StringBuilder();
 
-    time = appendTime(time, YEAR_MS, "years", timeString);
-    time = appendTime(time, DAY_MS, "days", timeString);
-    time = appendTime(time, HOUR_MS, "hours", timeString);
-    time = appendTime(time, MINUTE_MS, "minutes", timeString);
-    time = appendTime(time, SECOND_MS, "seconds", timeString);
+    time = appendTime(time, YEAR_MS, "y", timeString);
+    time = appendTime(time, DAY_MS, "d", timeString);
+    time = appendTime(time, HOUR_MS, "h", timeString);
+    time = appendTime(time, MINUTE_MS, "m", timeString);
+    time = appendTime(time, SECOND_MS, "s", timeString);
 
     if (timeString.length() == 0) {
-      if (time == 0) return "0 seconds";
+      if (time == 0) return "0 s";
       else return time + " ms";
     }
 

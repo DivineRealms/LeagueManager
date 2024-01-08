@@ -50,6 +50,14 @@ public class BaseCommand implements CommandExecutor {
           final UnbanPlayerCommand unbanPlayerCommand = new UnbanPlayerCommand(getUtilManager());
           unbanPlayerCommand.onCommand(sender, cmd, label, args);
           break;
+        case "suspend":
+          final SuspendCommand suspendCommand = new SuspendCommand(getUtilManager());
+          suspendCommand.onCommand(sender, cmd, label, args);
+          break;
+        case "unsuspend":
+          final UnsuspendCommand unsuspendCommand = new UnsuspendCommand(getUtilManager());
+          unsuspendCommand.onCommand(sender, cmd, label, args);
+          break;
         case "setteam":
         case "st":
           final SetTeamCommand setTeamCommand = new SetTeamCommand(getUtilManager());

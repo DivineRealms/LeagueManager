@@ -1,3 +1,4 @@
+//file:noinspection VulnerableLibrariesLocal
 plugins {
     id 'java'
 }
@@ -13,9 +14,10 @@ tasks.withType(JavaCompile).configureEach {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
-    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
+    maven { url 'https://papermc.io/repo/repository/maven-public/' }
     maven { url 'https://repo.kryptonmc.org/releases' }
-    maven { url = "https://repo.extendedclip.com/content/repositories/placeholderapi/" }
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url 'https://repo.essentialsx.net/releases/' }
 }
 
 dependencies {
@@ -25,6 +27,7 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.1'
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'org.projectlombok:lombok:1.18.24'
+    compileOnly 'net.essentialsx:EssentialsX:2.20.1'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     implementation files('libs/WorldEdit.jar')

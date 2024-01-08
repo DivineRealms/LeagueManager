@@ -13,9 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,14 +59,19 @@ public class ChatListener implements Listener {
 
       if (player.hasPermission("footcube.banned")) {
         final Duration expiry = getHelper().getPermissionExpireTime(player.getUniqueId(), "footcube.banned");
-        String duration = new Time(expiry.toMillis()).toString();
+        String duration;
+        try {
+          duration = new Time(expiry.toMillis()).toString();
+        } catch (Time.TimeParseException | NullPointerException e) {
+          return;
+        }
         getLogger().send(player, Lang.USER_STILL_BANNED.getConfigValue(new String[]{duration}));
         event.setCancelled(true);
       }
     }
 
     if (matcherAdmin.find()) {
-      if (!player.hasPermission("group.hoster")) {
+      if (!player.hasPermission("leaguemanager.footcube.admin")) {
         getLogger().send(player, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
         event.setCancelled(true);
       }

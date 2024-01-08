@@ -13,10 +13,10 @@ import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("unused")
 @Getter
 public class Helper {
   private final LeagueManager plugin;
@@ -89,6 +89,12 @@ public class Helper {
 
   public Group getGroup(final String groupName) {
     return getGroupManager().getGroup(groupName);
+  }
+
+  public String getGroupMeta(final String groupName, final String metaType) {
+    final Group group = getGroup(groupName);
+    if (group == null) return "&c&l!! &fInvalid Group &c&l!!";
+    else return group.getCachedData().getMetaData().getMetaValue(metaType);
   }
 
   public boolean groupHasPermission(final String groupName, final String permission) {

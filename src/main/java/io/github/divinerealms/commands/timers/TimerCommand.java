@@ -1,4 +1,4 @@
-package io.github.divinerealms.commands;
+package io.github.divinerealms.commands.timers;
 
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
@@ -48,16 +48,16 @@ public class TimerCommand implements CommandExecutor {
           getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
           return true;
         }
-        finalPrefix = ChatColor.translateAlternateColorCodes('&', args[2]);
+        finalPrefix = color(args[2].replace("_", " "));
         taskId = startTimer().startTask();
         getLogger().log(Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(taskId)}), "fcfa");
       } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
     } else if (args[0].equalsIgnoreCase("stop")) {
-      if (args.length == 2) {
-        final int id = Integer.parseInt(args[1]);
-        if (getPlugin().getServer().getScheduler().isQueued(id)) {
-          startTimer().cancelTask(id);
-          getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(id)}));
+      if (args.length == 1) {
+        if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
+          getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(taskId)}));
+          startTimer().getAfterTimer().run();
+          startTimer().cancelTask(taskId);
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
     } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
@@ -70,9 +70,13 @@ public class TimerCommand implements CommandExecutor {
       getLogger().log(Lang.TIMER_OVER.getConfigValue(new String[]{String.valueOf(taskId)}), "default");
       getLogger().broadcastBar(Lang.TIMER_END.getConfigValue(new String[]{getFinalPrefix()}));
       }, (t) -> {
-      String secondsParsed = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(t.getSecondsParsed())).format(DateTimeFormatter.ofPattern("mm:ss"));
-      String seconds = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(t.getSeconds())).format(DateTimeFormatter.ofPattern("mm:ss"));
+      String secondsParsed = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSecondsParsed())).format(DateTimeFormatter.ofPattern("mm:ss"));
+      String seconds = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSeconds())).format(DateTimeFormatter.ofPattern("mm:ss"));
       getLogger().broadcastBar(Lang.TIMER_CURRENT_TIME.getConfigValue(new String[]{getFinalPrefix(), secondsParsed, seconds}));
     });
+  }
+
+  private String color(final String string) {
+    return ChatColor.translateAlternateColorCodes('&', string);
   }
 }
