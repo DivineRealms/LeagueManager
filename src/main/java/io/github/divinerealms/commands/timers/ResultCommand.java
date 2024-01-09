@@ -24,14 +24,14 @@ public class ResultCommand implements CommandExecutor {
   private final Plugin plugin;
   private final Logger logger;
   private final Helper helper;
-  private static String home;
-  private static String away;
+  private static String home = "home";
+  private static String away = "away";
   private static int home_result = 0;
   private static int away_result = 0;
-  private static Time time = null;
+  private static Time time = Time.parseString("20min");
   private static Time extraTime = null;
   private static double extraTimeNew;
-  private String finalPrefix = null;
+  private String finalPrefix = "&b&lEvent";
   private boolean secondHalf = false;
 
   public ResultCommand(final Plugin plugin, final UtilManager utilManager) {
@@ -56,11 +56,8 @@ public class ResultCommand implements CommandExecutor {
     } else if (args.length == 1) {
       if (args[0].equalsIgnoreCase("start")) {
         if (!isTaskQueued(Timer.assignedTaskId)) {
-          if (!isSetup()) getLogger().send(sender, Lang.TIMER_NOT_SETUP.getConfigValue(null));
-          else {
-            Timer.assignedTaskId = firstHalf().startTask();
-            getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
-          }
+          Timer.assignedTaskId = firstHalf().startTask();
+          getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
         } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("stop")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
@@ -74,17 +71,15 @@ public class ResultCommand implements CommandExecutor {
         if (isTaskQueued(Timer.assignedTaskId)) {
           getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           firstHalf().cancelTask(Timer.assignedTaskId);
-          Timer.assignedTaskId = halfTime().startTask();
           secondHalf = true;
+          Timer.assignedTaskId = halfTime().startTask();
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("continue")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
-          if (!isSetup()) getLogger().send(sender, Lang.TIMER_NOT_SETUP.getConfigValue(null));
-          else {halfTime().cancelTask(Timer.assignedTaskId);
+          halfTime().cancelTask(Timer.assignedTaskId);
           Timer.assignedTaskId = secondHalf().startTask();
           getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           getPlugin().getServer().getScheduler().runTaskLaterAsynchronously(getPlugin(), () -> Timer.secondsParsed = (Timer.getSeconds() - 60) / 2, 20L);
-          }
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
     } else if (args.length == 2) {
@@ -214,11 +209,6 @@ public class ResultCommand implements CommandExecutor {
     home_result = 0;
     away_result = 0;
     time = null;
-  }
-
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  private boolean isSetup() {
-    return home != null && away != null && time != null && finalPrefix != null;
   }
 
   private String color(final String string) {

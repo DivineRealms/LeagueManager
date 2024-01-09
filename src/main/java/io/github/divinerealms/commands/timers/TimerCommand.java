@@ -40,7 +40,7 @@ public class TimerCommand implements CommandExecutor {
     if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
       getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
       return true;
-    } else if (args[0].equalsIgnoreCase("start")) {
+    } else if (args.length > 2 && args[0].equalsIgnoreCase("start")) {
       try {
         setTime(Time.parseString(args[1]));
       } catch (Time.TimeParseException | NullPointerException e) {
