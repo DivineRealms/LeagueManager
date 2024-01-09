@@ -7,7 +7,6 @@ import io.github.divinerealms.utils.Time;
 import io.github.divinerealms.utils.Timer;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,9 +24,8 @@ public class TwoXFourCommand implements CommandExecutor {
   private final Plugin plugin;
   private final Logger logger;
   private static Map<String, String> teams = createMap();
-  private static int taskId;
   private Time time = null;
-  private String finalPrefix = null;
+  private String type = "&b&lEvent";
   private static String blue, red, green, yellow;
 
   public TwoXFourCommand(final Plugin plugin, final UtilManager utilManager) {
@@ -46,28 +44,32 @@ public class TwoXFourCommand implements CommandExecutor {
       getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
       return true;
     } else if (args.length == 1) {
-      if (args[0].equalsIgnoreCase("tp")) {
-        Bukkit.dispatchCommand(sender, "warp 2x4");
-      } else if (args[0].equalsIgnoreCase("create")) {
-        taskId = startResult().startTask();
-        getLogger().log(Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(taskId)}), "hoster");
+      if (args[0].equalsIgnoreCase("start")) {
+        if (!isTaskQueued(Timer.assignedTaskId)) {
+          Timer.assignedTaskId = startResult().startTask();
+          getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+        } else getLogger().send("hoster", Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("reset")) {
         createMap();
-        getLogger().send(sender, Lang.RESULT_RESET.getConfigValue(null));
+        getLogger().send("hoster", Lang.RESULT_RESET.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("stop")) {
-        if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
-          getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(taskId)}));
-          startResult().getAfterTimer().run();
-          startResult().cancelTask(taskId);
+        if (isTaskQueued(Timer.assignedTaskId)) {
+          getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+          startResult().cancelTask(Timer.assignedTaskId);
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
-    } else if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
+    } else if (args.length == 2) {
+      if (args[0].equalsIgnoreCase("type")) {
+        setType(color("&b&lEvent " + args[1]));
+        getLogger().send(sender, Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getType()}));
+      } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
+    } else if (isTaskQueued(Timer.assignedTaskId)) {
       if (args[0].equalsIgnoreCase("add")) {
         if (teams.containsKey(args[1])) {
           if (!teams.get(args[1]).equals("4")) {
             final Integer add = Integer.parseInt(teams.get(args[1])) + 1;
             teams.put(args[1], String.valueOf(add));
-            getLogger().log(Lang.RESULT_ADD.getConfigValue(new String[]{args[1]}), "hoster");
+            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{args[1]}));
           } else getLogger().send(sender, Lang.RESULT_FULL_LIVES.getConfigValue(new String[]{args[1]}));
         } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("remove")) {
@@ -75,7 +77,7 @@ public class TwoXFourCommand implements CommandExecutor {
           if (!teams.get(args[1]).equals("0")) {
             final Integer remove = Integer.parseInt(teams.get(args[1])) - 1;
             teams.put(args[1], String.valueOf(remove));
-            getLogger().log(Lang.RESULT_REMOVE.getConfigValue(new String[]{args[1]}), "hoster");
+            getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{args[1]}));
           } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{args[1]}));
         } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
       } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
@@ -84,14 +86,13 @@ public class TwoXFourCommand implements CommandExecutor {
   }
 
   private Timer startResult() {
-    String prefix = color("&b&lEvent 2x4");
     Time time = Time.parseString("30min");
     return new Timer(getPlugin(), (int) time.toSeconds(), () -> {
-      getLogger().log(Lang.TIMER_STARTING.getConfigValue(new String[]{prefix}), "default");
-      getLogger().broadcastBar(Lang.RESULT_STARTING.getConfigValue(new String[]{prefix}));
+      getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getType()}));
+      getLogger().broadcastBar(Lang.RESULT_STARTING.getConfigValue(new String[]{getType()}));
     }, () -> {
-      getLogger().log(Lang.TWO_TIMES_FOUR_RESULT_OVER.getConfigValue(new String[]{prefix, blue, red, green, yellow}), "default");
-      getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_RESULT_END.getConfigValue(new String[]{prefix, blue, red, green, yellow}));
+      getLogger().send("default", Lang.TWO_TIMES_FOUR_RESULT_OVER.getConfigValue(new String[]{getType(), blue, red, green, yellow}));
+      getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_RESULT_END.getConfigValue(new String[]{getType(), blue, red, green, yellow}));
     }, (t) -> {
       blue = color("&b" + teams.get("blue"));
       red = color("&c" + teams.get("red"));
@@ -101,7 +102,7 @@ public class TwoXFourCommand implements CommandExecutor {
       teams.forEach((team, life) -> {
         if (life.equals("0")) teams.put(team, "✕");
       });
-      getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_ACTIONBAR.getConfigValue(new String[]{prefix, blue, red, green, yellow, secondsParsed}));
+      getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_ACTIONBAR.getConfigValue(new String[]{getType(), blue, red, green, yellow, secondsParsed}));
     });
   }
 
@@ -116,5 +117,10 @@ public class TwoXFourCommand implements CommandExecutor {
 
   private String color(final String string) {
     return ChatColor.translateAlternateColorCodes('&', string);
+  }
+
+  private boolean isTaskQueued(final Integer taskId) {
+    if (taskId != null) return getPlugin().getServer().getScheduler().isQueued(taskId);
+    else return false;
   }
 }

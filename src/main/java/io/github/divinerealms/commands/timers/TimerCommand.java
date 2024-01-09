@@ -7,6 +7,7 @@ import io.github.divinerealms.utils.Time;
 import io.github.divinerealms.utils.Timer;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 public class TimerCommand implements CommandExecutor {
   private final Plugin plugin;
   private final Logger logger;
-  private static int taskId;
   private Time time = null;
   private String finalPrefix = null;
 
@@ -40,24 +40,21 @@ public class TimerCommand implements CommandExecutor {
     if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
       getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
       return true;
-    } else if (args[0].equalsIgnoreCase("create")) {
-      if (args.length == 3) {
-        try {
-          setTime(Time.parseString(args[1]));
-        } catch (Time.TimeParseException | NullPointerException e) {
-          getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
-          return true;
-        }
-        finalPrefix = color(args[2].replace("_", " "));
-        taskId = startTimer().startTask();
-        getLogger().log(Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(taskId)}), "fcfa");
-      } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
+    } else if (args[0].equalsIgnoreCase("start")) {
+      try {
+        setTime(Time.parseString(args[1]));
+      } catch (Time.TimeParseException | NullPointerException e) {
+        getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
+        return true;
+      }
+      setFinalPrefix(color(StringUtils.join(args, " ", 2, args.length)));
+      Timer.assignedTaskId = startTimer().startTask();
+      getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
     } else if (args[0].equalsIgnoreCase("stop")) {
       if (args.length == 1) {
-        if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
-          getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(taskId)}));
-          startTimer().getAfterTimer().run();
-          startTimer().cancelTask(taskId);
+        if (isTaskQueued(Timer.assignedTaskId)) {
+          getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+          startTimer().cancelTask(Timer.assignedTaskId);
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
     } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
@@ -66,8 +63,8 @@ public class TimerCommand implements CommandExecutor {
 
   private Timer startTimer() {
     return new Timer(getPlugin(), (int) getTime().toSeconds(), () ->
-        getLogger().log(Lang.TIMER_STARTING.getConfigValue(new String[]{getFinalPrefix()}), "default"), () -> {
-      getLogger().log(Lang.TIMER_OVER.getConfigValue(new String[]{String.valueOf(taskId)}), "default");
+        getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getFinalPrefix()})), () -> {
+      getLogger().send("default", Lang.TIMER_OVER.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
       getLogger().broadcastBar(Lang.TIMER_END.getConfigValue(new String[]{getFinalPrefix()}));
       }, (t) -> {
       String secondsParsed = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSecondsParsed())).format(DateTimeFormatter.ofPattern("mm:ss"));
@@ -78,5 +75,10 @@ public class TimerCommand implements CommandExecutor {
 
   private String color(final String string) {
     return ChatColor.translateAlternateColorCodes('&', string);
+  }
+
+  private boolean isTaskQueued(final Integer taskId) {
+    if (taskId != null) return getPlugin().getServer().getScheduler().isQueued(taskId);
+    else return false;
   }
 }

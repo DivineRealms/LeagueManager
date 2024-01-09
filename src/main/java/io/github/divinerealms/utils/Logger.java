@@ -35,7 +35,7 @@ public class Logger {
     else getConsoleSender().sendMessage(message);
   }
 
-  public void log(final String message, final String rank) {
+  public void send(final String rank, final String message) {
     getServer().broadcast(message, "group." + rank);
     getConsoleSender().sendMessage(message);
   }

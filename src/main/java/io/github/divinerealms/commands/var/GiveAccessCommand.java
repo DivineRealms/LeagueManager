@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("deprecation")
 @Getter
 public class GiveAccessCommand implements CommandExecutor {
   private final Helper helper;
@@ -50,7 +51,7 @@ public class GiveAccessCommand implements CommandExecutor {
                 final DataMutateResult result = user.data().add(node);
 
                 if (result.wasSuccessful())
-                  getLogger().log(Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}), "fcfa");
+                  getLogger().send("fcfa", Lang.VAR_GIVEN_ACCESS.getConfigValue(new String[]{target.getName()}));
                 else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });
@@ -70,7 +71,7 @@ public class GiveAccessCommand implements CommandExecutor {
                 final DataMutateResult result = user.data().add(node);
 
                 if (result.wasSuccessful())
-                  getLogger().log(Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}), "fcfa");
+                  getLogger().send("fcfa", Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
                 else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });

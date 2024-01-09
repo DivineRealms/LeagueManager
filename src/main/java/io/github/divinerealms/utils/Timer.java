@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public class Timer implements Runnable {
   @Getter private final Plugin plugin;
   @Getter private final BukkitScheduler scheduler;
-  private Integer assignedTaskId;
+  public static Integer assignedTaskId;
   @Getter public static int seconds;
   @Getter public static int secondsParsed = 0;
   private final Consumer<Timer> everySecond;
@@ -35,7 +35,7 @@ public class Timer implements Runnable {
       return;
     }
 
-    if (secondsParsed < 1) beforeTimer.run();
+    if (secondsParsed == 0) beforeTimer.run();
 
     everySecond.accept(this);
     secondsParsed++;

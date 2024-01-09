@@ -1,6 +1,7 @@
 package io.github.divinerealms;
 
 import io.github.divinerealms.commands.BaseCommand;
+import io.github.divinerealms.commands.timers.OneXEightCommand;
 import io.github.divinerealms.commands.timers.ResultCommand;
 import io.github.divinerealms.commands.timers.TimerCommand;
 import io.github.divinerealms.commands.timers.TwoXFourCommand;
@@ -50,6 +51,7 @@ public class LeagueManager extends JavaPlugin {
     getCommand("timer").setExecutor(new TimerCommand(this, getUtilManager()));
     getCommand("result").setExecutor(new ResultCommand(this, getUtilManager()));
     getCommand("2x4").setExecutor(new TwoXFourCommand(this, getUtilManager()));
+    getCommand("1x8").setExecutor(new OneXEightCommand(this, getUtilManager()));
 
     if (getListenerManager().isRegistered()) getListenerManager().unregisterListeners();
     getListenerManager().registerListeners();

@@ -28,11 +28,11 @@ public class ResultCommand implements CommandExecutor {
   private static String away;
   private static int home_result = 0;
   private static int away_result = 0;
-  private static int taskId;
   private static Time time = null;
   private static Time extraTime = null;
   private static double extraTimeNew;
   private String finalPrefix = null;
+  private boolean secondHalf = false;
 
   public ResultCommand(final Plugin plugin, final UtilManager utilManager) {
     this.plugin = plugin;
@@ -52,48 +52,56 @@ public class ResultCommand implements CommandExecutor {
       return true;
     } else if (args[0].equalsIgnoreCase("prefix")) {
       setFinalPrefix(color(StringUtils.join(args, " ", 1, args.length)));
-      getLogger().send(sender, Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getFinalPrefix()}));
+      getLogger().send("hoster", Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getFinalPrefix()}));
     } else if (args.length == 1) {
       if (args[0].equalsIgnoreCase("start")) {
-        if (isSetup() && !home.contains("Invalid") && !away.contains("Invalid")) {
-          taskId = firstHalf().startTask();
-          getLogger().log(Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(taskId)}), "fcfa");
-        } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
+        if (!isTaskQueued(Timer.assignedTaskId)) {
+          if (!isSetup()) getLogger().send(sender, Lang.TIMER_NOT_SETUP.getConfigValue(null));
+          else {
+            Timer.assignedTaskId = firstHalf().startTask();
+            getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+          }
+        } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("stop")) {
-        if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
-          getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(taskId)}));
-          firstHalf().cancelTask(taskId);
+        if (isTaskQueued(Timer.assignedTaskId)) {
+          getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+          firstHalf().cancelTask(Timer.assignedTaskId);
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("reset")) {
         reset();
         getLogger().send(sender, Lang.TIMER_RESET.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("ht")) {
-        if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
-          getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(taskId)}));
-          firstHalf().cancelTask(taskId);
-          taskId = halfTime().startTask();
+        if (isTaskQueued(Timer.assignedTaskId)) {
+          getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+          firstHalf().cancelTask(Timer.assignedTaskId);
+          Timer.assignedTaskId = halfTime().startTask();
+          secondHalf = true;
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("continue")) {
-        if (isSetup() && getPlugin().getServer().getScheduler().isQueued(taskId)) {
-          halfTime().cancelTask(taskId);
-          taskId = secondHalf().startTask();
-          Timer.secondsParsed = Timer.getSeconds() / 2;
-          getLogger().log(Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(taskId)}), "fcfa");
-        } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
+        if (isTaskQueued(Timer.assignedTaskId)) {
+          if (!isSetup()) getLogger().send(sender, Lang.TIMER_NOT_SETUP.getConfigValue(null));
+          else {halfTime().cancelTask(Timer.assignedTaskId);
+          Timer.assignedTaskId = secondHalf().startTask();
+          getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+          getPlugin().getServer().getScheduler().runTaskLaterAsynchronously(getPlugin(), () -> Timer.secondsParsed = (Timer.getSeconds() - 60) / 2, 20L);
+          }
+        } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
     } else if (args.length == 2) {
       if (args[0].equalsIgnoreCase("time")) {
-        if (!getPlugin().getServer().getScheduler().isQueued(taskId)) {
+        if (!isTaskQueued(Timer.assignedTaskId)) {
           try {
             time = Time.parseString(args[1]);
+            if (time.toSeconds() < Time.parseString("10min").toSeconds())
+              time = Time.parseString("10min");
           } catch (Time.TimeParseException timeParseException) {
             getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(new String[]{args[1]}));
             return true;
           }
-          getLogger().send(sender, Lang.TIMER_TIME_SET.getConfigValue(new String[]{args[1]}));
-        } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
+          getLogger().send("hoster", Lang.TIMER_TIME_SET.getConfigValue(new String[]{time.toString()}));
+        } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("extend")) {
-        if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
+        if (isTaskQueued(Timer.assignedTaskId)) {
           try {
             extraTime = Time.parseString(args[1]);
           } catch (Time.TimeParseException timeParseException) {
@@ -101,69 +109,83 @@ public class ResultCommand implements CommandExecutor {
             return true;
           }
           Timer.seconds = (int) (Timer.getSeconds() + extraTime.toSeconds());
-          extraTimeNew = Timer.seconds - time.toSeconds();
-          getLogger().send(sender, Lang.TIMER_ADDED_EXTRA_TIME.getConfigValue(new String[]{String.valueOf(extraTime)}));
+          if (isSecondHalf()) extraTimeNew = Timer.seconds - time.toSeconds() - 60;
+          else extraTimeNew = Timer.seconds - time.toSeconds();
+          getLogger().send("hoster", Lang.TIMER_ADDED_EXTRA_TIME.getConfigValue(new String[]{String.valueOf(extraTime)}));
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
-      } else if (getPlugin().getServer().getScheduler().isQueued(taskId)) {
+      } else if (isTaskQueued(Timer.assignedTaskId)) {
         if (args[0].equalsIgnoreCase("add")) {
           if (args[1].equalsIgnoreCase("home")) {
             home_result++;
-            getLogger().log(Lang.RESULT_ADD.getConfigValue(new String[]{home}), "fcfa");
+            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{home}));
           } else if (args[1].equalsIgnoreCase("away")) {
             away_result++;
-            getLogger().log(Lang.RESULT_ADD.getConfigValue(new String[]{away}), "fcfa");
+            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{away}));
           } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
         } else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("rem")) {
           if (args[1].equalsIgnoreCase("home")) {
-            home_result--;
-            getLogger().log(Lang.RESULT_REMOVE.getConfigValue(new String[]{home}), "fcfa");
+            if (home_result != 0) {
+              home_result--;
+              getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{home}));
+            } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{home}));
           } else if (args[1].equalsIgnoreCase("away")) {
-            away_result--;
-            getLogger().log(Lang.RESULT_REMOVE.getConfigValue(new String[]{away}), "fcfa");
+            if (away_result != 0) {
+              away_result--;
+              getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{away}));
+            } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{away}));
           } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
         } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
       } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
     } else if (args.length == 3) {
       if (args[0].equalsIgnoreCase("teams")) {
-        home = getHelper().getGroupMeta(args[1], "team");
-        away = getHelper().getGroupMeta(args[2], "team");
-        getLogger().send(sender, Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{home, away}));
+        if (getHelper().groupExists(args[1])) {
+          home = getHelper().getGroupMeta(args[1], "team");
+        } else home = args[1];
+        if (getHelper().groupExists(args[2])) {
+          away = getHelper().getGroupMeta(args[2], "team");
+        } else away = args[2];
+        getLogger().send("hoster", Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{home, away}));
       } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
     } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
     return true;
   }
 
   private Timer secondHalf() {
-    return new Timer(getPlugin(), (int) time.toSeconds(),
-        () -> getLogger().log(Lang.RESULT_SECONDHALF.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}), "default"),
+    return new Timer(getPlugin(), (int) (time.toSeconds() + 60),
+        () -> getLogger().send("default", Lang.RESULT_SECONDHALF.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away})),
         () -> {
-      getLogger().log(Lang.RESULT_OVER.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}), "default");
+      getLogger().send("default", Lang.RESULT_OVER.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}));
       getLogger().broadcastBar(Lang.RESULT_END.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}));},
         (t) -> {
       String secondsParsed = formatTime(Timer.getSecondsParsed());
-      String seconds = formatTime(Timer.seconds);
+      String seconds = formatTime(Timer.getSeconds() - 60);
       String extraTimeString = formatTime((int) extraTimeNew);
-      String formatted;
+      String formatted = "", color = "&a";
 
       // if there's et
-      if (Timer.getSeconds() != (int) time.toSeconds())
-        formatted = color("&e 2HT &c(+" + extraTimeString + ")");
-      else formatted = "&e 2HT";
+      if ((Timer.getSeconds() - 60) != (int) time.toSeconds()) {
+        if (extraTimeNew != 0) formatted = color("&7 ┃ &e2HT &c(+" + extraTimeString + " ET)");
+        else color = color("&a");
+      } else formatted = color("&7 ┃ &e2HT");
 
-      getLogger().broadcastBar(Lang.RESULT_ACTIONBAR.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away, "" + ChatColor.GREEN, secondsParsed, seconds, formatted}));
+      // format last attack
+      if (Timer.getSecondsParsed() > ((Timer.getSeconds() - 60) - 5))
+        color = color("&c");
+
+      getLogger().broadcastBar(Lang.RESULT_ACTIONBAR.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away, color, secondsParsed, seconds, formatted}));
     });
   }
 
   private Timer halfTime() {
     return new Timer(getPlugin(), 600,
-        () -> getLogger().log(Lang.RESULT_HALFTIME.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}), "default"),
+        () -> getLogger().send("default", Lang.RESULT_HALFTIME.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away})),
         () -> {},
         (t -> getLogger().broadcastBar(Lang.RESULT_ACTIONBAR_HT.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}))));
   }
 
   private Timer firstHalf() {
     return new Timer(getPlugin(), (int) time.toSeconds(), () -> {
-      getLogger().log(Lang.TIMER_STARTING.getConfigValue(new String[]{getFinalPrefix()}), "default");
+      getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getFinalPrefix()}));
       getLogger().broadcastBar(Lang.RESULT_STARTING.getConfigValue(new String[]{getFinalPrefix()}));
       }, () -> {}, (t) -> {
       String secondsParsed = formatTime(Timer.getSecondsParsed());
@@ -172,7 +194,7 @@ public class ResultCommand implements CommandExecutor {
       String formatted, color;
 
       if (Timer.getSeconds() != (int) time.toSeconds())
-        formatted = color("&c (+" + extraTimeString + ")");
+        formatted = color("&7 ┃ &c(+" + extraTimeString + " ET)");
       else formatted = "";
 
       if (Timer.getSecondsParsed() > (time.toSeconds() / 2)) color = color("&c");
@@ -194,11 +216,17 @@ public class ResultCommand implements CommandExecutor {
     time = null;
   }
 
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   private boolean isSetup() {
     return home != null && away != null && time != null && finalPrefix != null;
   }
 
   private String color(final String string) {
     return ChatColor.translateAlternateColorCodes('&', string);
+  }
+
+  private boolean isTaskQueued(final Integer taskId) {
+    if (taskId != null) return getPlugin().getServer().getScheduler().isQueued(taskId);
+    else return false;
   }
 }

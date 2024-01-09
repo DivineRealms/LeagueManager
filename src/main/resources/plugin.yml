@@ -18,3 +18,5 @@ commands:
     aliases: [rs]
   2x4:
     description: 2x4 Result command.
+  1x8:
+    description: 1x8 Result command.

@@ -10,6 +10,7 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
+import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PermissionNode;
 
 import java.time.Duration;
@@ -87,14 +88,30 @@ public class Helper {
     getUserManager().modifyUser(uniqueId, user -> user.data().remove(permissionNode));
   }
 
+  public void playerAddMeta(final UUID uniqueId, final String key, final String value) {
+    final MetaNode node = MetaNode.builder(key, value).withContext("server", "football").build();
+    getUserManager().modifyUser(uniqueId, user -> user.data().add(node));
+  }
+
+  public void playerRemoveMeta(final UUID uniqueId, final String key) {
+    final User user = getPlayer(uniqueId);
+    final MetaNode node = user.getCachedData().getMetaData().queryMetaValue(key).node();
+    if (node != null)
+      getUserManager().modifyUser(uniqueId, u -> u.data().remove(node));
+  }
+
+  public String playerGetMeta(final UUID uniqueId, final String key) {
+    final User user = getPlayer(uniqueId);
+    return user.getCachedData().getMetaData().queryMetaValue(key).result();
+  }
+
   public Group getGroup(final String groupName) {
     return getGroupManager().getGroup(groupName);
   }
 
   public String getGroupMeta(final String groupName, final String metaType) {
     final Group group = getGroup(groupName);
-    if (group == null) return "&c&l!! &fInvalid Group &c&l!!";
-    else return group.getCachedData().getMetaData().getMetaValue(metaType);
+    return group.getCachedData().getMetaData().getMetaValue(metaType);
   }
 
   public boolean groupHasPermission(final String groupName, final String permission) {

@@ -38,7 +38,7 @@ public class LineChecker implements Runnable {
                 final Vector cubeVector = new Vector(cubeLoc.getX(), cubeLoc.getY(), cubeLoc.getZ());
                 if (region.contains(cubeVector)) {
                     //cube.remove();
-                    getLogger().log("IDE GAS: lopta presla gol liniju " + regionName, "fcfa");
+                    getLogger().send("fcfa", "IDE GAS: lopta presla gol liniju " + regionName);
                 }
             }
         }

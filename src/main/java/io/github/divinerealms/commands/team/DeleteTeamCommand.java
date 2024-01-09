@@ -39,7 +39,7 @@ public class DeleteTeamCommand implements CommandExecutor {
         if (groupManager.isLoaded(name.toLowerCase())) {
           final Group group = getHelper().getGroup(name.toLowerCase());
           groupManager.deleteGroup(group);
-          getLogger().log(Lang.TEAM_DELETED.getConfigValue(new String[]{nameUppercase}), "fcfa");
+          getLogger().send("fcfa", Lang.TEAM_DELETED.getConfigValue(new String[]{nameUppercase}));
         } else getLogger().send(sender, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{nameUppercase}));
       } else getLogger().send(sender, Lang.TEAM_USAGE_DELETE.getConfigValue(null));
     }
