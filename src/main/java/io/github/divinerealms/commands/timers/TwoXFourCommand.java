@@ -27,6 +27,7 @@ public class TwoXFourCommand implements CommandExecutor {
   private Time time = null;
   private String type = "&b&lEvent";
   private static String blue, red, green, yellow;
+  private static int team_size = 4;
 
   public TwoXFourCommand(final Plugin plugin, final UtilManager utilManager) {
     this.plugin = plugin;
@@ -62,26 +63,26 @@ public class TwoXFourCommand implements CommandExecutor {
       if (args[0].equalsIgnoreCase("type")) {
         setType(color("&b&lEvent " + args[1]));
         getLogger().send(sender, Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getType()}));
-      } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
-    } else if (isTaskQueued(Timer.assignedTaskId)) {
-      if (args[0].equalsIgnoreCase("add")) {
-        if (teams.containsKey(args[1])) {
-          if (!teams.get(args[1]).equals("4")) {
-            final Integer add = Integer.parseInt(teams.get(args[1])) + 1;
-            teams.put(args[1], String.valueOf(add));
-            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{args[1]}));
-          } else getLogger().send(sender, Lang.RESULT_FULL_LIVES.getConfigValue(new String[]{args[1]}));
-        } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
-      } else if (args[0].equalsIgnoreCase("remove")) {
-        if (teams.containsKey(args[1])) {
-          if (!teams.get(args[1]).equals("0")) {
-            final Integer remove = Integer.parseInt(teams.get(args[1])) - 1;
-            teams.put(args[1], String.valueOf(remove));
-            getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{args[1]}));
-          } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{args[1]}));
-        } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
-      } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
-    } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
+      } else if (isTaskQueued(Timer.assignedTaskId)) {
+        if (args[0].equalsIgnoreCase("add")) {
+          if (teams.containsKey(args[1])) {
+            if (!teams.get(args[1]).equals("4") && !teams.get(args[1]).equals("✕")) {
+              final Integer add = Integer.parseInt(teams.get(args[1])) + 1;
+              teams.put(args[1], String.valueOf(add));
+              getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{args[1]}));
+            } else getLogger().send(sender, Lang.RESULT_FULL_LIVES.getConfigValue(new String[]{args[1]}));
+          } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
+        } else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("rem")) {
+          if (teams.containsKey(args[1])) {
+            if (!teams.get(args[1]).equals("0") && !teams.get(args[1]).equals("✕")) {
+              final Integer remove = Integer.parseInt(teams.get(args[1])) - 1;
+              teams.put(args[1], String.valueOf(remove));
+              getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{args[1]}));
+            } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{args[1]}));
+          } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
+        } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
+      } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
+    } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
     return true;
   }
 
@@ -90,19 +91,24 @@ public class TwoXFourCommand implements CommandExecutor {
     return new Timer(getPlugin(), (int) time.toSeconds(), () -> {
       getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getType()}));
       getLogger().broadcastBar(Lang.RESULT_STARTING.getConfigValue(new String[]{getType()}));
-    }, () -> {
-      getLogger().send("default", Lang.TWO_TIMES_FOUR_RESULT_OVER.getConfigValue(new String[]{getType(), blue, red, green, yellow}));
-      getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_RESULT_END.getConfigValue(new String[]{getType(), blue, red, green, yellow}));
-    }, (t) -> {
+    }, () -> {}, (t) -> {
+      teams.forEach((team, life) -> {
+        if (life.equals("0")) {
+          teams.put(team, "✕");
+          team_size--;
+        }
+      });
       blue = color("&b" + teams.get("blue"));
       red = color("&c" + teams.get("red"));
       green = color("&a" + teams.get("green"));
       yellow = color("&e" + teams.get("yellow"));
       String secondsParsed = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSecondsParsed())).format(DateTimeFormatter.ofPattern("mm:ss"));
-      teams.forEach((team, life) -> {
-        if (life.equals("0")) teams.put(team, "✕");
-      });
       getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_ACTIONBAR.getConfigValue(new String[]{getType(), blue, red, green, yellow, secondsParsed}));
+      if (team_size == 1) {
+        getLogger().send("default", Lang.TWO_TIMES_FOUR_RESULT_OVER.getConfigValue(new String[]{getType(), blue, red, green, yellow}));
+        getLogger().broadcastBar(Lang.TWO_TIMES_FOUR_RESULT_END.getConfigValue(new String[]{getType(), blue, red, green, yellow}));
+        startResult().cancelTask(Timer.assignedTaskId);
+      }
     });
   }
 
