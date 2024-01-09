@@ -24,7 +24,7 @@ public class OneXEightCommand implements CommandExecutor {
   private final Plugin plugin;
   private final Logger logger;
   private static Map<String, String> teams = createMap();
-  private Time time = null;
+  private Time time = Time.parseString("30min");
   private String type = "&b&lEvent";
   private static String gray, red, orange, yellow, green, blue, purple, black;
 
@@ -62,31 +62,30 @@ public class OneXEightCommand implements CommandExecutor {
       if (args[0].equalsIgnoreCase("type")) {
         setType(color("&b&lEvent " + args[1]));
         getLogger().send(sender, Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getType()}));
-      } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-    } else if (isTaskQueued(Timer.assignedTaskId)) {
-      if (args[0].equalsIgnoreCase("add")) {
-        if (teams.containsKey(args[1])) {
-          if (!teams.get(args[1]).equals("2")) {
-            final Integer add = Integer.parseInt(teams.get(args[1])) + 1;
-            teams.put(args[1], String.valueOf(add));
-            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{args[1]}));
-          } else getLogger().send(sender, Lang.RESULT_FULL_LIVES.getConfigValue(new String[]{args[1]}));
-        } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
-      } else if (args[0].equalsIgnoreCase("remove")) {
-        if (teams.containsKey(args[1])) {
-          if (!teams.get(args[1]).equals("0")) {
-            final Integer remove = Integer.parseInt(teams.get(args[1])) - 1;
-            teams.put(args[1], String.valueOf(remove));
-            getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{args[1]}));
-          } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{args[1]}));
-        } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
-      } else getLogger().send(sender, Lang.ONE_TIMES_EIGHT_HELP.getConfigValue(null));
-    } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
+      } else if (isTaskQueued(Timer.assignedTaskId)) {
+        if (args[0].equalsIgnoreCase("add")) {
+          if (teams.containsKey(args[1])) {
+            if (!teams.get(args[1]).equals("2")) {
+              final Integer add = Integer.parseInt(teams.get(args[1])) + 1;
+              teams.put(args[1], String.valueOf(add));
+              getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{args[1]}));
+            } else getLogger().send(sender, Lang.RESULT_FULL_LIVES.getConfigValue(new String[]{args[1]}));
+          } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
+        } else if (args[0].equalsIgnoreCase("remove")) {
+          if (teams.containsKey(args[1])) {
+            if (!teams.get(args[1]).equals("0")) {
+              final Integer remove = Integer.parseInt(teams.get(args[1])) - 1;
+              teams.put(args[1], String.valueOf(remove));
+              getLogger().send("hoster", Lang.RESULT_REMOVE.getConfigValue(new String[]{args[1]}));
+            } else getLogger().send(sender, Lang.RESULT_ELIMINATED.getConfigValue(new String[]{args[1]}));
+          } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
+        } else getLogger().send(sender, Lang.ONE_TIMES_EIGHT_HELP.getConfigValue(null));
+      } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
+    } else getLogger().send(sender, Lang.ONE_TIMES_EIGHT_HELP.getConfigValue(null));
     return true;
   }
 
   private Timer startResult() {
-    Time time = Time.parseString("30min");
     return new Timer(getPlugin(), (int) time.toSeconds(), () -> {
       getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getType()}));
       getLogger().broadcastBar(Lang.RESULT_STARTING.getConfigValue(new String[]{getType()}));
@@ -94,10 +93,14 @@ public class OneXEightCommand implements CommandExecutor {
       getLogger().send("default", Lang.ONE_TIMES_EIGHT_RESULT_OVER.getConfigValue(new String[]{getType(), gray, red, orange, yellow, green, blue, purple, black}));
       getLogger().broadcastBar(Lang.ONE_TIMES_EIGHT_RESULT_END.getConfigValue(new String[]{getType(), gray, red, orange, yellow, green, blue, purple, black}));
     }, (t) -> {
-      blue = color("&b" + teams.get("blue"));
+      gray = color("&7" + teams.get("gray"));
       red = color("&c" + teams.get("red"));
-      green = color("&a" + teams.get("green"));
+      orange = color("&6" + teams.get("orange"));
       yellow = color("&e" + teams.get("yellow"));
+      green = color("&a" + teams.get("green"));
+      blue = color("&b" + teams.get("blue"));
+      purple = color("&d" + teams.get("purple"));
+      black = color("&0" + teams.get("black"));
       String secondsParsed = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSecondsParsed())).format(DateTimeFormatter.ofPattern("mm:ss"));
       teams.forEach((team, life) -> {
         if (life.equals("0")) teams.put(team, "✕");

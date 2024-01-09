@@ -14,6 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+@SuppressWarnings("deprecation")
 @Getter
 public class UnbanPlayerCommand implements CommandExecutor {
   private final Helper helper;
