@@ -63,18 +63,16 @@ public class ResultCommand implements CommandExecutor {
         if (isTaskQueued(Timer.assignedTaskId)) {
           getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           firstHalf().cancelTask(Timer.assignedTaskId);
+          reset();
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
-      } else if (args[0].equalsIgnoreCase("reset")) {
-        reset();
-        getLogger().send(sender, Lang.TIMER_RESET.getConfigValue(null));
-      } else if (args[0].equalsIgnoreCase("ht")) {
+      } else if (args[0].equalsIgnoreCase("pause")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
           getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           firstHalf().cancelTask(Timer.assignedTaskId);
           secondHalf = true;
           Timer.assignedTaskId = halfTime().startTask();
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
-      } else if (args[0].equalsIgnoreCase("continue")) {
+      } else if (args[0].equalsIgnoreCase("resume")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
           halfTime().cancelTask(Timer.assignedTaskId);
           Timer.assignedTaskId = secondHalf().startTask();
@@ -134,10 +132,14 @@ public class ResultCommand implements CommandExecutor {
     } else if (args.length == 3) {
       if (args[0].equalsIgnoreCase("teams")) {
         if (getHelper().groupExists(args[1])) {
-          home = getHelper().getGroupMeta(args[1], "team");
+          if (getHelper().groupHasMeta(args[1], "team"))
+            home = getHelper().getGroupMeta(args[1], "team");
+          else home = getHelper().getGroupMeta(args[1], "b");
         } else home = args[1];
         if (getHelper().groupExists(args[2])) {
-          away = getHelper().getGroupMeta(args[2], "team");
+          if (getHelper().groupHasMeta(args[2], "team"))
+            away = getHelper().getGroupMeta(args[2], "team");
+          else away = getHelper().getGroupMeta(args[2], "b");
         } else away = args[2];
         getLogger().send("hoster", Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{home, away}));
       } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));

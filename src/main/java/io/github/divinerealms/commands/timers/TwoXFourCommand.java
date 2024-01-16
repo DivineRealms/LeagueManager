@@ -50,13 +50,11 @@ public class TwoXFourCommand implements CommandExecutor {
           Timer.assignedTaskId = startResult().startTask();
           getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
         } else getLogger().send("hoster", Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
-      } else if (args[0].equalsIgnoreCase("reset")) {
-        createMap();
-        getLogger().send("hoster", Lang.RESULT_RESET.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("stop")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
           getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           startResult().cancelTask(Timer.assignedTaskId);
+          createMap();
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else getLogger().send(sender, Lang.TWO_TIMES_FOUR_HELP.getConfigValue(null));
     } else if (args.length == 2) {

@@ -35,23 +35,31 @@ public class CreateTeamCommand implements CommandExecutor {
       if (args.length <= 2 || args[1].equalsIgnoreCase("help")) {
         getLogger().send(sender, Lang.TEAM_HELP.getConfigValue(null));
       } else if (args.length == 3) {
-        final String name = args[1], tag = args[2], nameUppercase = name.toUpperCase();
+        final String name = args[1], tag = args[2];
         final GroupManager groupManager = getLuckPermsAPI().getGroupManager();
+        String nameA;
 
-        if (!groupManager.isLoaded(name.toLowerCase())) {
-          groupManager.createAndLoadGroup(name).thenApplyAsync(group -> {
-            group.data().add(WeightNode.builder(100).withContext("server", "football").build());
-            group.data().add(MetaNode.builder("team", tag).withContext("server", "football").build());
+        if (name.length() == 4) nameA = name.substring(0, 3);
+        else nameA = name;
 
+        if (!groupManager.isLoaded(nameA.toLowerCase())) {
+          groupManager.createAndLoadGroup(nameA).thenApplyAsync(group -> {
+            if (name.endsWith("b")) {
+              group.data().add(WeightNode.builder(99).withContext("server", "football").build());
+              group.data().add(MetaNode.builder("b", tag).withContext("server", "football").build());
+            } else {
+              group.data().add(WeightNode.builder(100).withContext("server", "football").build());
+              group.data().add(MetaNode.builder("team", tag).withContext("server", "football").build());
+            }
             for (String permission : getHelper().getPermissions()) {
-              permission = permission.replace("%team%", name.toLowerCase());
+              permission = permission.replace("%team%", nameA.toLowerCase());
               group.data().add(PermissionNode.builder(permission).withContext("server", "football").build());
             }
 
-            getLogger().send("fcfa", Lang.TEAM_CREATED.getConfigValue(new String[]{nameUppercase}));
+            getLogger().send("fcfa", Lang.TEAM_CREATED.getConfigValue(new String[]{nameA.toUpperCase()}));
             return group;
           }).thenCompose(groupManager::saveGroup);
-        } else getLogger().send(sender, Lang.TEAM_ALREADY_DEFINED.getConfigValue(new String[]{nameUppercase}));
+        } else getLogger().send(sender, Lang.TEAM_ALREADY_DEFINED.getConfigValue(new String[]{nameA.toUpperCase()}));
       } else getLogger().send(sender, Lang.TEAM_USAGE_CREATE.getConfigValue(null));
     }
     return true;
