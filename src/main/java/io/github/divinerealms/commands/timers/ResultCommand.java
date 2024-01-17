@@ -33,6 +33,7 @@ public class ResultCommand implements CommandExecutor {
   private static double extraTimeNew;
   private String finalPrefix = "&b&lEvent";
   private boolean secondHalf = false;
+  private boolean beginning = false;
 
   public ResultCommand(final Plugin plugin, final UtilManager utilManager) {
     this.plugin = plugin;
@@ -55,17 +56,20 @@ public class ResultCommand implements CommandExecutor {
       getLogger().send("hoster", Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getFinalPrefix()}));
     } else if (args.length == 1) {
       if (args[0].equalsIgnoreCase("start")) {
-        if (!isTaskQueued(Timer.assignedTaskId)) {
+        beginning = true;
+        if (!isTaskQueued(Timer.assignedTaskId) && time != null && home != null && away != null) {
           Timer.assignedTaskId = firstHalf().startTask();
           getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
         } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("stop")) {
+        beginning = false;
         if (isTaskQueued(Timer.assignedTaskId)) {
           getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           firstHalf().cancelTask(Timer.assignedTaskId);
           reset();
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("pause")) {
+        beginning = false;
         if (isTaskQueued(Timer.assignedTaskId)) {
           getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
           firstHalf().cancelTask(Timer.assignedTaskId);
@@ -110,10 +114,10 @@ public class ResultCommand implements CommandExecutor {
         if (args[0].equalsIgnoreCase("add")) {
           if (args[1].equalsIgnoreCase("home")) {
             home_result++;
-            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{home}));
+            getLogger().send("default", Lang.RESULT_ADD.getConfigValue(new String[]{home}));
           } else if (args[1].equalsIgnoreCase("away")) {
             away_result++;
-            getLogger().send("hoster", Lang.RESULT_ADD.getConfigValue(new String[]{away}));
+            getLogger().send("default", Lang.RESULT_ADD.getConfigValue(new String[]{away}));
           } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
         } else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("rem")) {
           if (args[1].equalsIgnoreCase("home")) {
