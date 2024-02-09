@@ -34,7 +34,7 @@ public class ChatListener implements Listener {
     final String message = event.getMessage().toLowerCase();
 
     final Pattern FC_STORE = Pattern.compile("^/(fc|footcube(:footcube|:fc|)) store");
-    final Pattern FC_COMMANDS = Pattern.compile("^/(footcube(:footcube|:fc|)|fc|tkp|takeplace|best|stats|2v2|3v3|4v4)");
+    final Pattern FC_COMMANDS = Pattern.compile("^/(footcube(:footcube|:fc|)|fc|takeplace|best|stats|fc join 2v2|fc join 3v3|fc join 4v4)");
     final Pattern FC_ADMIN = Pattern.compile("^/((clear|)cube(s|))");
 
     final Matcher matcherStore = FC_STORE.matcher(message);
@@ -50,7 +50,7 @@ public class ChatListener implements Listener {
 
     if (matcherCommands.find()) {
       if (!player.hasPermission("commandwhitelist.bypass.fc")) {
-        if (player.hasPermission("group.fcfa")) return;
+        if (player.hasPermission("group.fcba")) return;
         else {
           getLogger().send(player, Lang.FOOTCUBE_DISABLED.getConfigValue(null));
           event.setCancelled(true);
