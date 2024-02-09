@@ -1,6 +1,8 @@
 name: LeagueManager
 version: 1.2.4
-author: Neeonn
+author: 
+- Neeonn
+- Maatijaa
 depend:
   - LuckPerms
   - WorldGuard
