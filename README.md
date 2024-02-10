@@ -1,5 +1,5 @@
-# LeagueManager
-Plugin is created for easier league managment and operation.
+# pLeagueManager
+Plugin is designed for easier league managment.
 
 | Type         | Badges                                                                                                                                             |
 |--------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
