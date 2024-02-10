@@ -43,9 +43,9 @@ public class GiveAccessCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase(target.getName())) {
-          if (!getHelper().playerInGroup(target.getUniqueId(), "group._var")) {
+          if (!getHelper().playerInGroup(target.getUniqueId(), "group.var")) {
             if (args.length == 2) {
-              final Node node = Node.builder("group._var").build();
+              final Node node = Node.builder("group.var").build();
 
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);
@@ -65,13 +65,13 @@ public class GiveAccessCommand implements CommandExecutor {
                 return true;
               }
 
-              final Node node = Node.builder("group._var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
+              final Node node = Node.builder("group.var").expiry(time.toMilliseconds(), TimeUnit.MILLISECONDS).build();
 
               getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
                 final DataMutateResult result = user.data().add(node);
 
                 if (result.wasSuccessful())
-                  getLogger().send("fcfa", Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
+                  getLogger().send("fcba", Lang.VAR_GIVEN_ACCESS_1.getConfigValue(new String[]{target.getName(), time.toString()}));
                 else
                   getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
               });
