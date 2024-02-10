@@ -70,27 +70,27 @@ public class Helper {
   }
 
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
-    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
+    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(inheritanceNode));
   }
 
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
-    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
+    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().remove(inheritanceNode));
   }
 
   public void playerAddPermission(final UUID uniqueId, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    final PermissionNode permissionNode = PermissionNode.builder(permission).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(permissionNode));
   }
 
   public void playerRemovePermission(final UUID uniqueId, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    final PermissionNode permissionNode = PermissionNode.builder(permission).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().remove(permissionNode));
   }
 
   public void playerAddMeta(final UUID uniqueId, final String key, final String value) {
-    final MetaNode node = MetaNode.builder(key, value).withContext("server", "football").build();
+    final MetaNode node = MetaNode.builder(key, value).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(node));
   }
 
@@ -121,12 +121,12 @@ public class Helper {
   }
 
   public void groupAddPermission(final String groupName, final String permission, final boolean toggle) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).value(toggle).withContext("server", "football").build();
+    final PermissionNode permissionNode = PermissionNode.builder(permission).value(toggle).build();
     getGroupManager().modifyGroup(groupName, group -> group.data().add(permissionNode));
   }
 
   public void groupRemovePermission(final String groupName, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+    final PermissionNode permissionNode = PermissionNode.builder(permission).build();
     getGroupManager().modifyGroup(groupName, group -> group.data().remove(permissionNode));
   }
 
