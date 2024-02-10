@@ -1,6 +1,4 @@
 # LeagueManager
-Plugin for easier league organisation.
+![](https://img.shields.io/github/license/DivineRealms/LeagueManager.svg) ![](https://img.shields.io/github/issues/DivineRealms/LeagueManager) 
 
-| Type         | Badges                                                                                                                                             |
-|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **General:** | ![](https://tokei.rs/b1/github/DivineRealms/LeagueManager?category=code) ![](https://tokei.rs/b1/github/DivineRealms/LeagueManager?category=files) |
+Plugin for easier league organisation.
