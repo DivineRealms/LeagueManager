@@ -49,7 +49,7 @@ public class RemoveAccessCommand implements CommandExecutor {
               final DataMutateResult result = user1.data().remove(node);
 
               if (result.wasSuccessful())
-                getLogger().send("fcfa", Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
+                getLogger().send("fcba", Lang.VAR_REMOVED_ACCESS.getConfigValue(new String[]{target.getName()}));
               else
                 getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
             });
