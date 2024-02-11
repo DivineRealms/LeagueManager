@@ -38,6 +38,7 @@ public class LeagueManager extends JavaPlugin {
 
     setUtilManager(new UtilManager(this));
     setListenerManager(new ListenerManager(this, getUtilManager()));
+    getUtilManager().getLogger().initializeStrings();
     getUtilManager().getLogger().sendBanner();
     getLogger().info("Loading commands...");
     setup();

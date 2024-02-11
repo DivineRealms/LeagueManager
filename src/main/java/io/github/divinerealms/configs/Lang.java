@@ -3,11 +3,6 @@ package io.github.divinerealms.configs;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public enum Lang {
@@ -233,6 +228,7 @@ public enum Lang {
   ONE_TIMES_EIGHT_RESULT_END("result.1x8.end", "{0} &6┃ &fMatch over! Result: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6} &d{7} &0{8}"),
   TIMER_ADDED_EXTRA_TIME("result.extra-time-added", "&a▎ &fAdded &e{0} &fof extra time."),
   WEBHOOK_NOT_SETUP("webhook.not-setup", "&4▎ &cNiste dodali URL za Discord Webhook u config.yml!"),
+  WEBHOOK_TEAM_LINEUP("webhook.team-lineup", "**{0}** | **{1}** postave: `[CAP]` **{2}**, `[GK]` **{3}**, `[CB]` **{4}**, `[CB2]` **{5}**, `[CM]` **{6}**, `[ST]` **{7}**"),
   WEBHOOK_MATCH_START("webhook.match-start", "Početak utakmice **{0} - {1}**."),
   WEBHOOK_MATCH_ENDED("webhook.match-ended", "Kraj utakmice, rezultat: **{0} {1} - {2} {3}**. Trajanje: **`{4}`**."),
   WEBHOOK_MATCH_HALFTIME("webhook.match-halftime", "Poluvreme, rezultat: **{0} {1} - {2} {3}**."),

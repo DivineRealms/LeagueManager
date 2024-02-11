@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -21,8 +19,8 @@ import java.util.stream.Collectors;
 public class Logger {
   private final Server server;
   private final PluginDescriptionFile description;
-  private final List<String> banner = new ArrayList<>();
   private final ConsoleCommandSender consoleSender;
+  private String pluginName, authors, serverVersion;
 
   public Logger(final Plugin plugin) {
     this.server = plugin.getServer();
@@ -53,23 +51,18 @@ public class Logger {
       ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
   }
 
+  public void initializeStrings() {
+    pluginName = getDescription().getFullName();
+    authors = getDescription().getAuthors().stream().map(String::valueOf).collect(Collectors.joining(", "));
+    serverVersion = getServer().getName() + " - " + getServer().getBukkitVersion();
+  }
+
+  public String[] startupBanner() {
+    return new String[]{"&r","&d  88     &e8b    d8   &2" + getPluginName(),"&d  88     &e88b  d88   &5Authors: &d" + getAuthors(),"&d  88  .o &e88YbdP88","&d  88ood8 &e88 YY 88   &8Running on " + getServerVersion(),"&r"};
+  }
+
   public void sendBanner() {
-    final List<String> authors = getDescription().getAuthors();
-    final String formattedAuthors = authors.stream().map(String::valueOf).collect(Collectors.joining(", "));
-    final String pluginName = getDescription().getFullName();
-    final String serverName = getServer().getName();
-    final String version = getServer().getBukkitVersion();
-    final String serverNameVersion = serverName + " - " + version;
-
-    getBanner().add("&r");
-    getBanner().add("&d  88     &e8b    d8   &2" + pluginName);
-    getBanner().add("&d  88     &e88b  d88   &5Authors: &d" + formattedAuthors);
-    getBanner().add("&d  88  .o &e88YbdP88");
-    getBanner().add("&d  88ood8 &e88 YY 88   &8Running on " + serverNameVersion);
-    getBanner().add("&r");
-
-    for (final String message : getBanner())
+    for (final String message : startupBanner())
       getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-    getBanner().clear();
   }
 }

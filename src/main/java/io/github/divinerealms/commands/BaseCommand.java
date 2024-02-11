@@ -16,7 +16,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,6 +24,7 @@ public class BaseCommand implements CommandExecutor {
   private final LeagueManager instance;
   private final UtilManager utilManager;
   private final Logger logger;
+  private final List<String> banner = new ArrayList<>();
 
   public BaseCommand(final LeagueManager instance, final UtilManager utilManager) {
     this.instance = instance;
@@ -34,11 +35,8 @@ public class BaseCommand implements CommandExecutor {
   @Override
   public boolean onCommand(final CommandSender sender, final Command cmd, String label, String[] args) {
     if (args.length < 1) {
-      if (sender instanceof Player)
-        for (String message : getBanner())
-          sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-      else getLogger().sendBanner();
-      return false;
+      sendBanner(sender);
+      return true;
     } else if (args[0].equalsIgnoreCase("help")) {
       final HelpCommand helpCommand = new HelpCommand(getUtilManager());
       helpCommand.onCommand(sender, cmd, label, args);
@@ -118,5 +116,13 @@ public class BaseCommand implements CommandExecutor {
     return true;
   }
 
-  private final List<String> banner = Arrays.asList("&8▎ &r", "&8▎ &d  88       &e8b      d8", "&8▎ &d  88       &e88b   d88   &2LeagueManager", "&8▎ &d  88  .o   &e88YbdP88   &5Authors: &dNeeonn", "&8▎ &d  88ood8 &e88 Y||Y 88", "&8▎ &r");
+  private void sendBanner(final CommandSender sender) {
+    if (sender instanceof Player) for (final String message : startupBanner())
+      getLogger().send(sender, ChatColor.translateAlternateColorCodes('&', message));
+    else getLogger().sendBanner();
+  }
+
+  private String[] startupBanner() {
+    return new String[]{"&8▎ &r","&8▎ &d  88       &e8b      d8","&8▎ &d  88       &e88b   d88   &a" + getLogger().getPluginName(),"&8▎ &d  88    .o &e88YbdP88   &3Authors: &b" + getLogger().getAuthors(),"&8▎ &d  88ood8 &e88 Y||Y 88","&8▎ &r"};
+  }
 }

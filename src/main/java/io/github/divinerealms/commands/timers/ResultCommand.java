@@ -14,7 +14,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.awt.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -184,8 +183,6 @@ public class ResultCommand implements CommandExecutor {
         } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
       } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
     } else if (args.length == 8) {
-      final DiscordWebhook.EmbedObject embedObject = new DiscordWebhook.EmbedObject();
-      embedObject.setColor(Color.GREEN);
       if (args[0].equalsIgnoreCase("home")) {
         if (getHelper().groupExists(args[1])) {
           if (getHelper().groupHasMeta(args[1], "team"))
@@ -199,14 +196,7 @@ public class ResultCommand implements CommandExecutor {
           CM_HOME = args[6];
           ST_HOME = args[7];
           if (webhook != null) {
-            embedObject.setTitle("Postave za tim: " + HOME_NAME);
-            embedObject.setDescription("Kapiten tima: **" + CAPTAIN_HOME + "**");
-            embedObject.addField("GK:", GK_HOME, true);
-            embedObject.addField("CB:", CB_HOME, true);
-            embedObject.addField("CB2:", CB2_HOME, true);
-            embedObject.addField("CM:", CM_HOME, true);
-            embedObject.addField("ST:", ST_HOME, true);
-            webhook.addEmbed(embedObject);
+            webhook.setContent(Lang.WEBHOOK_TEAM_LINEUP.getConfigValue(new String[]{"HOME", HOME_NAME, CAPTAIN_HOME, GK_HOME, CB_HOME, CB2_HOME, CM_HOME, ST_HOME}));
             try {
               webhook.execute();
             } catch (IOException e) {
@@ -229,14 +219,7 @@ public class ResultCommand implements CommandExecutor {
           CM_AWAY = args[6];
           ST_AWAY = args[7];
           if (webhook != null) {
-            embedObject.setTitle("Postave za tim: " + AWAY_NAME);
-            embedObject.setDescription("Kapiten tima: **" + CAPTAIN_AWAY + "**");
-            embedObject.addField("GK:", GK_AWAY, true);
-            embedObject.addField("CB:", CB_AWAY, true);
-            embedObject.addField("CB2:", CB2_AWAY, true);
-            embedObject.addField("CM:", CM_AWAY, true);
-            embedObject.addField("ST:", ST_AWAY, true);
-            webhook.addEmbed(embedObject);
+            webhook.setContent(Lang.WEBHOOK_TEAM_LINEUP.getConfigValue(new String[]{"AWAY", AWAY_NAME, CAPTAIN_AWAY, GK_AWAY, CB_AWAY, CB2_AWAY, CM_AWAY, ST_AWAY}));
             try {
               webhook.execute();
             } catch (IOException e) {
