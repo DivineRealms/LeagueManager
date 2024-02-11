@@ -3,6 +3,11 @@ package io.github.divinerealms.configs;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public enum Lang {
@@ -263,5 +268,21 @@ public enum Lang {
     }
 
     return value;
+  }
+
+  public static List<String> banner(final Plugin plugin) {
+    final List<String> authors = plugin.getDescription().getAuthors();
+    final String formattedAuthors = authors.stream().map(String::valueOf).collect(Collectors.joining(", "));
+    final String pluginName = plugin.getDescription().getFullName();
+
+    final List<String> banner = new ArrayList<>();
+    banner.add("&8▎ &r");
+    banner.add("&8▎ &d  88       &e8b      d8");
+    banner.add("&8▎ &d  88       &e88b   d88   &2" + pluginName);
+    banner.add("&8▎ &d  88    .o &e88YbdP88   &5Authors: &d" + formattedAuthors);
+    banner.add("&8▎ &d  88ood8 &e88 Y||Y 88");
+    banner.add("&8▎ &r");
+
+    return banner;
   }
 }

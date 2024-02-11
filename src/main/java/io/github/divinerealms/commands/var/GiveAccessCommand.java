@@ -66,7 +66,7 @@ public class GiveAccessCommand implements CommandExecutor {
               else
                 getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
             });
-          }
+          } else getLogger().send(sender, Lang.VAR_ALREADY_HAS_ACCESS.getConfigValue(new String[]{target.getName()}));
         } else getLogger().send(sender, Lang.VAR_USAGE_ADD.getConfigValue(null));
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
     }

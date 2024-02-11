@@ -10,6 +10,7 @@ import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,9 +29,14 @@ public class BaseCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command cmd, String label, String[] args) {
-    if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
+    if (args.length < 1) {
+      for (final String message : Lang.banner(getPlugin()))
+        getLogger().send(sender, ChatColor.translateAlternateColorCodes('&', message));
+      return true;
+    } else if (args[0].equalsIgnoreCase("help")) {
       final HelpCommand helpCommand = new HelpCommand(getUtilManager());
       helpCommand.onCommand(sender, cmd, label, args);
+      return true;
     } else {
       switch (args[0].toLowerCase()) {
         case "reload":
@@ -97,8 +103,10 @@ public class BaseCommand implements CommandExecutor {
         case "vr":
           final RemoveAccessCommand removeAccessCommand = new RemoveAccessCommand(getUtilManager());
           removeAccessCommand.onCommand(sender, cmd, label, args);
+          break;
         default:
           getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+          break;
       }
     }
     return true;
