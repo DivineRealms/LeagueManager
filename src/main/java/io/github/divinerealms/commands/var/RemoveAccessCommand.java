@@ -42,7 +42,7 @@ public class RemoveAccessCommand implements CommandExecutor {
 
         if (args[1].equalsIgnoreCase(target.getName())) {
           final User user = getHelper().getPlayer(target.getUniqueId());
-          final Node node = user.getCachedData().getPermissionData().queryPermission("group._var").node();
+          final Node node = user.getCachedData().getPermissionData().queryPermission("vulcan.bypass.client-brand.whitelist").node();
 
           if (node != null) {
             getHelper().getUserManager().modifyUser(target.getUniqueId(), user1 -> {

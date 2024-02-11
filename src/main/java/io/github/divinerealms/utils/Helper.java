@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.group.GroupManager;
 import net.luckperms.api.model.user.User;
@@ -77,6 +78,11 @@ public class Helper {
   public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
     final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
     getUserManager().modifyUser(uniqueId, user -> user.data().remove(inheritanceNode));
+  }
+
+  public boolean playerHasPermission(final UUID uniqueId, final String permission) {
+    final CachedPermissionData cachedPermissionData = getUserManager().getUser(uniqueId).getCachedData().getPermissionData();
+    return cachedPermissionData.checkPermission(permission).asBoolean();
   }
 
   public void playerAddPermission(final UUID uniqueId, final String permission) {
