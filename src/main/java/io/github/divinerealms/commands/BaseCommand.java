@@ -34,8 +34,8 @@ public class BaseCommand implements CommandExecutor {
       for (String message : Lang.banner(getPlugin())) {
         message = ChatColor.translateAlternateColorCodes('&', message);
         if (sender instanceof Player) sender.sendMessage(message);
-        else getLogger().sendBanner();
       }
+      if (!(sender instanceof Player)) getLogger().sendBanner();
       return true;
     } else if (args[0].equalsIgnoreCase("help")) {
       final HelpCommand helpCommand = new HelpCommand(getUtilManager());
