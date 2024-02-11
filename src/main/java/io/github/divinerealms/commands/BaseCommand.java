@@ -10,25 +10,36 @@ import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 public class BaseCommand implements CommandExecutor {
-  private final LeagueManager plugin;
+  private final LeagueManager instance;
   private final UtilManager utilManager;
   private final Logger logger;
 
-  public BaseCommand(final LeagueManager plugin, final UtilManager utilManager) {
-    this.plugin = plugin;
+  public BaseCommand(final LeagueManager instance, final UtilManager utilManager) {
+    this.instance = instance;
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
   }
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command cmd, String label, String[] args) {
-    if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
+    if (args.length < 1) {
+      if (sender instanceof Player)
+        for (String message : getBanner())
+          sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+      else getLogger().sendBanner();
+      return false;
+    } else if (args[0].equalsIgnoreCase("help")) {
       final HelpCommand helpCommand = new HelpCommand(getUtilManager());
       helpCommand.onCommand(sender, cmd, label, args);
       return true;
@@ -36,11 +47,11 @@ public class BaseCommand implements CommandExecutor {
       switch (args[0].toLowerCase()) {
         case "reload":
         case "rl":
-          final ReloadCommand reloadCommand = new ReloadCommand(getPlugin(), getUtilManager());
+          final ReloadCommand reloadCommand = new ReloadCommand(getInstance(), getUtilManager());
           reloadCommand.onCommand(sender, cmd, label, args);
           break;
         case "toggle":
-          final ToggleCommand toggleCommand = new ToggleCommand(getPlugin(), getUtilManager());
+          final ToggleCommand toggleCommand = new ToggleCommand(getInstance(), getUtilManager());
           toggleCommand.onCommand(sender, cmd, label, args);
           break;
         case "ban":
@@ -81,12 +92,12 @@ public class BaseCommand implements CommandExecutor {
           break;
         case "createteam":
         case "ct":
-          final CreateTeamCommand createTeamCommand = new CreateTeamCommand(getPlugin(), getUtilManager());
+          final CreateTeamCommand createTeamCommand = new CreateTeamCommand(getInstance(), getUtilManager());
           createTeamCommand.onCommand(sender, cmd, label, args);
           break;
         case "deleteteam":
         case "dt":
-          final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getPlugin(), getUtilManager());
+          final DeleteTeamCommand deleteTeamCommand = new DeleteTeamCommand(getInstance(), getUtilManager());
           deleteTeamCommand.onCommand(sender, cmd, label, args);
           break;
         case "varadd":
@@ -106,4 +117,6 @@ public class BaseCommand implements CommandExecutor {
     }
     return true;
   }
+
+  private final List<String> banner = Arrays.asList("&8▎ &r", "&8▎ &d  88       &e8b      d8", "&8▎ &d  88       &e88b   d88   &2LeagueManager", "&8▎ &d  88  .o   &e88YbdP88   &5Authors: &dNeeonn", "&8▎ &d  88ood8 &e88 Y||Y 88", "&8▎ &r");
 }
