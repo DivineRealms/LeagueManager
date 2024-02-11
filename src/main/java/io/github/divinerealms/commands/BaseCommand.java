@@ -10,11 +10,9 @@ import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 @Getter
 public class BaseCommand implements CommandExecutor {
@@ -30,14 +28,7 @@ public class BaseCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(final CommandSender sender, final Command cmd, String label, String[] args) {
-    if (args.length < 1) {
-      for (String message : Lang.banner(getPlugin())) {
-        message = ChatColor.translateAlternateColorCodes('&', message);
-        if (sender instanceof Player) sender.sendMessage(message);
-      }
-      if (!(sender instanceof Player)) getLogger().sendBanner();
-      return true;
-    } else if (args[0].equalsIgnoreCase("help")) {
+    if (args.length < 1 || args[0].equalsIgnoreCase("help")) {
       final HelpCommand helpCommand = new HelpCommand(getUtilManager());
       helpCommand.onCommand(sender, cmd, label, args);
       return true;
