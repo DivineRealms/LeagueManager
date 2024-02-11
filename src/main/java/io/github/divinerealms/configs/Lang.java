@@ -6,6 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 @Getter
 public enum Lang {
+  ON("on", "&a&luključen"),
+  OFF("off", "&c&lisključen"),
   RELOAD("reload", "&a▎ &fPlugin reloaded!"),
   UNKNOWN_COMMAND("unknown-command", "&4▎ &cUnknown command."),
   INSUFFICIENT_PERMISSION("insufficient-permission", "&4▎ &cInsufficient permission."),
@@ -224,7 +226,15 @@ public enum Lang {
   ONE_TIMES_EIGHT_ACTIONBAR("result.1x8.actionbar", "{0} &7┃ &fResult: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6} &d{7} &0{8} &7┃ &fTime: &e{9}"),
   ONE_TIMES_EIGHT_RESULT_OVER("result.1x8.over", "&6▎ {0} &6┃ &fMatch over! Result: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6} &d{7} &0{8}&f!"),
   ONE_TIMES_EIGHT_RESULT_END("result.1x8.end", "{0} &6┃ &fMatch over! Result: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6} &d{7} &0{8}"),
-  TIMER_ADDED_EXTRA_TIME("result.extra-time-added", "&a▎ &fAdded &e{0} &fof extra time.");
+  TIMER_ADDED_EXTRA_TIME("result.extra-time-added", "&a▎ &fAdded &e{0} &fof extra time."),
+  WEBHOOK_NOT_SETUP("webhook.not-setup", "&4▎ &cNiste dodali URL za Discord Webhook u config.yml!"),
+  WEBHOOK_MATCH_START("webhook.match-start", "Početak utakmice **{0} - {1}**."),
+  WEBHOOK_MATCH_ENDED("webhook.match-ended", "Kraj utakmice, rezultat: **{0} {1} - {2} {3}**. Trajanje: **`{4}`**."),
+  WEBHOOK_MATCH_HALFTIME("webhook.match-halftime", "Poluvreme, rezultat: **{0} {1} - {2} {3}**."),
+  WEBHOOK_MATCH_SECONDHALF("webhook.match-secondhalf", "Početak drugog poluvremena, rezultat: **{0} {1} - {2} {3}**."),
+  WEBHOOK_MATCH_SCORE("webhook.match-score", "**GOOL!** Scorer: **{0}** (**{1}** - **`{2}`**)!"),
+  WEBHOOK_MATCH_ASSIST("webhook.match-assist", "**GOOL!** Scorer: **{0}** (**{1}** - **`{2}`**)! Asistent: **{3}**."),
+  WEBHOOK_PLAYER_NOT_IN_TEAM("webhook.player-not-in-team", "&4▎ &cIgrač &b{0} &cnije u {1} &ctimu!");
 
   private static FileConfiguration LANG;
   private final String path, def;

@@ -1,30 +1,42 @@
 package io.github.divinerealms.configs;
 
-import io.github.divinerealms.managers.ConfigManager;
 import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
 @Getter
-public class Config extends ConfigManager {
-    private final String name = "config.yml";
-    @Setter private FileConfiguration settings;
+public class Config {
+  private static Plugin plugin;
 
-    public Config(final JavaPlugin plugin) {
-        super(plugin, "");
-    }
+  public static void setup(Plugin plugin) {
+    Config.plugin = plugin;
+  }
 
-    public void reload() {
-        reloadConfig(getName());
-        setSettings(getConfig(getName()));
-    }
+  public static YamlConfiguration getConfig(String configName) {
+    String folder = plugin.getDataFolder().getAbsolutePath() + File.separatorChar;
+    File file = new File(folder + configName);
+    file.getParentFile().mkdirs();
+    YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+    if (!file.exists()) {
+      plugin.getLogger().info("Config " + configName + " not found! Creating.");
+      try {
+        config.save(file);
+      } catch (Exception exception) {
+        plugin.getLogger().warning("Unable to create " + configName + ".yml!");
+      }
+    } else config = YamlConfiguration.loadConfiguration(file);
+    return config;
+  }
 
-    public List<String> getStringList(final String path) {
-        final List<String> list = getSettings().getStringList(path);
-        return new ArrayList<>(list);
+  public static void saveConfig(YamlConfiguration config, String configName) {
+    File file = new File(configName);
+    try {
+      config.save(file);
+    } catch (IOException exception) {
+      plugin.getLogger().warning("Unable to save " + configName + ".yml");
     }
+  }
 }

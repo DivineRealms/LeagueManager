@@ -5,6 +5,7 @@ import io.github.divinerealms.commands.timers.OneXEightCommand;
 import io.github.divinerealms.commands.timers.ResultCommand;
 import io.github.divinerealms.commands.timers.TimerCommand;
 import io.github.divinerealms.commands.timers.TwoXFourCommand;
+import io.github.divinerealms.configs.Config;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.ConfigManager;
 import io.github.divinerealms.managers.ListenerManager;
@@ -12,12 +13,14 @@ import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 @Getter
 public class LeagueManager extends JavaPlugin {
   private final ConfigManager messagesFile = new ConfigManager(this, "");
+  private static YamlConfiguration config;
   @Setter private LuckPerms luckPermsAPI = null;
   @Setter private UtilManager utilManager;
   @Setter private ListenerManager listenerManager;
@@ -25,6 +28,8 @@ public class LeagueManager extends JavaPlugin {
   @Override
   public void onEnable() {
     setupMessages();
+    Config.setup(this);
+    loadConfigs();
 
     if (!setupLuckPermsAPI()) {
       getLogger().info("&cDisabled due to no LuckPerms dependency found!");
@@ -33,7 +38,6 @@ public class LeagueManager extends JavaPlugin {
 
     setUtilManager(new UtilManager(this));
     setListenerManager(new ListenerManager(this, getUtilManager()));
-    getUtilManager().reloadUtils();
     getUtilManager().getLogger().sendBanner();
     getLogger().info("Loading commands...");
     setup();
@@ -78,5 +82,9 @@ public class LeagueManager extends JavaPlugin {
 
     getMessagesFile().getConfig("libs/messages.yml").options().copyDefaults(true);
     getMessagesFile().saveConfig("libs/messages.yml");
+  }
+
+  private void loadConfigs() {
+    config = Config.getConfig("config.yml");
   }
 }

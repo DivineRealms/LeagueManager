@@ -9,24 +9,24 @@ import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Slime;
 
 @Getter
 public class LineChecker implements Runnable {
+    private static final YamlConfiguration config = Config.getConfig("config.yml");
     private final Logger logger;
-    private final Config config;
     private final RegionManager regionManager;
 
     public LineChecker(final UtilManager utilManager) {
         this.logger = utilManager.getLogger();
-        this.config = utilManager.getConfig();
         this.regionManager = WorldGuardPlugin.inst().getRegionManager(Bukkit.getWorld("world"));
     }
 
     @Override
     public void run() {
-        for (final String regionName : getConfig().getStringList("regions")) {
+        for (final String regionName : config.getStringList("regions")) {
             final ProtectedRegion region = getRegionManager().getRegion(regionName);
 
             if (region == null) continue;
