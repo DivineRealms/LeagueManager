@@ -7,34 +7,38 @@ import io.github.divinerealms.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 
 @Getter @Setter
-public class ResultCommand implements CommandExecutor {
+public class ResultCommand implements CommandExecutor, Listener {
   private final Plugin plugin;
   private final Logger logger;
   private final Helper helper;
   private static String home = "home";
   private static String away = "away";
-  private static String HOME_NAME, CAPTAIN_HOME, GK_HOME, CB_HOME, CB2_HOME, CM_HOME, ST_HOME;
-  private static String AWAY_NAME, CAPTAIN_AWAY, GK_AWAY, CB_AWAY, CB2_AWAY, CM_AWAY, ST_AWAY;
+  private static String HOME_NAME, CAPTAIN_HOME, AWAY_NAME, CAPTAIN_AWAY;
   private static int home_result = 0;
   private static int away_result = 0;
   private static Time time = Time.parseString("20min");
   private static Time extraTime = null;
   private static double extraTimeNew;
-  private String finalPrefix = "&b&lEvent";
+  private String finalPrefix = "&bEvent";
   private boolean secondHalf = false;
   private static YamlConfiguration config = Config.getConfig("config.yml");
   private DiscordWebhook webhook = null;
@@ -43,6 +47,9 @@ public class ResultCommand implements CommandExecutor {
     this.plugin = plugin;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
+
+    if (!config.getString("discordWebhookURL").isEmpty())
+      webhook = new DiscordWebhook(config.getString("discordWebhookURL"));
   }
 
   @Override
@@ -51,9 +58,6 @@ public class ResultCommand implements CommandExecutor {
       getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
       return true;
     }
-
-    if (!config.getString("discordWebhookURL").isEmpty())
-      webhook = new DiscordWebhook(config.getString("discordWebhookURL"));
 
     if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
       getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
@@ -70,15 +74,8 @@ public class ResultCommand implements CommandExecutor {
         } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("stop")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
-          webhook.setContent(Lang.WEBHOOK_MATCH_ENDED.getConfigValue(new String[]{HOME_NAME, String.valueOf(home_result), String.valueOf(away_result), AWAY_NAME, formatTime(Timer.getSecondsParsed())}));
-          try {
-            webhook.execute();
-          } catch (IOException e) {
-            getLogger().send("hoster", e.getMessage());
-          }
-          getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
-          firstHalf().cancelTask(Timer.assignedTaskId);
-          reset();
+          secondHalf().getAfterTimer().run();
+          Bukkit.getScheduler().cancelTasks(getPlugin());
         } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
       } else if (args[0].equalsIgnoreCase("pause") || args[0].equalsIgnoreCase("p")) {
         if (isTaskQueued(Timer.assignedTaskId)) {
@@ -143,95 +140,125 @@ public class ResultCommand implements CommandExecutor {
         } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
       } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
     } else if (args.length == 3 || args.length == 4) {
-      if (isTaskQueued(Timer.assignedTaskId)) {
+      if (args[0].equalsIgnoreCase("teams")) {
+        if (getHelper().groupExists(args[1])) {
+          if (getHelper().groupHasMeta(args[1], "team")) {
+            home = getHelper().getGroupMeta(args[1], "team");
+            HOME_NAME = args[1].toUpperCase();
+          } else home = getHelper().getGroupMeta(args[1], "b");
+        } else home = args[1];
+        if (getHelper().groupExists(args[2])) {
+          if (getHelper().groupHasMeta(args[2], "team")) {
+            away = getHelper().getGroupMeta(args[2], "team");
+            AWAY_NAME = args[2].toUpperCase();
+          } else away = getHelper().getGroupMeta(args[2], "b");
+        } else away = args[2];
+        getLogger().send("hoster", Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{home,away}));
+        if (webhook != null) {
+          webhook.setContent(Lang.WEBHOOK_TEAMS_SET.getConfigValue(new String[]{HOME_NAME,AWAY_NAME}));
+          try {
+            webhook.execute();
+          } catch (IOException e) {
+            getLogger().send(sender, e.getMessage());
+            return true;
+          }
+        } else getLogger().send(sender, Lang.WEBHOOK_NOT_SETUP.getConfigValue(null));
+      } else if (args[0].equalsIgnoreCase("cap") || args[0].equalsIgnoreCase("captain")) {
+        if (args.length == 3) {
+          CAPTAIN_HOME = args[1];
+          CAPTAIN_AWAY = args[2];
+          getLogger().send(sender, Lang.RESULT_CAPTAINS_SET.getConfigValue(new String[]{CAPTAIN_HOME,CAPTAIN_AWAY}));
+        } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
+      } else if (isTaskQueued(Timer.assignedTaskId)) {
         if (args[0].equalsIgnoreCase("add")) {
           if (args[1].equalsIgnoreCase("home")) {
-            final String[] homePlayers = {CAPTAIN_HOME, GK_HOME, CB_HOME, CB2_HOME, CM_HOME, ST_HOME};
-            if (Arrays.asList(homePlayers).contains(args[2])) {
-              home_result++;
-              getLogger().send("default", Lang.RESULT_ADD.getConfigValue(new String[]{args[2], home}));
-              if (webhook != null) {
-                webhook.setContent(Lang.WEBHOOK_MATCH_SCORE.getConfigValue(new String[]{args[2], HOME_NAME, formatTime(Timer.getSecondsParsed())}));
-                if (args.length == 4)
-                  webhook.setContent(Lang.WEBHOOK_MATCH_ASSIST.getConfigValue(new String[]{args[2], HOME_NAME, formatTime(Timer.getSecondsParsed()), args[3]}));
-                try {
-                  webhook.execute();
-                } catch (IOException e) {
-                  getLogger().send(sender, e.getMessage());
-                  return true;
-                }
-              } else getLogger().send(sender, Lang.WEBHOOK_NOT_SETUP.getConfigValue(null));
-            } else getLogger().send(sender, Lang.WEBHOOK_PLAYER_NOT_IN_TEAM.getConfigValue(new String[]{args[2], home}));
+            home_result++;
+            if (args.length == 3) getLogger().send("default", Lang.RESULT_ADD.getConfigValue(new String[]{args[2], home}));
+            else getLogger().send("default", Lang.RESULT_ADD_ASSIST.getConfigValue(new String[]{args[2], home, args[3]}));
+            if (webhook != null) {
+              webhook.setContent(Lang.WEBHOOK_MATCH_SCORE.getConfigValue(new String[]{args[2], HOME_NAME, formatTime(Timer.getSecondsParsed())}));
+              if (args.length == 4)
+                webhook.setContent(Lang.WEBHOOK_MATCH_ASSIST.getConfigValue(new String[]{args[2], HOME_NAME, formatTime(Timer.getSecondsParsed()), args[3]}));
+              try {
+                webhook.execute();
+              } catch (IOException e) {
+                getLogger().send(sender, e.getMessage());
+                return true;
+              }
+            } else getLogger().send(sender, Lang.WEBHOOK_NOT_SETUP.getConfigValue(null));
           } else if (args[1].equalsIgnoreCase("away")) {
-            final String[] awayPlayers = {CAPTAIN_AWAY, GK_AWAY, CB_AWAY, CB2_AWAY, CM_AWAY, ST_AWAY};
-            if (Arrays.asList(awayPlayers).contains(args[2])) {
-              away_result++;
-              getLogger().send("default", Lang.RESULT_ADD.getConfigValue(new String[]{args[2], away}));
-              if (webhook != null) {
-                webhook.setContent(Lang.WEBHOOK_MATCH_SCORE.getConfigValue(new String[]{args[2], AWAY_NAME, formatTime(Timer.getSecondsParsed())}));
-                if (args.length == 4)
-                  webhook.setContent(Lang.WEBHOOK_MATCH_ASSIST.getConfigValue(new String[]{args[2], AWAY_NAME, formatTime(Timer.getSecondsParsed()), args[3]}));
-                try {
-                  webhook.execute();
-                } catch (IOException e) {
-                  getLogger().send(sender, e.getMessage());
-                  return true;
-                }
-              } else getLogger().send(sender, Lang.WEBHOOK_NOT_SETUP.getConfigValue(null));
-            } else getLogger().send(sender, Lang.WEBHOOK_PLAYER_NOT_IN_TEAM.getConfigValue(new String[]{args[2], away}));
+            away_result++;
+            if (args.length == 3) getLogger().send("default", Lang.RESULT_ADD.getConfigValue(new String[]{args[2], away}));
+            else getLogger().send("default", Lang.RESULT_ADD_ASSIST.getConfigValue(new String[]{args[2], away, args[3]}));
+            if (webhook != null) {
+              webhook.setContent(Lang.WEBHOOK_MATCH_SCORE.getConfigValue(new String[]{args[2], AWAY_NAME, formatTime(Timer.getSecondsParsed())}));
+              if (args.length == 4)
+                webhook.setContent(Lang.WEBHOOK_MATCH_ASSIST.getConfigValue(new String[]{args[2], AWAY_NAME, formatTime(Timer.getSecondsParsed()), args[3]}));
+              try {
+                webhook.execute();
+              } catch (IOException e) {
+                getLogger().send(sender, e.getMessage());
+                return true;
+              }
+            } else getLogger().send(sender, Lang.WEBHOOK_NOT_SETUP.getConfigValue(null));
           } else getLogger().send(sender, Lang.RESULT_USAGE.getConfigValue(null));
         } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
       } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
-    } else if (args.length == 8) {
-      if (args[0].equalsIgnoreCase("home")) {
-        if (getHelper().groupExists(args[1])) {
-          if (getHelper().groupHasMeta(args[1], "team"))
-            home = getHelper().getGroupMeta(args[1], "team");
-          else home = getHelper().getGroupMeta(args[1], "b");
-          HOME_NAME = args[1].toUpperCase();
-          CAPTAIN_HOME = args[2];
-          GK_HOME = args[3];
-          CB_HOME = args[4];
-          CB2_HOME = args[5];
-          CM_HOME = args[6];
-          ST_HOME = args[7];
-          if (webhook != null) {
-            webhook.setContent(Lang.WEBHOOK_TEAM_LINEUP.getConfigValue(new String[]{"HOME", HOME_NAME, CAPTAIN_HOME, GK_HOME, CB_HOME, CB2_HOME, CM_HOME, ST_HOME}));
-            try {
-              webhook.execute();
-            } catch (IOException e) {
-              getLogger().send(sender, e.getMessage());
-              return true;
-            }
-          }
-        } else home = args[1];
-        getLogger().send("hoster", Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{home}));
-      } else if (args[0].equalsIgnoreCase("away")) {
-        if (getHelper().groupExists(args[1])) {
-          if (getHelper().groupHasMeta(args[1], "team"))
-            away = getHelper().getGroupMeta(args[1], "team");
-          else away = getHelper().getGroupMeta(args[1], "b");
-          AWAY_NAME = args[1].toUpperCase();
-          CAPTAIN_AWAY = args[2];
-          GK_AWAY = args[3];
-          CB_AWAY = args[4];
-          CB2_AWAY = args[5];
-          CM_AWAY = args[6];
-          ST_AWAY = args[7];
-          if (webhook != null) {
-            webhook.setContent(Lang.WEBHOOK_TEAM_LINEUP.getConfigValue(new String[]{"AWAY", AWAY_NAME, CAPTAIN_AWAY, GK_AWAY, CB_AWAY, CB2_AWAY, CM_AWAY, ST_AWAY}));
-            try {
-              webhook.execute();
-            } catch (IOException e) {
-              getLogger().send(sender, e.getMessage());
-              return true;
-            }
-          }
-        } else away = args[1];
-        getLogger().send("hoster", Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{away}));
-      } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
     } else getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
     return true;
+  }
+
+  @EventHandler(priority = EventPriority.LOWEST)
+  private void onChat(final AsyncPlayerChatEvent event) {
+    final Player player = event.getPlayer();
+    final String message = event.getMessage();
+
+    if (event.isCancelled()) return;
+    if (home == null) return;
+
+    if (player.getName().equals(CAPTAIN_HOME) || player.getName().equals(CAPTAIN_AWAY) ||
+        player.hasPermission("tab.group." + HOME_NAME + "-director") ||
+        player.hasPermission("tab.group." + AWAY_NAME + "-director")) {
+      String team = getHelper().playerGetMeta(player.getUniqueId(), "team");
+      String teamClean = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', team));
+
+      if (message.startsWith("postava")) {
+        event.setCancelled(true);
+        String[] lines = message.split("\\s", 0);
+        if (lines.length != 6) getLogger().send(player, Lang.RESULT_INVALID_LINEUP.getConfigValue(null));
+        else {
+          if (webhook != null) {
+            webhook.setContent(Lang.WEBHOOK_TEAM_LINEUP.getConfigValue(new String[]{teamClean,player.getName(),lines[1],lines[2],lines[3],lines[4],lines[5]}));
+            try {
+              webhook.execute();
+            } catch (IOException e) {
+              getLogger().send(player, e.getMessage());
+            }
+          }
+          getLogger().send("default", Lang.RESULT_LINEUP.getConfigValue(new String[]{team,player.getName(),lines[1],lines[2],lines[3],lines[4],lines[5]}));
+        }
+      }
+
+      if (isTaskQueued(Timer.assignedTaskId)) {
+        event.setMessage(Lang.RESULT_MANAGER_FORMAT.getConfigValue(new String[]{message}));
+        if (message.startsWith("izmena")) {
+          event.setCancelled(true);
+          String[] lines = message.split("\\s", 0);
+          if (lines.length != 3) getLogger().send(player, Lang.RESULT_INVALID_SUB.getConfigValue(null));
+          else {
+            if (webhook != null) {
+              webhook.setContent(Lang.WEBHOOK_TEAM_SUB.getConfigValue(new String[]{teamClean,lines[1],lines[2]}));
+              try {
+                webhook.execute();
+              } catch (IOException e) {
+                getLogger().send(player, e.getMessage());
+              }
+            }
+            getLogger().send("default", Lang.RESULT_SUB.getConfigValue(new String[]{team,player.getName(),lines[1],lines[2]}));
+          }
+        }
+      }
+    }
   }
 
   private Timer secondHalf() {
@@ -245,7 +272,8 @@ public class ResultCommand implements CommandExecutor {
         getLogger().send("hoster", e.getMessage());
       }
       getLogger().send("default", Lang.RESULT_OVER.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}));
-      getLogger().broadcastBar(Lang.RESULT_END.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}));},
+      getLogger().broadcastBar(Lang.RESULT_END.getConfigValue(new String[]{getFinalPrefix(), home, "" + home_result, "" + away_result, away}));
+      reset();},
         (t) -> {
       String secondsParsed = formatTime(Timer.getSecondsParsed());
       String seconds = formatTime(Timer.getSeconds() - 60);
@@ -317,7 +345,7 @@ public class ResultCommand implements CommandExecutor {
     away = null;
     home_result = 0;
     away_result = 0;
-    time = null;
+    time = Time.parseString("20min");
   }
 
   private String color(final String string) {

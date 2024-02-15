@@ -1,5 +1,6 @@
 package io.github.divinerealms.managers;
 
+import io.github.divinerealms.commands.timers.ResultCommand;
 import io.github.divinerealms.listeners.ChatListener;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class ListenerManager {
   public void registerListeners() {
     setRegistered(true);
     getPluginManager().registerEvents(new ChatListener(getUtilManager()), getPlugin());
+    getPluginManager().registerEvents(new ResultCommand(getPlugin(), getUtilManager()), getPlugin());
   }
 
   public void unregisterListeners() {
