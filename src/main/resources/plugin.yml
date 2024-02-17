@@ -1,5 +1,6 @@
 name: LeagueManager
 version: '1.2.5'
+api-version: 1.8
 author: Neeonn
 depend:
   - LuckPerms
