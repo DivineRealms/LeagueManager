@@ -1,84 +1,99 @@
 package io.github.divinerealms.commands.timers;
 
+import co.aikar.commands.BaseCommand;
+import co.aikar.commands.annotation.*;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Logger;
 import io.github.divinerealms.utils.Time;
 import io.github.divinerealms.utils.Timer;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
-@Getter @Setter
-public class TimerCommand implements CommandExecutor {
+@Getter
+@CommandAlias("timer")
+@CommandPermission("leaguemanager.command.timer")
+public class TimerCommand extends BaseCommand {
   private final Plugin plugin;
+  private final UtilManager utilManager;
   private final Logger logger;
-  private Time time = null;
-  private String finalPrefix = null;
+  private Time time;
+  private String prefix;
 
   public TimerCommand(final Plugin plugin, final UtilManager utilManager) {
     this.plugin = plugin;
+    this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
+
+    reset();
   }
 
-  @Override
-  public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
-    if (!sender.hasPermission("leaguemanager.command.timer")) {
-      getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
-      return true;
-    }
+  @Default
+  @CatchUnknown
+  @Subcommand("help")
+  @CommandPermission("leaguemanager.command.timer.help")
+  public void onHelp(CommandSender sender) {
+    getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
+  }
 
-    if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
-      getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
-      return true;
-    } else if (args.length > 2 && args[0].equalsIgnoreCase("start")) {
-      try {
-        setTime(Time.parseString(args[1]));
-      } catch (Time.TimeParseException | NullPointerException e) {
-        getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
-        return true;
-      }
-      setFinalPrefix(color(StringUtils.join(args, " ", 2, args.length)));
+  @Subcommand("start|s")
+  @CommandPermission("leaguemanager.command.timer.start")
+  public void onStart(CommandSender sender, String[] args) {
+    if (!getUtilManager().isTaskQueued(Timer.assignedTaskId) && isSetup() && args.length == 0) {
       Timer.assignedTaskId = startTimer().startTask();
       getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
-    } else if (args[0].equalsIgnoreCase("stop")) {
-      if (args.length == 1) {
-        if (isTaskQueued(Timer.assignedTaskId)) {
-          getLogger().send("hoster", Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
-          startTimer().cancelTask(Timer.assignedTaskId);
-        } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
-      } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
+    } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
+  }
+
+  @Subcommand("stop")
+  @CommandPermission("leaguemanager.command.timer.stop")
+  public void onStop(CommandSender sender, String[] args) {
+    if (getUtilManager().isTaskQueued(Timer.assignedTaskId) && isSetup() && args.length == 0) {
+      getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+      startTimer().cancelTask(Timer.assignedTaskId);
+    } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
+  }
+
+  @Subcommand("time")
+  @CommandPermission("leaguemanager.command.timer.setup")
+  public void onTime(CommandSender sender, String[] args) {
+    if (args.length == 1) {
+      try {
+        time = Time.parseString(args[0]);
+        getLogger().send(sender, Lang.TIMER_TIME_SET.getConfigValue(new String[]{time.toString()}));
+      } catch (Time.TimeParseException | NullPointerException e) {
+        getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(null));
+      }
     } else getLogger().send(sender, Lang.TIMER_HELP.getConfigValue(null));
-    return true;
+  }
+
+  @Subcommand("prefix")
+  @CommandPermission("leaguemanager.command.timer.setup")
+  public void onPrefix(CommandSender sender, String[] args) {
+    prefix = getUtilManager().color(StringUtils.join(args, " ", 0, args.length));
+    getLogger().send(sender, Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{prefix}));
   }
 
   private Timer startTimer() {
     return new Timer(getPlugin(), (int) getTime().toSeconds(), () ->
-        getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getFinalPrefix()})), () -> {
+        getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getPrefix()})), () -> {
       getLogger().send("default", Lang.TIMER_OVER.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
-      getLogger().broadcastBar(Lang.TIMER_END.getConfigValue(new String[]{getFinalPrefix()}));
-      }, (t) -> {
-      String secondsParsed = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSecondsParsed())).format(DateTimeFormatter.ofPattern("mm:ss"));
-      String seconds = LocalTime.MIDNIGHT.plus(Duration.ofSeconds(Timer.getSeconds())).format(DateTimeFormatter.ofPattern("mm:ss"));
-      getLogger().broadcastBar(Lang.TIMER_CURRENT_TIME.getConfigValue(new String[]{getFinalPrefix(), secondsParsed, seconds}));
+      getLogger().broadcastBar(Lang.TIMER_END.getConfigValue(new String[]{getPrefix()}));
+    }, (t) -> {
+      String secondsParsed = UtilManager.formatTime(Timer.getSecondsParsed());
+      String seconds = UtilManager.formatTime(Timer.getSeconds());
+      getLogger().broadcastBar(Lang.TIMER_CURRENT_TIME.getConfigValue(new String[]{getPrefix(), secondsParsed, seconds}));
     });
   }
 
-  private String color(final String string) {
-    return ChatColor.translateAlternateColorCodes('&', string);
+  private boolean isSetup() {
+    return getTime() != null;
   }
 
-  private boolean isTaskQueued(final Integer taskId) {
-    if (taskId != null) return getPlugin().getServer().getScheduler().isQueued(taskId);
-    else return false;
+  private void reset() {
+    time = Time.parseString("20min");
+    prefix = "&bEvent";
   }
 }

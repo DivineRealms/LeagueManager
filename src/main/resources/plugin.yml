@@ -1,22 +1,8 @@
 name: LeagueManager
-version: 1.2.5
+version: '1.2.5'
 author: Neeonn
 depend:
   - LuckPerms
   - WorldGuard
 load: POSTWORLD
 main: io.github.divinerealms.LeagueManager
-commands:
-  leaguemanager:
-    description: Base command.
-    aliases: [lm]
-  timer:
-    description: Timer command.
-    aliases: [ts]
-  result:
-    description: Result command.
-    aliases: [rs]
-  2x4:
-    description: 2x4 Result command.
-  1x8:
-    description: 1x8 Result command.

@@ -201,6 +201,8 @@ public enum Lang {
   RESULT_FULL_LIVES("result.full-lives", "&4▎ &cTeam {0} &calready has all lives."),
   RESULT_ELIMINATED("result.eliminated", "&4▎ &cTeam {0} &cis already eliminated."),
   RESULT_RESET("result.reset", "&a▎ &fTeams are reset!"),
+  RESULT_ADDED_LIFE("result.added-life", "&a▎ &fAdded one life for team {1}&f!"),
+  RESULT_REMOVED_LIFE("result.removed-life", "&a▎ &fRemoved one life from the team {1}&f!"),
   RESULT_REMOVE("result.remove", "&a▎ &fRemoved one goal for the team {0}&f."),
   RESULT_USAGE("result.add-usage", "&4▎ &cYou need to specify a team."),
   RESULT_STARTING("result.starting", "{0} &7┃ &fHost starting!"),

@@ -49,7 +49,7 @@ public class ChatListener implements Listener {
     }
 
     if (matcherCommands.find()) {
-      if (!player.hasPermission("commandwhitelist.bypass.fc")) {
+      if (!player.hasPermission("leaguemanager.footcube")) {
         if (player.hasPermission("group.fcfa")) return;
         else {
           getLogger().send(player, Lang.FOOTCUBE_DISABLED.getConfigValue(null));
@@ -57,8 +57,8 @@ public class ChatListener implements Listener {
         }
       }
 
-      if (player.hasPermission("footcube.banned")) {
-        final Duration expiry = getHelper().getPermissionExpireTime(player.getUniqueId(), "footcube.banned");
+      if (player.hasPermission("leaguemanager.banned")) {
+        final Duration expiry = getHelper().getPermissionExpireTime(player.getUniqueId(), "leaguemanager.banned");
         String duration;
         try {
           duration = new Time(expiry.toMillis()).toString();

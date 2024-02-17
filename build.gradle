@@ -1,5 +1,6 @@
 //file:noinspection VulnerableLibrariesLocal
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
 }
 
@@ -13,6 +14,7 @@ tasks.withType(JavaCompile).configureEach {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.aikar.co/content/groups/aikar/' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://papermc.io/repo/repository/maven-public/' }
     maven { url 'https://repo.kryptonmc.org/releases' }
@@ -28,6 +30,7 @@ dependencies {
     compileOnly 'net.luckperms:api:5.4'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     compileOnly 'net.essentialsx:EssentialsX:2.20.1'
+    compileOnly 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     implementation files('libs/WorldEdit.jar')
@@ -36,6 +39,11 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+}
+
+shadowJar {
+    relocate 'co.aikar.commands', 'io.github.divinerealms.acf'
+    relocate 'co.aikar.locales', 'io.github.divinerealms.locales'
 }
 
 test {

@@ -1,43 +1,52 @@
 package io.github.divinerealms;
 
-import io.github.divinerealms.commands.BaseCommand;
-import io.github.divinerealms.commands.timers.OneXEightCommand;
+import co.aikar.commands.BukkitCommandManager;
+import io.github.divinerealms.commands.LMCommand;
+import io.github.divinerealms.commands.RostersCommand;
+import io.github.divinerealms.commands.VARCommand;
+import io.github.divinerealms.commands.timers.OXECommand;
 import io.github.divinerealms.commands.timers.ResultCommand;
+import io.github.divinerealms.commands.timers.TXFCommand;
 import io.github.divinerealms.commands.timers.TimerCommand;
-import io.github.divinerealms.commands.timers.TwoXFourCommand;
 import io.github.divinerealms.configs.Config;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.ConfigManager;
+import io.github.divinerealms.managers.GUIManager;
 import io.github.divinerealms.managers.ListenerManager;
 import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@Setter
 @Getter
 public class LeagueManager extends JavaPlugin {
-  private final ConfigManager messagesFile = new ConfigManager(this, "");
-  private static YamlConfiguration config;
-  @Setter private LuckPerms luckPermsAPI = null;
-  @Setter private UtilManager utilManager;
-  @Setter private ListenerManager listenerManager;
+  private ConfigManager messagesFile = new ConfigManager(this, "");
+  private YamlConfiguration config;
+  private LuckPerms luckPermsAPI = null;
+  private UtilManager utilManager;
+  private ListenerManager listenerManager;
+  private GUIManager guiManager;
 
   @Override
   public void onEnable() {
     setupMessages();
     Config.setup(this);
-    loadConfigs();
+    config = Config.getConfig("config.yml");
 
     if (!setupLuckPermsAPI()) {
       getLogger().info("&cDisabled due to no LuckPerms dependency found!");
       getServer().getPluginManager().disablePlugin(this);
     }
 
-    setUtilManager(new UtilManager(this));
-    setListenerManager(new ListenerManager(this, getUtilManager()));
+    utilManager = new UtilManager(this);
+    listenerManager = new ListenerManager(this, utilManager);
+    guiManager = new GUIManager();
+
     getUtilManager().getLogger().initializeStrings();
     getUtilManager().getLogger().sendBanner();
     getLogger().info("Loading commands...");
@@ -52,16 +61,19 @@ public class LeagueManager extends JavaPlugin {
   }
 
   public void setup() {
-    getCommand("leagueManager").setExecutor(new BaseCommand(this, getUtilManager()));
-    getCommand("timer").setExecutor(new TimerCommand(this, getUtilManager()));
-    getCommand("result").setExecutor(new ResultCommand(this, getUtilManager()));
-    getCommand("2x4").setExecutor(new TwoXFourCommand(this, getUtilManager()));
-    getCommand("1x8").setExecutor(new OneXEightCommand(this, getUtilManager()));
-
     if (getListenerManager().isRegistered()) getListenerManager().unregisterListeners();
     getListenerManager().registerListeners();
 
-    getServer().getScheduler().runTaskTimer(this, getUtilManager().getLineChecker(), 20L, 1L);
+    BukkitCommandManager commandManager = new BukkitCommandManager(this);
+    commandManager.registerCommand(new LMCommand(getUtilManager(), this));
+    commandManager.registerCommand(new VARCommand(getUtilManager()));
+    commandManager.registerCommand(new ResultCommand(this, getUtilManager()));
+    commandManager.registerCommand(new TimerCommand(this, getUtilManager()));
+    commandManager.registerCommand(new OXECommand(this, getUtilManager()));
+    commandManager.registerCommand(new TXFCommand(this, getUtilManager()));
+    commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
+
+    Bukkit.getScheduler().runTaskTimer(this, getUtilManager().getLineChecker(), 20L, 1L);
   }
 
   public void setupMessages() {
@@ -83,9 +95,5 @@ public class LeagueManager extends JavaPlugin {
 
     getMessagesFile().getConfig("libs/messages.yml").options().copyDefaults(true);
     getMessagesFile().saveConfig("libs/messages.yml");
-  }
-
-  private void loadConfigs() {
-    config = Config.getConfig("config.yml");
   }
 }
