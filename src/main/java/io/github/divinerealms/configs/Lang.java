@@ -254,7 +254,15 @@ public enum Lang {
   WEBHOOK_MATCH_SECONDHALF("webhook.match-secondhalf", "Početak drugog poluvremena, rezultat: **{0} {1} - {2} {3}**."),
   WEBHOOK_MATCH_SCORE("webhook.match-score", "**GOOL!** Scorer: **{0}** (**{1}** - **`{2}`**)!"),
   WEBHOOK_MATCH_ASSIST("webhook.match-assist", "**GOOL!** Scorer: **{0}** (**{1}** - **`{2}`**)! Asistent: **{3}**."),
-  WEBHOOK_PLAYER_NOT_IN_TEAM("webhook.player-not-in-team", "&4▎ &cIgrač &b{0} &cnije u {1} &ctimu!");
+  WEBHOOK_PLAYER_NOT_IN_TEAM("webhook.player-not-in-team", "&4▎ &cIgrač &b{0} &cnije u {1} &ctimu!"),
+  ROSTERS_HELP("rosters.help", String.join(System.lineSeparator(),
+      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r",
+      "&6 /&erosters&6|&ert &3[&bgui&3] &7- &fOtvaranje Rosters GUI.",
+      "&6 /&erosters create &2<&aimeTima&2> <&atag&2> &3[&bb&3] &7- &fPravljenje tima.",
+      "&6 /&erosters delete &2<&aimeTima&2> &7- &fBrisanje tima.",
+      "&6 /&erosters add &2<&aimeTima&2> <&aigrač&2> <&apozicija&2> &7- &fDodavanje u tim.",
+      "&6 /&erosters remove &2<&aimeTima&2> <&aigrač&2> &7- &fIzbacivanje iz tima.",
+      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"));
 
   private static FileConfiguration LANG;
   private final String path, def;

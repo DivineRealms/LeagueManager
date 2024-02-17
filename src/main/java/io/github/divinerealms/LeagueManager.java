@@ -29,8 +29,8 @@ public class LeagueManager extends JavaPlugin {
   private YamlConfiguration config;
   private LuckPerms luckPermsAPI = null;
   private UtilManager utilManager;
-  private ListenerManager listenerManager;
   private GUIManager guiManager;
+  private ListenerManager listenerManager;
 
   @Override
   public void onEnable() {
@@ -44,8 +44,8 @@ public class LeagueManager extends JavaPlugin {
     }
 
     utilManager = new UtilManager(this);
-    listenerManager = new ListenerManager(this, utilManager);
     guiManager = new GUIManager();
+    listenerManager = new ListenerManager(this, utilManager, guiManager);
 
     getUtilManager().getLogger().initializeStrings();
     getUtilManager().getLogger().sendBanner();

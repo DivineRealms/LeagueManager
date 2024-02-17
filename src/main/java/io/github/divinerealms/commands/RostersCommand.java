@@ -27,13 +27,39 @@ public class RostersCommand extends BaseCommand {
 
   @Default
   @Subcommand("gui")
+  @CommandPermission("leaguemanager.command.rosters")
   public void onOpen(Player player) {
     getGuiManager().openGUI(new RostersGUI(getUtilManager()), player);
   }
 
   @CatchUnknown
   @Subcommand("help")
+  @CommandPermission("leaguemanager.command.rosters.help")
   public void onHelp(CommandSender sender) {
-    getLogger().send(sender, Lang.ONE_TIMES_EIGHT_HELP.getConfigValue(null));
+    getLogger().send(sender, Lang.ROSTERS_HELP.getConfigValue(null));
+  }
+
+  @Subcommand("create")
+  @CommandPermission("leaguemanager.command.rosters.create")
+  public void onCreate(CommandSender sender, String[] args) {
+    // todo
+  }
+
+  @Subcommand("delete")
+  @CommandPermission("leaguemanager.command.rosters.delete")
+  public void onDelete(CommandSender sender, String[] args) {
+    // todo
+  }
+
+  @Subcommand("add")
+  @CommandPermission("leaguemanager.command.rosters.add")
+  public void onAdd(CommandSender sender, String[] args) {
+    // todo
+  }
+
+  @Subcommand("remove")
+  @CommandPermission("leaguemanager.command.rosters.remove")
+  public void onRemove(CommandSender sender, String[] args) {
+    // todo
   }
 }
