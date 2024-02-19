@@ -65,9 +65,19 @@ public class Helper {
   public void playerRemoveTeams(final UUID uniqueId) {
     final User user = getPlayer(uniqueId);
     for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
-      final int weight = 100, groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
-      if (groupWeight == weight) playerRemoveGroup(uniqueId, group.getName());
+      final int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+      if (groupWeight == 100 || groupWeight == 99) playerRemoveGroup(uniqueId, group.getName());
     }
+  }
+
+  public String playerGetTeam(final UUID uniqueId) {
+    User user = getPlayer(uniqueId);
+    String teamName = null;
+    for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
+      int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+      if (groupWeight == 100 || groupWeight == 99) return group.getName();
+    }
+    return teamName;
   }
 
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
@@ -110,6 +120,12 @@ public class Helper {
   public String playerGetMeta(final UUID uniqueId, final String key) {
     final User user = getPlayer(uniqueId);
     return user.getCachedData().getMetaData().queryMetaValue(key).result();
+  }
+
+  public boolean playerHasMeta(final UUID uniqueId, final String metaType) {
+    final User user = getPlayer(uniqueId);
+    final CachedMetaData metaData = user.getCachedData().getMetaData();
+    return metaData.getMeta().containsKey(metaType);
   }
 
   public Group getGroup(final String groupName) {

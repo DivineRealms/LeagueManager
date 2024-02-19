@@ -257,12 +257,22 @@ public enum Lang {
   WEBHOOK_PLAYER_NOT_IN_TEAM("webhook.player-not-in-team", "&4▎ &cIgrač &b{0} &cnije u {1} &ctimu!"),
   ROSTERS_HELP("rosters.help", String.join(System.lineSeparator(),
       "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r",
-      "&6 /&erosters&6|&ert &3[&bgui&3] &7- &fOtvaranje Rosters GUI.",
+      "&e &lPomoćnik za \"&6/&erosters&6|&ert &3[&bgui&3]&e&l\" komande",
+      "&r &r",
       "&6 /&erosters create &2<&aimeTima&2> <&atag&2> &3[&bb&3] &7- &fPravljenje tima.",
       "&6 /&erosters delete &2<&aimeTima&2> &7- &fBrisanje tima.",
       "&6 /&erosters add &2<&aimeTima&2> <&aigrač&2> <&apozicija&2> &7- &fDodavanje u tim.",
+      "&6 /&erosters setrole &2<&aigrač&2> <&arole&2> &7- &fPostavljanje menadžera/kapitena.",
+      "&6 /&erosters setposition &2<&aigrač&2> <&apozicija&2> &7- &fPostavljanje pozicije.",
       "&6 /&erosters remove &2<&aimeTima&2> <&aigrač&2> &7- &fIzbacivanje iz tima.",
-      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"));
+      "&r &r",
+      "&7 &oSve komande imaju [TAB] completion, koristite ovo za pomoć!",
+      "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
+  ROSTERS_GENERATED_FILES("rosters.generated-files", "&a▎ &fUspešno generisani fajlovi za tim {0}&f."),
+  ROSTERS_NOT_FOUND("rosters.not-found", "&4▎ &cFajlovi nisu generisani za tim {0}&f."),
+  ROSTERS_DELETED_FILES("rosters.deleted-files", "&a▎ &fUspešno obrisani fajlovi za tim {0}&f."),
+  ROSTERS_FILE_NOT_FOUND("rosters.file-not-found", "&4▎ &cFajl {0} nije pronađen. Kreiramo ga sada..."),
+  ROSTERS_SET_ROLE("rosters.set-role", "&a▎ &fIgrač &b{0} &fuspešno postavljen kao &e{1} &fza tim {2}&f!");
 
   private static FileConfiguration LANG;
   private final String path, def;

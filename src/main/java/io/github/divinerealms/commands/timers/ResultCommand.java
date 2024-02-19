@@ -222,7 +222,7 @@ public class ResultCommand extends BaseCommand {
   @Subcommand("prefix")
   @CommandPermission("leaguemanager.command.result.prefix")
   public void onPrefix(CommandSender sender, String[] args) {
-    prefix = getUtilManager().color(StringUtils.join(args, "\\s", 0, args.length));
+    prefix = getUtilManager().color(StringUtils.join(args, " ", 0, args.length));
     getLogger().send("fcfa", Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getPrefix()}));
   }
 
