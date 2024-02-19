@@ -70,14 +70,13 @@ public class Helper {
     }
   }
 
-  public String playerGetTeam(final UUID uniqueId) {
+  public String playerGetTeam(final UUID uniqueId, int weight) {
     User user = getPlayer(uniqueId);
-    String teamName = null;
     for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
       int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
-      if (groupWeight == 100 || groupWeight == 99) return group.getName();
+      if (groupWeight == weight) return group.getName();
     }
-    return teamName;
+    return "/";
   }
 
   public void playerAddGroup(final UUID uniqueId, final String groupName) {

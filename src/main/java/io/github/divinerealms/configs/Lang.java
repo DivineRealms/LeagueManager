@@ -272,7 +272,10 @@ public enum Lang {
   ROSTERS_NOT_FOUND("rosters.not-found", "&4▎ &cFajlovi nisu generisani za tim {0}&f."),
   ROSTERS_DELETED_FILES("rosters.deleted-files", "&a▎ &fUspešno obrisani fajlovi za tim {0}&f."),
   ROSTERS_FILE_NOT_FOUND("rosters.file-not-found", "&4▎ &cFajl {0} nije pronađen. Kreiramo ga sada..."),
-  ROSTERS_SET_ROLE("rosters.set-role", "&a▎ &fIgrač &b{0} &fuspešno postavljen kao &e{1} &fza tim {2}&f!");
+  ROSTERS_SET_ROLE("rosters.set-role", "&a▎ &fIgrač &b{0} &fuspešno postavljen kao &e{1} &fza tim {2}&f!"),
+  ROSTERS_SET("rosters.set", "&a▎ &fUspešno postavljen &e{0} &fza tim {1} &fna: &e{2}&f."),
+  ROSTERS_NOT_BANNER("rosters.not-banner", "&4▎ &cMorate držati banner u ruci..."),
+  ROSTERS_BANNER_SET("rosters.banner-set", "&a▎ &fUspešno postavljena zastava za klub {0}.");
 
   private static FileConfiguration LANG;
   private final String path, def;
