@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import io.github.divinerealms.gui.InventoryButton;
 import io.github.divinerealms.gui.InventoryGUI;
+import io.github.divinerealms.managers.RostersDataManager;
 import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
@@ -12,14 +13,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.UUID;
@@ -30,11 +29,13 @@ public class RostersGUI extends InventoryGUI {
   private final UtilManager utilManager;
   private final Logger logger;
   private final Helper helper;
+  private final RostersDataManager dataManager;
 
   public RostersGUI(final UtilManager utilManager) {
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
+    this.dataManager = new RostersDataManager(utilManager.getPlugin());
   }
 
   @Override
@@ -45,26 +46,20 @@ public class RostersGUI extends InventoryGUI {
   @Override
   public void decorate(Player player) {
     AtomicInteger slot = new AtomicInteger(10);
-    File dir = new File(getUtilManager().getPlugin().getDataFolder() + File.separator + "data");
-    File[] dirListing = dir.listFiles();
-    if (dirListing != null) {
-      for (File child : dirListing) {
-        FileConfiguration config = YamlConfiguration.loadConfiguration(child);
-        if (config.get("type").equals("main")) {
-          this.addButton(slot.get() <= 16 ? slot.getAndIncrement() : slot.get(),
-              this.createTeamItem(new ItemStack(Material.BANNER, 1, (byte) 15),
-                  getUtilManager().color(config.getString("tag"))));
-        }
-      }
-      slot = new AtomicInteger(19);
-      for (File child : dirListing) {
-        FileConfiguration config = YamlConfiguration.loadConfiguration(child);
-        if (config.get("type").equals("b")) {
-          this.addButton(slot.get() <= 25 ? slot.getAndIncrement() : slot.get(),
-              this.createTeamItem(new ItemStack(Material.BANNER, 1, (byte) 10),
-                  getUtilManager().color(config.getString("tag"))));
-        }
-      }
+    getDataManager().setConfig("main");
+    FileConfiguration main = getDataManager().getConfig("main");
+    for (String team : main.getKeys(false)) {
+      this.addButton(slot.get() <= 16 ? slot.getAndIncrement() : slot.get(),
+          this.createTeamItem(new ItemStack(Material.BANNER, 1, (byte) 15),
+              getUtilManager().color(main.getString(team + ".tag"))));
+    }
+    getDataManager().setConfig("juniors");
+    FileConfiguration juniors = getDataManager().getConfig("juniors");
+    slot = new AtomicInteger(19);
+    for (String team : juniors.getKeys(false)) {
+      this.addButton(slot.get() <= 25 ? slot.getAndIncrement() : slot.get(),
+          this.createTeamItem(new ItemStack(Material.BANNER, 1, (byte) 10),
+              getUtilManager().color(juniors.getString(team + ".tag"))));
     }
     super.decorate(player);
   }
