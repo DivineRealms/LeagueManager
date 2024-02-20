@@ -1,5 +1,6 @@
 package io.github.divinerealms.gui.impl;
 
+import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.gui.InventoryButton;
 import io.github.divinerealms.gui.InventoryGUI;
 import io.github.divinerealms.managers.GUIManager;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 public class RostersGUI extends InventoryGUI {
@@ -42,37 +42,49 @@ public class RostersGUI extends InventoryGUI {
 
   @Override
   public void decorate(Player player) {
-    AtomicInteger slot = new AtomicInteger(10);
-    getDataManager().setConfig("main");
-    FileConfiguration main = getDataManager().getConfig("main");
-    for (String team : main.getKeys(false)) {
-      int teamSize = main.get(team + ".players") != null ?
-          main.getConfigurationSection(team + ".players").getKeys(false).size() : 0;
-      ItemStack banner = main.get(team + ".banner") != null ? (ItemStack) main.get(team + ".banner") :
-          new ItemStack(Material.BANNER, 1, (byte) 15);
-      this.addButton(slot.get() <= 16 ? slot.getAndIncrement() : slot.get(),
-          this.createTeamItem(banner, "&f&l" + main.getString(team + ".name", "&c/"), team, "",
-              getUtilManager().color("&fTag: " + main.getString(team + ".tag", "/")),
-              getUtilManager().color("&fMenadžer: &a" + main.getString(team + ".manager", "/")),
-              getUtilManager().color("&fKapiten: &c" + main.getString(team + ".captain", "/")), "",
-              getUtilManager().color("&7&oTim ima " + teamSize + " igrača")));
+    // Add placeholder item to specified slots and ranges
+    for (int slot = 0; slot <= 35; slot++) {
+      if (slot <= 9 || slot == 17 || slot == 18 || slot >= 26 && slot != 31) {
+        if (!processTeamSlot(slot) && !closeButtonSlot(slot)) this.addButton(slot, this.createPlaceholder());
+      } else if (slot == 31) {
+        this.addButton(slot, this.createCloseButton("&cZatvorite"));
+      }
     }
-    getDataManager().setConfig("juniors");
-    FileConfiguration juniors = getDataManager().getConfig("juniors");
-    slot = new AtomicInteger(19);
-    for (String team : juniors.getKeys(false)) {
-      int teamSize = juniors.get(team + ".players") != null ?
-          juniors.getConfigurationSection(team + ".players").getKeys(false).size() : 0;
-      ItemStack banner = juniors.get(team + ".banner") != null ? (ItemStack) juniors.get(team + ".banner") :
-          new ItemStack(Material.BANNER, 1, (byte) 10);
-      this.addButton(slot.get() <= 25 ? slot.getAndIncrement() : slot.get(),
-          this.createTeamItem(banner, "&a&l" + juniors.getString(team + ".name", "&c/"), team, "",
-              getUtilManager().color("&fTag: " + juniors.getString(team + ".tag", "/")),
-              getUtilManager().color("&fMenadžer: &a" + juniors.getString(team + ".manager", "/")),
-              getUtilManager().color("&fKapiten: &c" + juniors.getString(team + ".captain", "/")), "",
-              getUtilManager().color("&2&oTim ima " + teamSize + " igrača")));
-    }
+
+    // Process main and juniors teams
+    processTeamConfig("main", 10, player);
+    processTeamConfig("juniors", 19, player);
+
     super.decorate(player);
+  }
+
+  private void processTeamConfig(String configType, int slot, Player player) {
+    getDataManager().setConfig(configType);
+    FileConfiguration config = getDataManager().getConfig(configType);
+    if (config == null) {
+      getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{configType.toUpperCase()}));
+      return;
+    }
+
+    for (String teamName : config.getKeys(false)) {
+      if ((configType.equals("main") && getHelper().groupHasMeta(teamName, "team")) ||
+          (configType.equals("juniors") && getHelper().groupHasMeta(teamName, "b"))) {
+
+        int teamSize = config.get(teamName + ".players") != null ?
+            config.getConfigurationSection(teamName + ".players").getKeys(false).size() : 0;
+        ItemStack banner = config.get(teamName + ".banner") != null ? (ItemStack) config.get(teamName + ".banner") :
+            new ItemStack(Material.BANNER, 1, (byte) (configType.equals("main") ? 15 : 10));
+
+        String teamDisplayName = (configType.equals("main") ? "&f&l" : "&a&l") + config.getString(teamName + ".name", "&c/");
+        String tag = getUtilManager().color("&fTag: " + config.getString(teamName + ".tag", "/"));
+        String manager = getUtilManager().color("&fMenadžer: &a" + config.getString(teamName + ".manager", "/"));
+        String captain = getUtilManager().color("&fKapiten: &c" + config.getString(teamName + ".captain", "/"));
+        String teamInfo = getUtilManager().color("&7&oTim ima " + teamSize + " igrača");
+
+        this.addButton(slot <= (configType.equals("main") ? 16 : 25) ? slot++ : slot,
+            this.createTeamItem(banner, teamDisplayName, teamName, "", tag, manager, captain, "", teamInfo));
+      }
+    }
   }
 
   private InventoryButton createTeamItem(ItemStack itemStack, String title, String teamName, String... lore) {
@@ -87,5 +99,46 @@ public class RostersGUI extends InventoryGUI {
           player.closeInventory();
           getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), teamName), player);
         });
+  }
+
+  private InventoryButton createCloseButton(String title, String... lore) {
+    ItemStack closeButton = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
+    ItemMeta itemMeta = closeButton.getItemMeta();
+    itemMeta.setDisplayName(getUtilManager().color(title));
+    itemMeta.setLore(Arrays.asList(lore));
+    closeButton.setItemMeta(itemMeta);
+    return new InventoryButton()
+        .creator(player -> closeButton)
+        .consumer(event -> {
+          Player player = (Player) event.getWhoClicked();
+          player.closeInventory();
+        });
+  }
+
+  private InventoryButton createPlaceholder() {
+    ItemStack placeholder = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
+    ItemMeta itemMeta = placeholder.getItemMeta();
+    itemMeta.setDisplayName("");
+    placeholder.setItemMeta(itemMeta);
+    return new InventoryButton()
+        .creator(player -> placeholder)
+        .consumer(event -> {});
+  }
+
+  private boolean slotInRange(int slot, int[] ranges) {
+    for (int range : ranges) {
+      if (slot == range) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean processTeamSlot(int slot) {
+    return slot == 10 || slot == 19;
+  }
+
+  private boolean closeButtonSlot(int slot) {
+    return slot == 31;
   }
 }

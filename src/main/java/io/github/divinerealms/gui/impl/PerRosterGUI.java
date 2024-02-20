@@ -21,7 +21,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 public class PerRosterGUI extends InventoryGUI {
@@ -41,31 +40,79 @@ public class PerRosterGUI extends InventoryGUI {
 
   @Override
   public Inventory createInventory() {
-    return Bukkit.createInventory(null, 4 * 9, "Roster");
+    return Bukkit.createInventory(null, 4 * 9, "Roster GUI");
   }
 
   @Override
   public void decorate(Player player) {
-    AtomicInteger slot = new AtomicInteger(10);
+    int slot;
+    String type = null;
+
     if (getHelper().groupExists(getTeam())) {
-      String type = null;
       if (getHelper().groupHasMeta(getTeam(), "team")) type = "main";
       else if (getHelper().groupHasMeta(getTeam(), "b")) type = "juniors";
+
       if (type == null) {
         getLogger().send(player, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{getTeam().toUpperCase()}));
         return;
       }
+
       getDataManager().setConfig(type);
-      FileConfiguration team = getDataManager().getConfig(type);
-      for (String teamPlayer : team.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
-        this.addButton(slot.get() <= 16 ? slot.getAndIncrement() : slot.get(),
-            this.createPlayerHead("&b&l" + teamPlayer, teamPlayer,
-                team.getString(getTeam() + ".manager").equals(teamPlayer) ?
-                    getUtilManager().color("&aDirektor") : getUtilManager().color("&7Igrač"), "",
-                getUtilManager().color("&fPozicija: &e" + team.getString(getTeam() + ".players." + teamPlayer))));
+      FileConfiguration teamConfig = getDataManager().getConfig(type);
+      if (teamConfig == null) {
+        getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{type.toUpperCase()}));
+        return;
       }
+
+      boolean managerFound = false;
+      boolean captainFound = false;
+
+      for (String teamPlayer : teamConfig.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
+        String playerRole = playerRole(teamConfig, teamPlayer);
+
+        if (playerRole.equals(getUtilManager().color("&2Director"))) {
+          this.addButton(10, this.createPlayerHead("&a&l" + teamPlayer, teamPlayer, playerRole, "",
+              getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer))));
+          managerFound = true;
+        } else if (playerRole.equals(getUtilManager().color("&4Kapiten"))) {
+          this.addButton(11, this.createPlayerHead("&c&l" + teamPlayer, teamPlayer, playerRole, "",
+              getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer))));
+          captainFound = true;
+        }
+      }
+
+      slot = managerFound ? 11 : captainFound ? 10 : 9;
+
+      for (String teamPlayer : teamConfig.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
+        String playerRole = playerRole(teamConfig, teamPlayer);
+
+        if (!playerRole.equals(getUtilManager().color("&2Director")) && !playerRole.equals(getUtilManager().color("&4Kapiten"))) {
+          while (slot == 9 || slot == 17 || slot == 18) slot++;
+          if (slot > 25) break;
+
+          this.addButton(slot, this.createPlayerHead("&b&l" + teamPlayer, teamPlayer, playerRole, "",
+              getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer))));
+          slot++;
+        }
+      }
+
+
     }
     super.decorate(player);
+  }
+
+  private String playerRole(FileConfiguration team, String teamPlayer) {
+    String player = getUtilManager().color("&7Igrač");
+    String manager = team.getString(getTeam() + ".manager");
+    String captain = team.getString(getTeam() + ".captain");
+
+    if (manager != null && manager.equals(teamPlayer)) {
+      return getUtilManager().color("&2Director");
+    } else if (captain != null && captain.equals(teamPlayer)) {
+      return getUtilManager().color("&4Kapiten");
+    }
+
+    return player;
   }
 
   private InventoryButton createPlayerHead(String title, String playerName, String... lore) {
