@@ -15,6 +15,7 @@ public class Timer implements Runnable {
   private final Consumer<Timer> everySecond;
   @Getter private final Runnable beforeTimer;
   @Getter private final Runnable afterTimer;
+  @Getter public static boolean isRunning = false;
 
   public Timer(final Plugin plugin, int seconds, Runnable beforeTimer, Runnable afterTimer, Consumer<Timer> everySecond) {
     this.plugin = plugin;

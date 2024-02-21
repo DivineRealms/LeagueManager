@@ -21,6 +21,7 @@ public class TimerCommand extends BaseCommand {
   private final Logger logger;
   private Time time;
   private String prefix;
+  private int timerId;
 
   public TimerCommand(final Plugin plugin, final UtilManager utilManager) {
     this.plugin = plugin;
@@ -41,18 +42,19 @@ public class TimerCommand extends BaseCommand {
   @Subcommand("start|s")
   @CommandPermission("leaguemanager.command.timer.start")
   public void onStart(CommandSender sender, String[] args) {
-    if (!getUtilManager().isTaskQueued(Timer.assignedTaskId) && isSetup() && args.length == 0) {
-      Timer.assignedTaskId = startTimer().startTask();
-      getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+    if (!getUtilManager().isTaskQueued(getTimerId()) && isSetup() && !Timer.isRunning() && args.length == 0) {
+      timerId = startTimer().startTask();
+      Timer.isRunning = true;
+      getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(getTimerId())}));
     } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
   }
 
   @Subcommand("stop")
   @CommandPermission("leaguemanager.command.timer.stop")
   public void onStop(CommandSender sender, String[] args) {
-    if (getUtilManager().isTaskQueued(Timer.assignedTaskId) && isSetup() && args.length == 0) {
-      getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
-      startTimer().cancelTask(Timer.assignedTaskId);
+    if (getUtilManager().isTaskQueued(getTimerId()) && isSetup() && args.length == 0) {
+      getLogger().send(sender, Lang.TIMER_STOP.getConfigValue(new String[]{String.valueOf(getTimerId())}));
+      startTimer().cancelTask(getTimerId());
     } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
   }
 
@@ -79,8 +81,9 @@ public class TimerCommand extends BaseCommand {
   private Timer startTimer() {
     return new Timer(getPlugin(), (int) getTime().toSeconds(), () ->
         getLogger().send("default", Lang.TIMER_STARTING.getConfigValue(new String[]{getPrefix()})), () -> {
-      getLogger().send("default", Lang.TIMER_OVER.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+      getLogger().send("default", Lang.TIMER_OVER.getConfigValue(new String[]{String.valueOf(getTimerId())}));
       getLogger().broadcastBar(Lang.TIMER_END.getConfigValue(new String[]{getPrefix()}));
+      Timer.isRunning = false;
     }, (t) -> {
       String secondsParsed = UtilManager.formatTime(Timer.getSecondsParsed());
       String seconds = UtilManager.formatTime(Timer.getSeconds());

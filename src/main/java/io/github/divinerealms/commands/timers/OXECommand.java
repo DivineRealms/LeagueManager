@@ -27,6 +27,7 @@ public class OXECommand extends BaseCommand {
   private static String[] team_names;
   private Time time;
   private String prefix;
+  private int timerId;
 
   public OXECommand(final Plugin plugin, final UtilManager utilManager) {
     this.plugin = plugin;
@@ -49,10 +50,11 @@ public class OXECommand extends BaseCommand {
   @Subcommand("start|s")
   @CommandPermission("leaguemanager.command.1x8.start")
   public void onStart(CommandSender sender, String[] args) {
-    if (!getUtilManager().isTaskQueued(Timer.assignedTaskId)) {
+    if (!getUtilManager().isTaskQueued(getTimerId()) && !Timer.isRunning()) {
       if (args.length == 0) {
-        Timer.assignedTaskId = startResult().startTask();
-        getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(Timer.assignedTaskId)}));
+        timerId = startResult().startTask();
+        Timer.isRunning = true;
+        getLogger().send("hoster", Lang.TIMER_CREATE.getConfigValue(new String[]{String.valueOf(getTimerId())}));
       } else getLogger().send(sender, Lang.ONE_TIMES_EIGHT_HELP.getConfigValue(null));
     } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
   }
@@ -60,7 +62,7 @@ public class OXECommand extends BaseCommand {
   @Subcommand("stop")
   @CommandPermission("leaguemanager.command.1x8.stop")
   public void onStop(CommandSender sender, String[] args) {
-    if (getUtilManager().isTaskQueued(Timer.assignedTaskId)) {
+    if (getUtilManager().isTaskQueued(getTimerId())) {
       if (args.length == 0) {
         startResult().getAfterTimer().run();
         Bukkit.getScheduler().cancelTasks(getPlugin());
@@ -71,7 +73,7 @@ public class OXECommand extends BaseCommand {
   @Subcommand("type")
   @CommandPermission("leaguemanager.command.1x8.type")
   public void onType(CommandSender sender, String[] args) {
-    if (!getUtilManager().isTaskQueued(Timer.assignedTaskId)) {
+    if (!getUtilManager().isTaskQueued(getTimerId())) {
       if (args.length == 1) {
         prefix = getUtilManager().color(prefix + " " + args[0]);
         getLogger().send(sender, Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{prefix}));
@@ -83,7 +85,7 @@ public class OXECommand extends BaseCommand {
   @CommandCompletion("gray|red|gold|yellow|green|blue|light_purple|black")
   @CommandPermission("leaguemanager.command.1x8.add")
   public void onAdd(CommandSender sender, String[] args) {
-    if (getUtilManager().isTaskQueued(Timer.assignedTaskId)) {
+    if (getUtilManager().isTaskQueued(getTimerId())) {
       if (args.length == 1) {
         if (teams.containsKey(args[0])) {
           if (!teams.get(args[0]).equals(2)) {
@@ -100,7 +102,7 @@ public class OXECommand extends BaseCommand {
   @CommandCompletion("gray|red|gold|yellow|green|blue|light_purple|black")
   @CommandPermission("leaguemanager.command.1x8.remove")
   public void onRemove(CommandSender sender, String[] args) {
-    if (getUtilManager().isTaskQueued(Timer.assignedTaskId)) {
+    if (getUtilManager().isTaskQueued(getTimerId())) {
       if (args.length == 1) {
         if (teams.containsKey(args[0])) {
           if (!teams.get(args[0]).equals(0)) {
@@ -144,5 +146,6 @@ public class OXECommand extends BaseCommand {
       teams.put(team, 2);
       colored_names.put(team, ChatColor.valueOf(team.toUpperCase()) + String.valueOf(teams.get(team)));
     }
+    Timer.isRunning = false;
   }
 }

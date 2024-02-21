@@ -252,7 +252,7 @@ public class RostersCommand extends BaseCommand {
     }
 
     OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-    String role = args[1].toLowerCase(), type;
+    String role = args[1].toLowerCase(), type = null;
     if (target == null || !target.hasPlayedBefore()) {
       getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(new String[]{args[0]}));
       return;
@@ -264,13 +264,20 @@ public class RostersCommand extends BaseCommand {
       return;
     }
 
-    if (getHelper().playerHasMeta(target.getUniqueId(), "b")) type = "juniors";
-    else type = "main";
+    if (getHelper().playerHasMeta(target.getUniqueId(), "b")) {
+      if (!getHelper().playerGetMeta(target.getUniqueId(), "b").equals("&r")) type = "juniors";
+    } else if (getHelper().playerHasMeta(target.getUniqueId(), "team")) {
+      if (!getHelper().playerGetMeta(target.getUniqueId(), "team").equals("&8&oNema")) type = "main";
+    }
+
+    if (type == null) {
+      getLogger().send(sender, Lang.ROSTERS_TEAM_NOT_FOUND.getConfigValue(null));
+      return;
+    }
 
     String name = type.equals("juniors") ? getHelper().playerGetTeam(target.getUniqueId(), 99) : getHelper().playerGetTeam(target.getUniqueId(), 100);
-
     if (name == null) {
-      getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), "that"}));
+      getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
       return;
     }
 
@@ -320,13 +327,13 @@ public class RostersCommand extends BaseCommand {
     else if (getHelper().playerHasMeta(target.getUniqueId(), "b")) type = "juniors";
 
     if (type == null) {
-      getLogger().send(sender, Lang.ROSTERS_HELP.getConfigValue(null));
+      getLogger().send(sender, Lang.ROSTERS_TEAM_NOT_FOUND.getConfigValue(null));
       return;
     }
 
     String name = type.equals("juniors") ? getHelper().playerGetTeam(target.getUniqueId(), 99) : getHelper().playerGetTeam(target.getUniqueId(), 100);
     if (name == null) {
-      getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), "that"}));
+      getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
       return;
     }
 
@@ -360,7 +367,7 @@ public class RostersCommand extends BaseCommand {
     if (args[0].equalsIgnoreCase(name)) {
       if (args[1].equalsIgnoreCase(target.getName())) {
         if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-          getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), name.toUpperCase()}));
+          getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
           return;
         }
 
@@ -369,7 +376,7 @@ public class RostersCommand extends BaseCommand {
         else if (getHelper().groupHasMeta(name, "b")) type = "juniors";
 
         if (type == null) {
-          getLogger().send(sender, Lang.USER_NOT_IN_THAT_TEAM.getConfigValue(new String[]{target.getName(), name.toUpperCase()}));
+          getLogger().send(sender, Lang.ROSTERS_TEAM_NOT_FOUND.getConfigValue(null));
           return;
         }
 
