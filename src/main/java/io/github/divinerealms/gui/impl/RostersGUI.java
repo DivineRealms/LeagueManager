@@ -37,21 +37,17 @@ public class RostersGUI extends InventoryGUI {
 
   @Override
   public Inventory createInventory() {
-    return Bukkit.createInventory(null, 4 * 9, "Rosters GUI");
+    return Bukkit.createInventory(null, 4 * 9, "Roster GUI");
   }
 
   @Override
   public void decorate(Player player) {
-    // Add placeholder item to specified slots and ranges
     for (int slot = 0; slot <= 35; slot++) {
       if (slot <= 9 || slot == 17 || slot == 18 || slot >= 26 && slot != 31) {
-        if (!processTeamSlot(slot) && !closeButtonSlot(slot)) this.addButton(slot, this.createPlaceholder());
-      } else if (slot == 31) {
-        this.addButton(slot, this.createCloseButton("&cZatvorite"));
-      }
+        if (!processTeamSlot(slot) && !closeButtonSlot(slot)) this.addButton(slot, this.createButton("&r", (byte) 7));
+      } else if (slot == 31) this.addButton(slot, this.createButton("&cZatvorite", (byte) 14).consumer(event -> event.getWhoClicked().closeInventory()));
     }
 
-    // Process main and juniors teams
     processTeamConfig("main", 10, player);
     processTeamConfig("juniors", 19, player);
 
@@ -70,10 +66,8 @@ public class RostersGUI extends InventoryGUI {
       if ((configType.equals("main") && getHelper().groupHasMeta(teamName, "team")) ||
           (configType.equals("juniors") && getHelper().groupHasMeta(teamName, "b"))) {
 
-        int teamSize = config.get(teamName + ".players") != null ?
-            config.getConfigurationSection(teamName + ".players").getKeys(false).size() : 0;
-        ItemStack banner = config.get(teamName + ".banner") != null ? (ItemStack) config.get(teamName + ".banner") :
-            new ItemStack(Material.BANNER, 1, (byte) (configType.equals("main") ? 15 : 10));
+        int teamSize = config.get(teamName + ".players") != null ? config.getConfigurationSection(teamName + ".players").getKeys(false).size() : 0;
+        ItemStack banner = config.get(teamName + ".banner") != null ? (ItemStack) config.get(teamName + ".banner") : new ItemStack(Material.BANNER, 1, (byte) (configType.equals("main") ? 15 : 10));
 
         String teamDisplayName = (configType.equals("main") ? "&f&l" : "&a&l") + config.getString(teamName + ".name", "&c/");
         String tag = getUtilManager().color("&fTag: " + config.getString(teamName + ".tag", "/"));
@@ -81,8 +75,7 @@ public class RostersGUI extends InventoryGUI {
         String captain = getUtilManager().color("&fKapiten: &c" + config.getString(teamName + ".captain", "/"));
         String teamInfo = getUtilManager().color("&7&oTim ima " + teamSize + " igrača");
 
-        this.addButton(slot <= (configType.equals("main") ? 16 : 25) ? slot++ : slot,
-            this.createTeamItem(banner, teamDisplayName, teamName, "", tag, manager, captain, "", teamInfo));
+        this.addButton(slot <= (configType.equals("main") ? 16 : 25) ? slot++ : slot, this.createTeamItem(banner, teamDisplayName, teamName, "", tag, manager, captain, "", teamInfo));
       }
     }
   }
@@ -97,41 +90,19 @@ public class RostersGUI extends InventoryGUI {
         .consumer(event -> {
           Player player = (Player) event.getWhoClicked();
           player.closeInventory();
-          getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), teamName), player);
+          getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), teamName, getGuiManager()), player);
         });
   }
 
-  private InventoryButton createCloseButton(String title, String... lore) {
-    ItemStack closeButton = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 14);
-    ItemMeta itemMeta = closeButton.getItemMeta();
-    itemMeta.setDisplayName(getUtilManager().color(title));
-    itemMeta.setLore(Arrays.asList(lore));
-    closeButton.setItemMeta(itemMeta);
+  private InventoryButton createButton(String title, byte damage, String... lore) {
+    ItemStack button = new ItemStack(Material.STAINED_GLASS_PANE, 1, damage);
+    ItemMeta buttonMeta = button.getItemMeta();
+    buttonMeta.setDisplayName(getUtilManager().color(title));
+    buttonMeta.setLore(Arrays.asList(lore));
+    button.setItemMeta(buttonMeta);
     return new InventoryButton()
-        .creator(player -> closeButton)
-        .consumer(event -> {
-          Player player = (Player) event.getWhoClicked();
-          player.closeInventory();
-        });
-  }
-
-  private InventoryButton createPlaceholder() {
-    ItemStack placeholder = new ItemStack(Material.STAINED_GLASS_PANE, 1, (byte) 7);
-    ItemMeta itemMeta = placeholder.getItemMeta();
-    itemMeta.setDisplayName("");
-    placeholder.setItemMeta(itemMeta);
-    return new InventoryButton()
-        .creator(player -> placeholder)
+        .creator(player -> button)
         .consumer(event -> {});
-  }
-
-  private boolean slotInRange(int slot, int[] ranges) {
-    for (int range : ranges) {
-      if (slot == range) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private boolean processTeamSlot(int slot) {
