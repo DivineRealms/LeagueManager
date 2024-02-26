@@ -9,6 +9,8 @@ import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,18 +18,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.Arrays;
 
 @Getter
-public class RostersGUI extends InventoryGUI {
+public class OnlinePlayerGUI extends InventoryGUI {
   private final UtilManager utilManager;
   private final Logger logger;
   private final Helper helper;
   private final RostersDataManager dataManager;
   private final GUIManager guiManager;
 
-  public RostersGUI(final UtilManager utilManager, final GUIManager guiManager) {
+  public OnlinePlayerGUI(final UtilManager utilManager, final GUIManager guiManager) {
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
@@ -37,29 +40,69 @@ public class RostersGUI extends InventoryGUI {
 
   @Override
   public Inventory createInventory() {
-    return Bukkit.createInventory(null, 4 * 9, "Roster GUI");
+    return Bukkit.createInventory(null, 4 * 9, "Izaberite igrača...");
   }
 
   @Override
   public void decorate(Player player) {
     for (int slot = 0; slot <= 35; slot++) {
-      if (slot <= 9 || slot == 17 || slot == 18 || slot >= 26 && slot != 34 && slot != 28) {
+      if (slot >= 27 && !(slot >= 33 && slot <= 34)) {
         this.addButton(slot, this.createButton("&r", (byte) 7));
-      } else if (slot == 34) this.addButton(slot, this.createButton("&cZatvorite", (byte) 14).consumer(event -> event.getWhoClicked().closeInventory()));
-      else if (slot == 28) {
-        this.addButton(slot, this.createButton("&fPomoćnik", (byte) 0)
+      } else if (slot == 33) {
+        this.addButton(slot, this.createButton("&6Nazad", (byte) 1)
             .consumer(event -> {
-              Player target = (Player) event.getWhoClicked();
-              target.closeInventory();
-              target.performCommand("rosters help");
+              event.getWhoClicked().closeInventory();
+              getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), getGuiManager().getTeamName(), getGuiManager()), (Player) event.getWhoClicked());
             }));
+      } else if (slot == 34) {
+        this.addButton(slot, this.createButton("&cZatvorite", (byte) 14)
+            .consumer(event -> event.getWhoClicked().closeInventory()));
       }
     }
 
-    processTeamConfig("main", 10, player);
-    processTeamConfig("juniors", 19, player);
+    String type = null;
+    int slot = 0;
+
+    if (getHelper().groupHasMeta(getGuiManager().getTeamName(), "team")) type = "main";
+    else if (getHelper().groupHasMeta(getGuiManager().getTeamName(), "b")) type = "juniors";
+
+    if (type == null) {
+      getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
+      return;
+    }
+
+    for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+      User user = getHelper().getPlayer(onlinePlayer.getUniqueId());
+      for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
+        final int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+        if (groupWeight == 100 || groupWeight == 99) {
+          getLogger().send(player, Lang.ROSTERS_NO_FA.getConfigValue(null));
+          player.closeInventory();
+          return;
+        }
+      }
+
+      this.addButton(slot, this.createPlayerHead("&a" + onlinePlayer.getName(), onlinePlayer.getName())
+          .consumer(event -> {
+            getGuiManager().setTarget(onlinePlayer);
+            Player target = (Player) event.getWhoClicked();
+            target.closeInventory();
+            getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+          }));
+      slot++;
+    }
 
     super.decorate(player);
+  }
+
+  private InventoryButton createPlayerHead(String title, String playerName, String... lore) {
+    ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+    SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+    skullMeta.setOwner(playerName);
+    skullMeta.setDisplayName(getUtilManager().color(title));
+    skullMeta.setLore(Arrays.asList(lore));
+    skull.setItemMeta(skullMeta);
+    return new InventoryButton().creator(player -> skull).consumer(event -> {});
   }
 
   private void processTeamConfig(String configType, int slot, Player player) {

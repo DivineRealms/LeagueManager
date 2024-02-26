@@ -65,6 +65,7 @@ public class LeagueManager extends JavaPlugin {
     getListenerManager().registerListeners();
 
     BukkitCommandManager commandManager = new BukkitCommandManager(this);
+    commandManager.enableUnstableAPI("help");
     commandManager.registerCommand(new LMCommand(getUtilManager(), this));
     commandManager.registerCommand(new VARCommand(getUtilManager()));
     commandManager.registerCommand(new ResultCommand(this, getUtilManager()));

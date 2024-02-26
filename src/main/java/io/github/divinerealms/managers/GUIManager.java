@@ -2,6 +2,9 @@ package io.github.divinerealms.managers;
 
 import io.github.divinerealms.gui.InventoryGUI;
 import io.github.divinerealms.gui.InventoryHandler;
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -13,6 +16,8 @@ import java.util.Map;
 
 public class GUIManager {
   private final Map<Inventory, InventoryHandler> activeInventories = new HashMap<>();
+  @Getter @Setter private String teamName;
+  @Getter @Setter private OfflinePlayer target;
 
   public void openGUI(InventoryGUI gui, Player player) {
     this.registerHandledInventory(gui.getInventory(), gui);

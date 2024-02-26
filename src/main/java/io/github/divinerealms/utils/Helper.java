@@ -118,7 +118,7 @@ public class Helper {
 
   public String playerGetMeta(final UUID uniqueId, final String key) {
     final User user = getPlayer(uniqueId);
-    return user.getCachedData().getMetaData().queryMetaValue(key).result();
+    return user.getCachedData().getMetaData().getMetaValue(key);
   }
 
   public boolean playerHasMeta(final UUID uniqueId, final String metaType) {

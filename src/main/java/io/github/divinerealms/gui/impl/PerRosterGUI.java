@@ -11,6 +11,8 @@ import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import net.luckperms.api.model.group.Group;
+import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -49,21 +51,54 @@ public class PerRosterGUI extends InventoryGUI {
 
   @Override
   public void decorate(Player player) {
+    getGuiManager().setTeamName(getTeam());
     for (int slot = 0; slot <= 35; slot++) {
-      if (slot <= 9 || slot == 17 || slot == 18 || slot >= 26 && slot != 29 && slot != 31 && slot != 33) {
+      if (slot <= 9 || slot == 17 || slot == 18 || slot >= 26 && !(slot >= 28 && slot <= 30) && !(slot >= 33 && slot <= 34)) {
         this.addButton(slot, this.createButton("&r", (byte) 7));
-      } else if (slot == 29) this.addButton(slot, this.createButton("&6Nazad", (byte) 1)
-          .consumer(event -> {
-            event.getWhoClicked().closeInventory();
-            getGuiManager().openGUI(new RostersGUI(getUtilManager(), getGuiManager()), (Player) event.getWhoClicked());
-          }));
-      else if (slot == 31) this.addButton(slot, this.createButton("&f" + getTeam() + " &fStadion", (byte) 0, getUtilManager().color("&7Klik za teleport!"))
-          .consumer(event -> {
-            Player target = (Player) event.getWhoClicked();
-            target.closeInventory();
-            target.performCommand("warp " + getTeam() + "top");
-          }));
-      else if (slot == 33) this.addButton(slot, this.createButton("&cZatvorite", (byte) 14).consumer(event -> event.getWhoClicked().closeInventory()));
+      } else if (slot == 28) {
+        this.addButton(slot, this.createButton("&f" + getTeam() + " &fStadion", (byte) 0, getUtilManager().color("&7Klik za teleport!"))
+            .consumer(event -> {
+              Player target = (Player) event.getWhoClicked();
+              target.closeInventory();
+              target.performCommand("warp " + getTeam() + "top");
+            }));
+      } else if (slot == 29) {
+        this.addButton(slot, this.createButton("&aPotpišite igrača", (byte) 5, hasAccess(player) ? getUtilManager().color("&7Klik da otvorite GUI") : getUtilManager().color("&cMorate biti &aDirector"), hasAccess(player) ? getUtilManager().color("&7sa online igračima.") : getUtilManager().color("&cili &eFCFA &cza pristup."))
+            .consumer(event -> {
+              if (!hasAccess(player)) return;
+              Player target = (Player) event.getWhoClicked();
+              target.closeInventory();
+              for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+                User user = getHelper().getPlayer(onlinePlayer.getUniqueId());
+                for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
+                  final int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+                  if (groupWeight == 100 || groupWeight == 99) {
+                    getLogger().send(player, Lang.ROSTERS_NO_FA.getConfigValue(null));
+                    return;
+                  } else {
+                    getGuiManager().openGUI(new OnlinePlayerGUI(getUtilManager(), getGuiManager()), (Player) event.getWhoClicked());
+                  }
+                }
+              }
+            }));
+      } else if (slot == 30) {
+        this.addButton(slot, this.createButton("&dPrekid ugovora", (byte) 6, hasAccess(player) ? getUtilManager().color("&7Klik da otvorite GUI") : getUtilManager().color("&cMorate biti &aDirector"), hasAccess(player) ? getUtilManager().color("&7sa online igračima.") : getUtilManager().color("&cili &eFCFA &cza pristup."))
+            .consumer(event -> {
+              if (!hasAccess(player)) return;
+              Player target = (Player) event.getWhoClicked();
+              target.closeInventory();
+              getGuiManager().openGUI(new OnlinePlayerGUI(getUtilManager(), getGuiManager()), (Player) event.getWhoClicked());
+            }));
+      } else if (slot == 33) {
+        this.addButton(slot, this.createButton("&6Nazad", (byte) 1)
+            .consumer(event -> {
+              event.getWhoClicked().closeInventory();
+              getGuiManager().openGUI(new RostersGUI(getUtilManager(), getGuiManager()), (Player) event.getWhoClicked());
+            }));
+      } else if (slot == 34) {
+        this.addButton(slot, this.createButton("&cZatvorite", (byte) 14)
+            .consumer(event -> event.getWhoClicked().closeInventory()));
+      }
     }
 
     int slot = 9;
@@ -74,14 +109,14 @@ public class PerRosterGUI extends InventoryGUI {
       else if (getHelper().groupHasMeta(getTeam(), "b")) type = "juniors";
 
       if (type == null) {
-        getLogger().send(player, Lang.TEAM_NOT_FOUND.getConfigValue(new String[]{getTeam().toUpperCase()}));
+        getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
         return;
       }
 
       getDataManager().setConfig(type);
       FileConfiguration teamConfig = getDataManager().getConfig(type);
       if (teamConfig == null) {
-        getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{type.toUpperCase()}));
+        getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"fajl"}));
         return;
       }
 
@@ -90,10 +125,24 @@ public class PerRosterGUI extends InventoryGUI {
 
       for (String teamPlayer : teamConfig.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
         if (playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&2Director"))) {
-          this.addButton(10, this.createPlayerHead(teamConfig, type, "&a&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position"))));
+          this.addButton(10, this.createPlayerHead(teamConfig, type, "&a&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position")))
+              .consumer(event -> {
+                Player target = (Player) event.getWhoClicked();
+                if (!hasAccess(target)) return;
+                getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
+                target.closeInventory();
+                getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+              }));
           managerFound = true;
         } else if (playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
-          this.addButton(11, this.createPlayerHead(teamConfig, type, "&c&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position"))));
+          this.addButton(11, this.createPlayerHead(teamConfig, type, "&c&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position")))
+              .consumer(event -> {
+                Player target = (Player) event.getWhoClicked();
+                if (!hasAccess(target) || !isManager(target)) return;
+                getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
+                target.closeInventory();
+                getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+              }));
           captainFound = true;
         }
       }
@@ -102,7 +151,14 @@ public class PerRosterGUI extends InventoryGUI {
         if (!playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&2Director")) && !playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
           while (slot == 9 || slot == 17 || slot == 18 || managerFound && slot == 10 || captainFound && slot == 11) slot++;
           if (slot > 25) break;
-          this.addButton(slot, this.createPlayerHead(teamConfig, type, "&b&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position"))));
+          this.addButton(slot, this.createPlayerHead(teamConfig, type, "&b&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position")))
+              .consumer(event -> {
+                Player target = (Player) event.getWhoClicked();
+                if (!hasAccess(target) || !isManager(target)) return;
+                getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
+                target.closeInventory();
+                getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+              }));
           slot++;
         }
       }
@@ -122,6 +178,14 @@ public class PerRosterGUI extends InventoryGUI {
     }
 
     return player;
+  }
+
+  private boolean hasAccess(Player player) {
+    return getHelper().playerInGroup(player.getUniqueId(), "fcfa");
+  }
+
+  private boolean isManager(Player player) {
+    return getHelper().playerHasPermission(player.getUniqueId(), "tab." + getTeam() + ".director");
   }
 
   private InventoryButton createPlayerHead(FileConfiguration team, String type, String title, String playerName, String... lore) {
