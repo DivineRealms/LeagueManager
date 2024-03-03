@@ -4,6 +4,7 @@ api-version: 1.8
 author: Neeonn
 depend:
   - LuckPerms
-  - WorldGuard
+softdepend:
+  - HeadDatabase
 load: POSTWORLD
 main: io.github.divinerealms.LeagueManager

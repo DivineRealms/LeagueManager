@@ -37,7 +37,7 @@ public class ResultCommand extends BaseCommand {
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
 
-    if (!config.getString("discordWebhookURL").isEmpty())
+    if (config.getString("discordWebhookURL") != null)
       webhook = new DiscordWebhook(config.getString("discordWebhookURL"));
 
     reset();

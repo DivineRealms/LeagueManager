@@ -11,7 +11,7 @@ import java.util.logging.Level;
 
 public class RostersDataManager {
   @Getter private final Plugin plugin;
-  private final String folderName = "data";
+  @Getter private final String folderName = "data";
   private FileConfiguration config;
   private File file;
 
@@ -57,12 +57,12 @@ public class RostersDataManager {
   }
 
   public boolean deleteFiles(String name) {
-    File teamFile = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
-    return teamFile.delete();
+    File file = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
+    return file.delete();
   }
 
   public boolean configExists(String name) {
-    File teamFile = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
-    return teamFile.exists();
+    File file = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
+    return file.exists();
   }
 }

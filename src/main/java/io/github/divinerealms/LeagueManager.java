@@ -17,7 +17,6 @@ import io.github.divinerealms.managers.UtilManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -73,8 +72,6 @@ public class LeagueManager extends JavaPlugin {
     commandManager.registerCommand(new OXECommand(this, getUtilManager()));
     commandManager.registerCommand(new TXFCommand(this, getUtilManager()));
     commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
-
-    Bukkit.getScheduler().runTaskTimer(this, getUtilManager().getLineChecker(), 20L, 1L);
   }
 
   public void setupMessages() {

@@ -58,7 +58,8 @@ public class RostersCommand extends BaseCommand {
         getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
         return;
       }
-      getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), teamName, getGuiManager()), player);
+      getGuiManager().setTeamName(teamName);
+      getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), getGuiManager()), player);
     } else getLogger().send(player, Lang.UNKNOWN_COMMAND.getConfigValue(null));
   }
 
@@ -152,12 +153,102 @@ public class RostersCommand extends BaseCommand {
     } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
   }
 
+  @Subcommand("add")
+  @CommandCompletion("@players")
+  @CommandPermission("leaguemanager.command.rosters.add")
+  public void onAdd(CommandSender sender, String[] args) {
+    if (args.length < 2) {
+      getLogger().send(sender, Lang.ROSTERS_ADD_USAGE.getConfigValue(null));
+      return;
+    }
+
+    String teamName = args[0].toLowerCase(), type = null;
+    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+    if (target == null || !target.hasPlayedBefore()) {
+      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
+      return;
+    }
+
+    if (!getHelper().groupExists(teamName)) {
+      getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
+      return;
+    }
+
+    if (getHelper().groupHasMeta(teamName, "team")) type = "main";
+    else if (getHelper().groupHasMeta(teamName, "b")) type = "juniors";
+
+    if (type == null) {
+      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+      return;
+    }
+
+    if (getHelper().playerInGroup(target.getUniqueId(), teamName)) {
+      getLogger().send(sender, Lang.ROSTERS_USER_ALREADY_IN_TEAM.getConfigValue(new String[]{target.getName()}));
+      return;
+    }
+
+    if (getDataManager().configExists(type)) {
+      getDataManager().setConfig(type);
+      FileConfiguration config = getDataManager().getConfig(type);
+      ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+      SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
+      skullMeta.setOwner(target.getName());
+      skull.setItemMeta(skullMeta);
+      config.set(teamName.toUpperCase() + ".players." + target.getName() + ".head", skull);
+      getDataManager().saveConfig(type);
+      if (type.equals("main")) getHelper().playerRemoveTeams(target.getUniqueId());
+      getHelper().playerAddGroup(target.getUniqueId(), teamName);
+      getLogger().send("fcfa", Lang.ROSTERS_USER_ADDED.getConfigValue(new String[]{sender.getName(), target.getName(), teamName.toUpperCase()}));
+    } else {
+      getDataManager().createNewFile(target.getName(), "Created config file for player " + target.getName());
+      getLogger().send(sender, Lang.ROSTERS_FILE_NOT_FOUND.getConfigValue(new String[]{target.getName()}));
+    }
+  }
+
+  @Subcommand("remove")
+  @CommandCompletion("@players")
+  @CommandPermission("leaguemanager.command.rosters.remove")
+  public void onRemove(CommandSender sender, String[] args) {
+    if (args.length < 2) {
+      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+      return;
+    }
+
+    String teamName = args[0].toLowerCase(), type = null;
+    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+    if (target == null || !target.hasPlayedBefore()) {
+      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
+      return;
+    }
+
+    if (!getHelper().groupExists(teamName)) {
+      getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
+      return;
+    }
+
+    if (getHelper().groupHasMeta(teamName, "team")) type = "main";
+    else if (getHelper().groupHasMeta(teamName, "b")) type = "juniors";
+
+    if (type == null) {
+      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+      return;
+    }
+
+    if (getDataManager().configExists(type)) {
+      getDataManager().setConfig(type);
+      FileConfiguration teamConfig = getDataManager().getConfig(type);
+      teamConfig.set(teamName.toUpperCase() + ".players." + target.getName(), null);
+      getDataManager().saveConfig(type);
+      getLogger().send("fcfa", Lang.ROSTERS_USER_REMOVED.getConfigValue(new String[]{sender.getName(), target.getName(), teamName.toUpperCase()}));
+    } else getLogger().send("fcfa", Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
+  }
+
   @Subcommand("set")
   @CommandCompletion("name|tag")
   @CommandPermission("leaguemanager.command.rosters.set")
   public void onSet(CommandSender sender, String[] args) {
     if (args.length < 2) {
-      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+      getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
       return;
     }
 
@@ -177,7 +268,7 @@ public class RostersCommand extends BaseCommand {
 
     String[] arguments = {"name","tag"};
     if (Arrays.stream(arguments).noneMatch(arg::contains)) {
-      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+      getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
       return;
     }
 
@@ -189,124 +280,6 @@ public class RostersCommand extends BaseCommand {
     getLogger().send("fcfa", Lang.ROSTERS_SET.getConfigValue(new String[]{sender.getName(),args[1].toUpperCase(),team.toUpperCase(),name}));
   }
 
-  @Subcommand("add")
-  @CommandCompletion("@players|GK|CB|CM|ST")
-  @CommandPermission("leaguemanager.command.rosters.add")
-  public void onAdd(CommandSender sender, String[] args) {
-    if (args.length != 3) {
-      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-      return;
-    }
-
-    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-    String name = args[0].toLowerCase(), position = args[2], type = null;
-    if (target == null || !target.hasPlayedBefore()) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
-      return;
-    }
-
-    if (!getHelper().groupExists(name)) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
-      return;
-    }
-
-    if (args[0].equalsIgnoreCase(name)) {
-      if (args[1].equalsIgnoreCase(target.getName())) {
-        if (getHelper().groupHasMeta(name, "team")) type = "main";
-        else if (getHelper().groupHasMeta(name, "b")) type = "juniors";
-
-        if (type == null) {
-          getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-          return;
-        }
-
-        if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-          getDataManager().setConfig(type);
-          FileConfiguration teamConfig = getDataManager().getConfig(type);
-          if (type.equals("main")) getHelper().playerRemoveTeams(target.getUniqueId());
-          getHelper().playerAddGroup(target.getUniqueId(), name);
-          teamConfig.set(name.toUpperCase() + ".players." + target.getName() + ".position", position.toUpperCase());
-          ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
-          SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-          skullMeta.setOwner(target.getName());
-          skull.setItemMeta(skullMeta);
-          teamConfig.set(name.toUpperCase() + ".players." + target.getName() + ".head", skull);
-          getDataManager().saveConfig(name);
-          getLogger().send("fcfa", Lang.ROSTERS_USER_ADDED.getConfigValue(new String[]{sender.getName(), target.getName(), name.toUpperCase()}));
-        } else getLogger().send(sender, Lang.ROSTERS_USER_ALREADY_IN_TEAM.getConfigValue(new String[]{target.getName(), name.toUpperCase()}));
-      } else getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
-    } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-  }
-
-  @Subcommand("setrole")
-  @CommandCompletion("@players|manager|captain|player")
-  @CommandPermission("leaguemanager.command.rosters.setrole")
-  public void onSetRole(CommandSender sender, String[] args) {
-    if (args.length != 3) {
-      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-      return;
-    }
-
-    String teamName = args[0].toLowerCase(), role = args[2].toLowerCase();
-    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-    if (target == null || !target.hasPlayedBefore()) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
-      return;
-    }
-
-    if (!getHelper().groupExists(teamName)) {
-      getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
-      return;
-    }
-
-    String type = null;
-    if (getHelper().groupHasMeta(teamName, "team")) type = "main";
-    else if (getHelper().groupHasMeta(teamName, "b")) type = "juniors";
-
-    if (type == null) {
-      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-      return;
-    }
-
-    String[] roles = {"manager","captain","player"};
-    if (Arrays.stream(roles).noneMatch(role::contains)) {
-      getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-      return;
-    }
-
-    getDataManager().setConfig(type);
-    FileConfiguration teamConfig = getDataManager().getConfig(type);
-    if (!role.equalsIgnoreCase("player")) {
-      teamConfig.set(teamName.toUpperCase() + "." + role.toLowerCase(), target.getName());
-      getDataManager().saveConfig(type);
-      if (role.equalsIgnoreCase("manager")) {
-        getHelper().playerAddPermission(target.getUniqueId(), "tab.group." + teamName + "-director");
-        getHelper().playerAddGroup(target.getUniqueId(), "director");
-      }
-      getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{target.getName(), role.toUpperCase(), teamName.toUpperCase()}));
-    } else {
-      if (teamConfig.getString(teamName.toUpperCase() + ".manager") != null) {
-        if (teamConfig.getString(teamName.toUpperCase() + ".manager").equals(target.getName())) {
-          teamConfig.set(teamName.toUpperCase() + ".manager", null);
-          getHelper().playerRemovePermission(target.getUniqueId(), "tab.group." + teamName + "-director");
-          getHelper().playerRemoveGroup(target.getUniqueId(), "director");
-          getDataManager().saveConfig(type);
-          getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{target.getName(), role.toUpperCase(), teamName.toUpperCase()}));
-        }
-      }
-
-      if (teamConfig.getString(teamName.toUpperCase() + ".captain") != null) {
-        if (teamConfig.getString(teamName.toUpperCase() + ".captain").equals(target.getName())) {
-          teamConfig.set(teamName.toUpperCase() + ".captain", null);
-          getDataManager().saveConfig(type);
-          getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{target.getName(), role.toUpperCase(), teamName.toUpperCase()}));
-        }
-      }
-
-      else getLogger().send(sender, Lang.ROSTERS_NOT_ROLE.getConfigValue(null));
-    }
-  }
-
   @Subcommand("setposition")
   @CommandCompletion("@players")
   @CommandPermission("leaguemanager.command.rosters.setposition")
@@ -316,8 +289,8 @@ public class RostersCommand extends BaseCommand {
       return;
     }
 
-    String teamName = args[0], position = args[1];
-    OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+    String teamName = args[0], position = args[2];
+    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
     if (target == null || !target.hasPlayedBefore()) {
       getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
       return;
@@ -344,52 +317,7 @@ public class RostersCommand extends BaseCommand {
     getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{target.getName(), position.toUpperCase(), teamName.toUpperCase()}));
   }
 
-  @Subcommand("remove")
-  @CommandCompletion("@players")
-  @CommandPermission("leaguemanager.command.rosters.remove")
-  public void onRemove(CommandSender sender, String[] args) {
-    if (args.length != 2) {
-      getLogger().send(sender, Lang.ROSTERS_HELP.getConfigValue(null));
-      return;
-    }
-    String name = args[0].toLowerCase(), type = null;
-    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
-    if (target == null || !target.hasPlayedBefore()) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
-      return;
-    }
-
-    if (!getHelper().groupExists(name)) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
-      return;
-    }
-
-    if (args[0].equalsIgnoreCase(name)) {
-      if (args[1].equalsIgnoreCase(target.getName())) {
-        if (!getHelper().playerInGroup(target.getUniqueId(), name)) {
-          getLogger().send(sender, Lang.ROSTERS_USER_NOT_IN_TEAM.getConfigValue(new String[]{target.getName()}));
-          return;
-        }
-
-        getHelper().playerRemoveGroup(target.getUniqueId(), name);
-        if (getHelper().groupHasMeta(name, "team")) type = "main";
-        else if (getHelper().groupHasMeta(name, "b")) type = "juniors";
-
-        if (type == null) {
-          getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
-          return;
-        }
-
-        getDataManager().setConfig(type);
-        FileConfiguration teamConfig = getDataManager().getConfig(type);
-        teamConfig.set(name.toUpperCase() + ".players." + target.getName(), null);
-        getDataManager().saveConfig(type);
-        getLogger().send("fcfa", Lang.ROSTERS_USER_REMOVED.getConfigValue(new String[]{sender.getName(), target.getName(), name.toUpperCase()}));
-      } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-    } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
-  }
-
-  @Subcommand("createbanner")
+  @Subcommand("createbanner|banner|cb")
   @CommandPermission("leaguemanager.command.rosters.createbanner")
   public void onCreateBanner(Player player, String[] args) {
     if (args.length != 1) {

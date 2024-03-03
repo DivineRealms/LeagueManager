@@ -9,6 +9,7 @@ import io.github.divinerealms.managers.UtilManager;
 import io.github.divinerealms.utils.Helper;
 import io.github.divinerealms.utils.Logger;
 import lombok.Getter;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,36 +25,36 @@ public class RostersGUI extends InventoryGUI {
   private final UtilManager utilManager;
   private final Logger logger;
   private final Helper helper;
-  private final RostersDataManager dataManager;
   private final GUIManager guiManager;
+  private final RostersDataManager dataManager;
 
   public RostersGUI(final UtilManager utilManager, final GUIManager guiManager) {
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
-    this.dataManager = new RostersDataManager(utilManager.getPlugin());
     this.guiManager = guiManager;
+    this.dataManager = new RostersDataManager(utilManager.getPlugin());
   }
 
   @Override
   public Inventory createInventory() {
-    return Bukkit.createInventory(null, 4 * 9, "Roster GUI");
+    return Bukkit.createInventory(null, 6 * 9, "Serverliga Rosteri");
   }
 
   @Override
   public void decorate(Player player) {
-    for (int slot = 0; slot <= 35; slot++) {
-      if (slot <= 9 || slot == 17 || slot == 18 || slot >= 26 && slot != 34 && slot != 28) {
-        this.addButton(slot, this.createButton("&r", (byte) 7));
-      } else if (slot == 34) this.addButton(slot, this.createButton("&cZatvorite", (byte) 14).consumer(event -> event.getWhoClicked().closeInventory()));
-      else if (slot == 28) {
-        this.addButton(slot, this.createButton("&fPomoćnik", (byte) 0)
+    for (int slot = 0; slot <= 53; slot++) {
+      if (slot == 37) {
+        this.addButton(slot, this.createHead("&fPomoćnik", "18154", getUtilManager().color("&eLevi klik &7za pregled rostera."), getUtilManager().color("&eDesni klik &7za tp do stadiona."))
             .consumer(event -> {
               Player target = (Player) event.getWhoClicked();
               target.closeInventory();
               target.performCommand("rosters help");
             }));
-      }
+      } else if (slot == 43) {
+        this.addButton(slot, this.createHead("&cZatvorite", "3229")
+            .consumer(event -> event.getWhoClicked().closeInventory()));
+      } else this.addButton(slot, this.createButton("&r", (byte) 7));
     }
 
     processTeamConfig("main", 10, player);
@@ -96,9 +97,11 @@ public class RostersGUI extends InventoryGUI {
     return new InventoryButton()
         .creator(player -> itemStack)
         .consumer(event -> {
+          getGuiManager().setTeamName(teamName);
           Player player = (Player) event.getWhoClicked();
           player.closeInventory();
-          getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), teamName, getGuiManager()), player);
+          if (event.getClick().isRightClick()) player.performCommand("warp " + teamName + "top");
+          else getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), getGuiManager()), player);
         });
   }
 
@@ -110,6 +113,24 @@ public class RostersGUI extends InventoryGUI {
     button.setItemMeta(buttonMeta);
     return new InventoryButton()
         .creator(player -> button)
+        .consumer(event -> {});
+  }
+
+  private InventoryButton createHead(String title, String headId, String... lore) {
+    HeadDatabaseAPI headDatabaseAPI = new HeadDatabaseAPI();
+    ItemStack head = null;
+    try {
+      head = headDatabaseAPI.getItemHead(headId);
+      ItemMeta headMeta = head.getItemMeta();
+      headMeta.setDisplayName(getUtilManager().color(title));
+      headMeta.setLore(Arrays.asList(lore));
+      head.setItemMeta(headMeta);
+    } catch (NullPointerException exception) {
+      getLogger().send("helper", "nemoguće pronaći glavu " + headId);
+    }
+    ItemStack finalHead = head;
+    return new InventoryButton()
+        .creator(player -> finalHead != null ? finalHead : new ItemStack(Material.BARRIER))
         .consumer(event -> {});
   }
 }

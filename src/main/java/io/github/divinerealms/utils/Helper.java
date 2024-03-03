@@ -79,6 +79,15 @@ public class Helper {
     return "/";
   }
 
+  public boolean playerHasTeam(final UUID uniqueId) {
+    User user = getPlayer(uniqueId);
+    for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
+      int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+      if (groupWeight == 100 || groupWeight == 99) return true;
+    }
+    return false;
+  }
+
   public void playerAddGroup(final UUID uniqueId, final String groupName) {
     final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(inheritanceNode));
