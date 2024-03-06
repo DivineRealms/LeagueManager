@@ -80,11 +80,14 @@ public class RostersGUI extends InventoryGUI {
 
         String teamDisplayName = (configType.equals("main") ? "&f&l" : "&a&l") + config.getString(teamName + ".name", "&c/");
         String tag = getUtilManager().color("&fTag: " + config.getString(teamName + ".tag", "/"));
-        String manager = getUtilManager().color("&fMenadžer: &a" + config.getString(teamName + ".manager", "/"));
+        String manager = getUtilManager().color("&fMenadžer: &a" + config.getString(teamName + ".manager"));
         String captain = getUtilManager().color("&fKapiten: &c" + config.getString(teamName + ".captain", "/"));
         String teamInfo = getUtilManager().color("&7&oTim ima " + teamSize + " igrača");
 
-        this.addButton(slot <= (configType.equals("main") ? 16 : 25) ? slot++ : slot, this.createTeamItem(banner, teamDisplayName, teamName, "", tag, manager, captain, "", teamInfo));
+        this.addButton(slot <= (configType.equals("main") ? 16 : 25) ? slot++ : slot,
+            this.createTeamItem(banner, teamDisplayName, teamName, "", tag,
+                config.getString(teamName + ".manager") != null ? manager : "",
+                config.getString(teamName + ".captain") != null ? captain : "", "", teamInfo));
       }
     }
   }

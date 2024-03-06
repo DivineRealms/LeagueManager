@@ -108,7 +108,10 @@ public class PerRosterGUI extends InventoryGUI {
 
       for (String teamPlayer : teamConfig.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
         if (playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&2Director"))) {
-          this.addButton(10, this.createPlayerHead(teamConfig, type, "&a&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position")))
+          this.addButton(10, this.createPlayerHead(teamConfig, type, "&a&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
+                  getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position", "/")),
+                  getUtilManager().color("&fDržava: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".country", "/")),
+                  getUtilManager().color("&fBroj: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".number", 0)))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
                 if (!hasAccess(target)) return;
@@ -118,7 +121,11 @@ public class PerRosterGUI extends InventoryGUI {
               }));
           managerFound = true;
         } else if (playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
-          this.addButton(11, this.createPlayerHead(teamConfig, type, "&c&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position")))
+          this.addButton(11, this.createPlayerHead(teamConfig, type, "&c&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
+                  getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position", "/")),
+                  getUtilManager().color("&fDržava: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".country", "/")),
+                  getUtilManager().color("&fBroj: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".number", 0)),
+                  getUtilManager().color("&fUgovor: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".contract", 0) + " sezone"))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
                 if (!hasAccess(target) || !isManager(target)) return;
@@ -134,7 +141,11 @@ public class PerRosterGUI extends InventoryGUI {
         if (!playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&2Director")) && !playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
           while (slot == 17 || slot == 18 || slot == 26 || slot == 10 && managerFound || captainFound && slot == 11) slot++;
           if (slot > 25) break;
-          this.addButton(slot, this.createPlayerHead(teamConfig, type, "&b&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position")))
+          this.addButton(slot, this.createPlayerHead(teamConfig, type, "&b&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
+                  getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position", "")),
+                  getUtilManager().color("&fDržava: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".country", "/")),
+                  getUtilManager().color("&fBroj: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".number", 0)),
+                  getUtilManager().color("&fUgovor: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".contract", 0) + " sezone"))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
                 if (!hasAccess(target) || !isManager(target)) return;

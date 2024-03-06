@@ -244,40 +244,88 @@ public class RostersCommand extends BaseCommand {
   }
 
   @Subcommand("set")
-  @CommandCompletion("name|tag")
+  @CommandCompletion("@players|name|tag|country|number|position|contract")
   @CommandPermission("leaguemanager.command.rosters.set")
   public void onSet(CommandSender sender, String[] args) {
-    if (args.length < 2) {
+    if (args.length < 1) {
       getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
       return;
     }
 
-    String team = args[0].toLowerCase(), type = null, arg = args[2].toLowerCase();
-    if (getHelper().groupHasMeta(team, "team")) type = "main";
-    else if (getHelper().groupHasMeta(team, "b")) type = "juniors";
+    String team = args[0].toLowerCase(), type = null, arg = args[1].toLowerCase();
 
-    if (type == null) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
-      return;
+    if (getHelper().groupExists(team)) {
+      if (getHelper().groupHasMeta(team, "team")) type = "main";
+      else if (getHelper().groupHasMeta(team, "b")) type = "juniors";
+
+      if (type == null) {
+        getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
+        return;
+      }
+
+      String[] arguments = {"name","tag"};
+      if (Arrays.stream(arguments).noneMatch(arg::contains)) {
+        getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
+        return;
+      }
+
+      if (!args[1].equalsIgnoreCase("name") && args.length > 3) {
+        getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
+        return;
+      }
+
+      String name = StringUtils.join(args, ' ', 2, args.length), tag = args[2];
+      getDataManager().setConfig(type);
+      FileConfiguration teamConfig = getDataManager().getConfig(type);
+      teamConfig.set(team.toUpperCase() + "." + arg, arg.equalsIgnoreCase("name") ? name : tag);
+      getDataManager().saveConfig(type);
+      getLogger().send("fcfa", Lang.ROSTERS_SET.getConfigValue(new String[]{sender.getName(), args[1].toUpperCase(), "tim", team.toUpperCase(), name}));
+    } else {
+      OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+      String[] arguments = {"country","number","position","contract"};
+      String value = args[2];
+      if (Arrays.stream(arguments).noneMatch(arg::contains)) {
+        getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
+        return;
+      }
+
+      if (!getHelper().playerGetMeta(target.getUniqueId(), "team").equals("&8&oNema")) {
+        type = "main";
+        team = getHelper().playerGetTeam(target.getUniqueId(), 100);
+      } else if (!getHelper().playerGetMeta(target.getUniqueId(), "b").equals("&r")) {
+        type = "juniors";
+        team = getHelper().playerGetTeam(target.getUniqueId(), 99);
+      }
+
+      getDataManager().setConfig(type);
+      FileConfiguration teamConfig = getDataManager().getConfig(type);
+
+      if (!args[1].equalsIgnoreCase("position") && args.length > 3) {
+        getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
+        return;
+      }
+
+      switch (args[1].toLowerCase()) {
+        case "country":
+          teamConfig.set(team.toUpperCase() + ".players." + target.getName() + ".country", String.valueOf(args[2]));
+          break;
+        case "number":
+          teamConfig.set(team.toUpperCase() + ".players." + target.getName() + ".number", Integer.valueOf(args[2]));
+          break;
+        case "contract":
+          teamConfig.set(team.toUpperCase() + ".players." + target.getName() + ".contract", Integer.valueOf(args[2]));
+          break;
+        case "position":
+          String position = StringUtils.join(args, ' ', 2, args.length);
+          teamConfig.set(team.toUpperCase() + ".players." + target.getName() + ".position", position);
+          break;
+        default:
+          getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
+          break;
+      }
+      getDataManager().saveConfig(type);
+      getLogger().send(sender, Lang.ROSTERS_SET.getConfigValue(new String[]{sender.getName(), args[1].toUpperCase(), "igrača", target.getName(), value}));
     }
-
-    if (!getHelper().groupExists(team)) {
-      getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
-      return;
-    }
-
-    String[] arguments = {"name","tag"};
-    if (Arrays.stream(arguments).noneMatch(arg::contains)) {
-      getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
-      return;
-    }
-
-    String name = StringUtils.join(args, ' ', 2, args.length), tag = args[2];
-    getDataManager().setConfig(type);
-    FileConfiguration teamConfig = getDataManager().getConfig(type);
-    teamConfig.set(team.toUpperCase() + "." + arg + ".", arg.equalsIgnoreCase("name") ? name : tag);
-    getDataManager().saveConfig(type);
-    getLogger().send("fcfa", Lang.ROSTERS_SET.getConfigValue(new String[]{sender.getName(),args[1].toUpperCase(),team.toUpperCase(),name}));
   }
 
   @Subcommand("setposition")
