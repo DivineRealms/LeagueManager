@@ -180,7 +180,8 @@ public class PerRosterGUI extends InventoryGUI {
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
   private boolean isManager(Player player) {
-    return getHelper().playerHasPermission(player.getUniqueId(), "tab." + getTeam() + ".director");
+    getLogger().send("owner", getTeam().toLowerCase());
+    return getHelper().playerHasPermission(player.getUniqueId(), "tab.group." + getTeam().toLowerCase() + "-director");
   }
 
   private InventoryButton createPlayerHead(FileConfiguration team, String type, String title, String playerName, String... lore) {
