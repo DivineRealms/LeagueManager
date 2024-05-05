@@ -22,15 +22,18 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("deprecation")
 @Getter
 @CommandAlias("leaguemanager|lm")
 public class LMCommand extends BaseCommand {
   private final LeagueManager instance;
+  private final UtilManager utilManager;
   private final Logger logger;
   private final Helper helper;
 
   public LMCommand(final UtilManager utilManager, final LeagueManager instance) {
     this.instance = instance;
+    this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
   }
@@ -59,6 +62,7 @@ public class LMCommand extends BaseCommand {
   public void onReload(CommandSender sender) {
     getInstance().setupMessages();
     getInstance().setup();
+    getUtilManager().reload();
     getLogger().send(sender, Lang.RELOAD.getConfigValue(null));
   }
 

@@ -1,5 +1,6 @@
 package io.github.divinerealms.gui.impl;
 
+import io.github.divinerealms.configs.Config;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.gui.InventoryButton;
 import io.github.divinerealms.gui.InventoryGUI;
@@ -13,6 +14,7 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +29,7 @@ public class RostersGUI extends InventoryGUI {
   private final Helper helper;
   private final GUIManager guiManager;
   private final RostersDataManager dataManager;
+  private static final YamlConfiguration config = Config.getConfig("config.yml");
 
   public RostersGUI(final UtilManager utilManager, final GUIManager guiManager) {
     this.utilManager = utilManager;
@@ -38,9 +41,9 @@ public class RostersGUI extends InventoryGUI {
 
   @Override
   public Inventory createInventory() {
-    return Bukkit.createInventory(null, 6 * 9, "Serverliga Rosteri");
+    return Bukkit.createInventory(null, 6 * 9, "Rosteri");
   }
-
+  
   @Override
   public void decorate(Player player) {
     for (int slot = 0; slot <= 53; slot++) {
@@ -83,6 +86,8 @@ public class RostersGUI extends InventoryGUI {
         String manager = getUtilManager().color("&fMenadžer: &a" + config.getString(teamName + ".manager"));
         String captain = getUtilManager().color("&fKapiten: &c" + config.getString(teamName + ".captain", "/"));
         String teamInfo = getUtilManager().color("&7&oTim ima " + teamSize + " igrača");
+
+        if (slot == 17 || slot == 18 || slot == 27) slot = slot+2;
 
         this.addButton(slot <= (configType.equals("main") ? 16 : 25) ? slot++ : slot,
             this.createTeamItem(banner, teamDisplayName, teamName, "", tag,

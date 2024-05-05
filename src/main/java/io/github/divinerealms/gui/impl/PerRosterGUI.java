@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.Arrays;
 
+@SuppressWarnings("deprecation")
 @Getter
 public class PerRosterGUI extends InventoryGUI {
   private final UtilManager utilManager;
@@ -128,7 +129,7 @@ public class PerRosterGUI extends InventoryGUI {
                   getUtilManager().color("&fUgovor: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".contract", 0) + " sezone"))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
-                if (!hasAccess(target) || !isManager(target)) return;
+                if (!hasAccess(target)) return;
                 getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
                 target.closeInventory();
                 getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
@@ -148,7 +149,7 @@ public class PerRosterGUI extends InventoryGUI {
                   getUtilManager().color("&fUgovor: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".contract", 0) + " sezone"))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
-                if (!hasAccess(target) || !isManager(target)) return;
+                if (!hasAccess(target)) return;
                 getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
                 target.closeInventory();
                 getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
@@ -178,11 +179,10 @@ public class PerRosterGUI extends InventoryGUI {
     return getHelper().playerInGroup(player.getUniqueId(), "fcfa");
   }
 
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  private boolean isManager(Player player) {
-    getLogger().send("owner", getTeam().toLowerCase());
-    return getHelper().playerHasPermission(player.getUniqueId(), "tab.group." + getTeam().toLowerCase() + "-director");
-  }
+//  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+//  private boolean isManager(Player player) {
+//    return getHelper().playerHasPermission(player.getUniqueId(), "tab.group." + getTeam().toLowerCase() + "-director");
+//  }
 
   private InventoryButton createPlayerHead(FileConfiguration team, String type, String title, String playerName, String... lore) {
     ItemStack skull = team.getItemStack(getTeam() + ".players." + playerName + ".head");

@@ -19,9 +19,10 @@ import java.util.Set;
 /**
  * Class used to execute Discord Webhooks with low effort
  */
+@SuppressWarnings("unused")
 public class DiscordWebhook {
 
-  private final String url;
+  private final List<String> url;
   @Setter
   private String content;
   @Setter
@@ -37,7 +38,7 @@ public class DiscordWebhook {
    *
    * @param url The webhook URL obtained in Discord
    */
-  public DiscordWebhook(String url) {
+  public DiscordWebhook(List<String> url) {
     this.url = url;
   }
 
@@ -131,20 +132,23 @@ public class DiscordWebhook {
       json.put("embeds", embedObjects.toArray());
     }
 
-    URL url = new URL(this.url);
-    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-    connection.addRequestProperty("Content-Type", "application/json");
-    connection.addRequestProperty("User-Agent", "Java-DiscordWebhook-BY-Gelox_");
-    connection.setDoOutput(true);
-    connection.setRequestMethod("POST");
+    for (String eachUrl : url) {
+      URL url = new URL(eachUrl);
+      HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
 
-    OutputStream stream = connection.getOutputStream();
-    stream.write(json.toString().getBytes(StandardCharsets.UTF_8));
-    stream.flush();
-    stream.close();
+      connection.addRequestProperty("Content-Type", "application/json");
+      connection.addRequestProperty("User-Agent", "Java-DiscordWebhook-BY-Gelox_");
+      connection.setDoOutput(true);
+      connection.setRequestMethod("POST");
 
-    connection.getInputStream().close(); //I'm not sure why but it doesn't work without getting the InputStream
-    connection.disconnect();
+      OutputStream stream = connection.getOutputStream();
+      stream.write(json.toString().getBytes(StandardCharsets.UTF_8));
+      stream.flush();
+      stream.close();
+
+      connection.getInputStream().close(); //I'm not sure why but it doesn't work without getting the InputStream
+      connection.disconnect();
+    }
   }
 
   @Getter
@@ -324,7 +328,7 @@ public class DiscordWebhook {
         } else if (val instanceof Boolean) {
           builder.append(val);
         } else if (val instanceof JSONObject) {
-          builder.append(val.toString());
+          builder.append(val);
         } else if (val.getClass().isArray()) {
           builder.append("[");
           int len = Array.getLength(val);

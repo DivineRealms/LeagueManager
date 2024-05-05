@@ -13,11 +13,16 @@ import java.time.format.DateTimeFormatter;
 @Getter
 public class UtilManager {
   private final LeagueManager plugin;
-  private final Logger logger;
-  private final Helper helper;
+  private Logger logger;
+  private Helper helper;
 
   public UtilManager(final LeagueManager plugin) {
     this.plugin = plugin;
+    this.logger = new Logger(plugin);
+    this.helper = new Helper(plugin);
+  }
+
+  public void reload() {
     this.logger = new Logger(plugin);
     this.helper = new Helper(plugin);
   }

@@ -26,9 +26,9 @@ public class ResultCommand extends BaseCommand {
   private Time time, extraTime;
   private String home, away, prefix;
   private int home_result, away_result, extraTimeNew, timerId;
-  private static String HOME_NAME, CAPTAIN_HOME, AWAY_NAME, CAPTAIN_AWAY;
+  private static String HOME_NAME, AWAY_NAME;
   private boolean secondHalf = false, league = false;
-  private static final YamlConfiguration config = Config.getConfig("config.yml");
+  private static YamlConfiguration config;
   private DiscordWebhook webhook = null;
 
   public ResultCommand(final Plugin plugin, final UtilManager utilManager) {
@@ -36,9 +36,10 @@ public class ResultCommand extends BaseCommand {
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
+    config = Config.getConfig("config.yml");
 
-    if (config.getString("discordWebhookURL") != null)
-      webhook = new DiscordWebhook(config.getString("discordWebhookURL"));
+    if (config.getStringList("discordWebhookURL") != null)
+      webhook = new DiscordWebhook(config.getStringList("discordWebhookURL"));
 
     reset();
   }
@@ -65,8 +66,18 @@ public class ResultCommand extends BaseCommand {
   @CommandPermission("leaguemanager.command.result.stop")
   public void onStop(CommandSender sender) {
     if (getUtilManager().isTaskQueued(getTimerId())) {
+      getLogger().send("owner", UtilManager.formatTime(Timer.getSecondsParsed()));
+      if (webhook != null && isLeague()) {
+        webhook.setContent(Lang.WEBHOOK_MATCH_ENDED.getConfigValue(new String[]{HOME_NAME, String.valueOf(home_result), String.valueOf(away_result), AWAY_NAME, UtilManager.formatTime(Timer.getSecondsParsed())}));
+        try {
+          webhook.execute();
+        } catch (IOException e) {
+          getLogger().send("hoster", e.getMessage());
+        }
+      }
       secondHalf().getAfterTimer().run();
       Bukkit.getScheduler().cancelTasks(getPlugin());
+      reset();
     } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
   }
 
@@ -112,7 +123,7 @@ public class ResultCommand extends BaseCommand {
       Timer.seconds = (int) (Timer.getSeconds() + extraTime.toSeconds());
       if (isSecondHalf()) extraTimeNew = (int) (Timer.seconds - time.toSeconds()) - 60;
       else extraTimeNew = (int) (Timer.seconds - time.toSeconds());
-      getLogger().send("fcfa", Lang.TIMER_TIME_SET.getConfigValue(new String[]{String.valueOf(extraTimeNew)}));
+      getLogger().send("fcfa", Lang.TIMER_TIME_SET.getConfigValue(new String[]{UtilManager.formatTime(extraTimeNew)}));
     } else getLogger().send(sender, Lang.TIMER_ALREADY_RUNNING.getConfigValue(null));
   }
 
@@ -182,7 +193,7 @@ public class ResultCommand extends BaseCommand {
         time = Time.parseString(args[0]);
         if (time.toSeconds() < Time.parseString("10min").toSeconds())
           time = Time.parseString("10min");
-        getLogger().send("fcfa", Lang.TIMER_TIME_SET.getConfigValue(new String[]{time.toString()}));
+        getLogger().send("fcfa", Lang.TIMER_TIME_SET.getConfigValue(new String[]{UtilManager.formatTime((int) time.toSeconds())}));
       } catch (Time.TimeParseException timeParseException) {
         getLogger().send(sender, Lang.INVALID_TIME.getConfigValue(new String[]{args[1]}));
       }
@@ -198,14 +209,14 @@ public class ResultCommand extends BaseCommand {
       if (getHelper().groupExists(args[0].toLowerCase())) {
         if (getHelper().groupHasMeta(args[0].toLowerCase(), "team")) {
           home = getHelper().getGroupMeta(args[0].toLowerCase(), "team");
+          league = true;
         } else home = getHelper().getGroupMeta(args[0].toLowerCase(), "b");
-        league = true;
       } else home = args[0];
       if (getHelper().groupExists(args[1].toLowerCase())) {
         if (getHelper().groupHasMeta(args[1].toLowerCase(), "team")) {
           away = getHelper().getGroupMeta(args[1].toLowerCase(), "team");
+          league = true;
         } else away = getHelper().getGroupMeta(args[1].toLowerCase(), "b");
-        league = true;
       } else away = args[1];
       getLogger().send("fcfa", Lang.TIMER_TEAMS_SET.getConfigValue(new String[]{home, away}));
       if (webhook != null && isLeague()) {
@@ -272,20 +283,9 @@ public class ResultCommand extends BaseCommand {
   }
 
   private Timer secondHalf() {
-    return new Timer(getPlugin(), (int) (time.toSeconds() + 60), () -> {
-      getLogger().send("default", Lang.RESULT_SECONDHALF.getConfigValue(new String[]{getPrefix(), home, "" + home_result, "" + away_result, away}));
-    }, () -> {
-      if (webhook != null && isLeague()) {
-        webhook.setContent(Lang.WEBHOOK_MATCH_ENDED.getConfigValue(new String[]{HOME_NAME, String.valueOf(home_result), String.valueOf(away_result), AWAY_NAME, UtilManager.formatTime(Timer.getSecondsParsed())}));
-        try {
-          webhook.execute();
-        } catch (IOException e) {
-          getLogger().send("hoster", e.getMessage());
-        }
-      }
+    return new Timer(getPlugin(), (int) (time.toSeconds() + 60), () -> getLogger().send("default", Lang.RESULT_SECONDHALF.getConfigValue(new String[]{getPrefix(), home, "" + home_result, "" + away_result, away})), () -> {
       getLogger().send("default", Lang.RESULT_OVER.getConfigValue(new String[]{getPrefix(), home, "" + home_result, "" + away_result, away}));
       getLogger().broadcastBar(Lang.RESULT_END.getConfigValue(new String[]{getPrefix(), home, "" + home_result, "" + away_result, away}));
-      reset();
     }, (t) -> {
       String secondsParsed = UtilManager.formatTime(Timer.getSecondsParsed());
       String seconds = UtilManager.formatTime(Timer.getSeconds() - 60);
