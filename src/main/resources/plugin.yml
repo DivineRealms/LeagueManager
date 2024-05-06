@@ -1,10 +1,13 @@
 name: LeagueManager
-version: '1.2.5'
+version: '${version}'
 api-version: 1.8
-author: Neeonn
+main: io.github.divinerealms.LeagueManager
+prefix: LeagueManager
+authors: [Neeonn]
 depend:
   - LuckPerms
 softdepend:
   - HeadDatabase
+description: Plugin for easier league organization.
+website: https://divinerealms.org
 load: POSTWORLD
-main: io.github.divinerealms.LeagueManager
