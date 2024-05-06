@@ -4,10 +4,6 @@ import co.aikar.commands.BukkitCommandManager;
 import io.github.divinerealms.commands.LMCommand;
 import io.github.divinerealms.commands.RostersCommand;
 import io.github.divinerealms.commands.VARCommand;
-import io.github.divinerealms.commands.timers.OXECommand;
-import io.github.divinerealms.commands.timers.ResultCommand;
-import io.github.divinerealms.commands.timers.TXFCommand;
-import io.github.divinerealms.commands.timers.TimerCommand;
 import io.github.divinerealms.configs.Config;
 import io.github.divinerealms.configs.Lang;
 import io.github.divinerealms.managers.ConfigManager;
@@ -67,10 +63,6 @@ public class LeagueManager extends JavaPlugin {
     commandManager.enableUnstableAPI("help");
     commandManager.registerCommand(new LMCommand(getUtilManager(), this));
     commandManager.registerCommand(new VARCommand(getUtilManager()));
-    commandManager.registerCommand(new ResultCommand(this, getUtilManager()));
-    commandManager.registerCommand(new TimerCommand(this, getUtilManager()));
-    commandManager.registerCommand(new OXECommand(this, getUtilManager()));
-    commandManager.registerCommand(new TXFCommand(this, getUtilManager()));
     commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
   }
 
