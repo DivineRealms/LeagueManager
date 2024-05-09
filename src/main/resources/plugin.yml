@@ -1,9 +1,9 @@
 name: LeagueManager
 version: '${version}'
 api-version: 1.8
-main: io.github.divinerealms.LeagueManager
+main: io.github.divinerealms.leaguemanager.LeagueManager
 prefix: LeagueManager
-authors: [Neeonn]
+author: Neeonn
 depend:
   - LuckPerms
 softdepend:

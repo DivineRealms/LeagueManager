@@ -1,4 +1,4 @@
-package io.github.divinerealms.configs;
+package io.github.divinerealms.leaguemanager.configs;
 
 import lombok.Getter;
 import org.bukkit.ChatColor;

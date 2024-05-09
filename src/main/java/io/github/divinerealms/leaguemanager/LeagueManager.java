@@ -1,15 +1,15 @@
-package io.github.divinerealms;
+package io.github.divinerealms.leaguemanager;
 
 import co.aikar.commands.BukkitCommandManager;
-import io.github.divinerealms.commands.LMCommand;
-import io.github.divinerealms.commands.RostersCommand;
-import io.github.divinerealms.commands.VARCommand;
-import io.github.divinerealms.configs.Config;
-import io.github.divinerealms.configs.Lang;
-import io.github.divinerealms.managers.ConfigManager;
-import io.github.divinerealms.managers.GUIManager;
-import io.github.divinerealms.managers.ListenerManager;
-import io.github.divinerealms.managers.UtilManager;
+import io.github.divinerealms.leaguemanager.commands.LMCommand;
+import io.github.divinerealms.leaguemanager.commands.RostersCommand;
+import io.github.divinerealms.leaguemanager.commands.VARCommand;
+import io.github.divinerealms.leaguemanager.configs.Config;
+import io.github.divinerealms.leaguemanager.configs.Lang;
+import io.github.divinerealms.leaguemanager.managers.GUIManager;
+import io.github.divinerealms.leaguemanager.managers.ConfigManager;
+import io.github.divinerealms.leaguemanager.managers.ListenerManager;
+import io.github.divinerealms.leaguemanager.managers.UtilManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
@@ -26,9 +26,12 @@ public class LeagueManager extends JavaPlugin {
   private UtilManager utilManager;
   private GUIManager guiManager;
   private ListenerManager listenerManager;
+  @Getter
+  private static LeagueManager instance;
 
   @Override
   public void onEnable() {
+    instance = this;
     setupMessages();
     Config.setup(this);
     config = Config.getConfig("config.yml");
@@ -78,12 +81,12 @@ public class LeagueManager extends JavaPlugin {
   }
 
   private void loadMessages() {
-    Lang.setFile(getMessagesFile().getConfig("libs/messages.yml"));
+    Lang.setFile(getMessagesFile().getConfig("messages.yml"));
 
     for (final Lang value : Lang.values())
-      getMessagesFile().getConfig("libs/messages.yml").addDefault(value.getPath(), value.getDefault());
+      getMessagesFile().getConfig("messages.yml").addDefault(value.getPath(), value.getDefault());
 
-    getMessagesFile().getConfig("libs/messages.yml").options().copyDefaults(true);
-    getMessagesFile().saveConfig("libs/messages.yml");
+    getMessagesFile().getConfig("messages.yml").options().copyDefaults(true);
+    getMessagesFile().saveConfig("messages.yml");
   }
 }

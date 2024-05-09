@@ -1,6 +1,6 @@
-package io.github.divinerealms.utils;
+package io.github.divinerealms.leaguemanager.utils;
 
-import io.github.divinerealms.LeagueManager;
+import io.github.divinerealms.leaguemanager.LeagueManager;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
@@ -14,6 +14,7 @@ import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.MetaNode;
 import net.luckperms.api.node.types.PermissionNode;
+import org.bukkit.plugin.Plugin;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings("unused")
 @Getter
 public class Helper {
-  private final LeagueManager plugin;
+  private final Plugin plugin;
   private final UserManager userManager;
   private final GroupManager groupManager;
   private final String[] permissions = new String[]{"chatcontrol.channel.%team%",
@@ -37,9 +38,9 @@ public class Helper {
   @Setter
   private LuckPerms luckPermsAPI;
 
-  public Helper(final LeagueManager plugin) {
+  public Helper(final Plugin plugin) {
     this.plugin = plugin;
-    this.luckPermsAPI = plugin.getLuckPermsAPI();
+    this.luckPermsAPI = LeagueManager.getInstance().getLuckPermsAPI();
     this.userManager = getLuckPermsAPI().getUserManager();
     this.groupManager = getLuckPermsAPI().getGroupManager();
   }

@@ -3,7 +3,7 @@ plugins {
     id 'java'
 }
 
-group = 'io.github.divinerealms'
+group = 'io.github.divinerealms.leaguemanager'
 version = '1.2.5-SNAPSHOT'
 
 repositories {
@@ -54,7 +54,7 @@ shadowJar {
     relocate 'co.aikar.locales', 'io.github.divinerealms.locales'
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 11
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

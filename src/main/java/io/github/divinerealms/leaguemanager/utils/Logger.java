@@ -1,4 +1,4 @@
-package io.github.divinerealms.utils;
+package io.github.divinerealms.leaguemanager.utils;
 
 import lombok.Getter;
 import org.bukkit.Server;

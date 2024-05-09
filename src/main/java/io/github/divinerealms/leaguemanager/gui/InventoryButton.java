@@ -1,4 +1,4 @@
-package io.github.divinerealms.gui;
+package io.github.divinerealms.leaguemanager.gui;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;

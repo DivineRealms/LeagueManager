@@ -1,18 +1,18 @@
-package io.github.divinerealms.managers;
+package io.github.divinerealms.leaguemanager.managers;
 
-import io.github.divinerealms.LeagueManager;
-import io.github.divinerealms.utils.Helper;
-import io.github.divinerealms.utils.Logger;
+import io.github.divinerealms.leaguemanager.utils.Logger;
+import io.github.divinerealms.leaguemanager.utils.Helper;
 import lombok.Getter;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 
 @Getter
 public class UtilManager {
-  private final LeagueManager plugin;
+  private final Plugin plugin;
   private Logger logger;
   private Helper helper;
 
-  public UtilManager(final LeagueManager plugin) {
+  public UtilManager(final Plugin plugin) {
     this.plugin = plugin;
     this.logger = new Logger(plugin);
     this.helper = new Helper(plugin);

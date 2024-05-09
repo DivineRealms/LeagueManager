@@ -1,13 +1,13 @@
-package io.github.divinerealms.gui.impl;
+package io.github.divinerealms.leaguemanager.gui.impl;
 
-import io.github.divinerealms.configs.Lang;
-import io.github.divinerealms.gui.InventoryButton;
-import io.github.divinerealms.gui.InventoryGUI;
-import io.github.divinerealms.managers.GUIManager;
-import io.github.divinerealms.managers.RostersDataManager;
-import io.github.divinerealms.managers.UtilManager;
-import io.github.divinerealms.utils.Helper;
-import io.github.divinerealms.utils.Logger;
+import io.github.divinerealms.leaguemanager.configs.Lang;
+import io.github.divinerealms.leaguemanager.gui.InventoryButton;
+import io.github.divinerealms.leaguemanager.gui.InventoryGUI;
+import io.github.divinerealms.leaguemanager.managers.GUIManager;
+import io.github.divinerealms.leaguemanager.managers.RostersDataManager;
+import io.github.divinerealms.leaguemanager.managers.UtilManager;
+import io.github.divinerealms.leaguemanager.utils.Helper;
+import io.github.divinerealms.leaguemanager.utils.Logger;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;

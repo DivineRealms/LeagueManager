@@ -1,6 +1,6 @@
-package io.github.divinerealms.listeners;
+package io.github.divinerealms.leaguemanager.listeners;
 
-import io.github.divinerealms.managers.GUIManager;
+import io.github.divinerealms.leaguemanager.managers.GUIManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;

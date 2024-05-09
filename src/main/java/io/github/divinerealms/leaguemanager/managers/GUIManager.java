@@ -1,7 +1,7 @@
-package io.github.divinerealms.managers;
+package io.github.divinerealms.leaguemanager.managers;
 
-import io.github.divinerealms.gui.InventoryGUI;
-import io.github.divinerealms.gui.InventoryHandler;
+import io.github.divinerealms.leaguemanager.gui.InventoryGUI;
+import io.github.divinerealms.leaguemanager.gui.InventoryHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.OfflinePlayer;

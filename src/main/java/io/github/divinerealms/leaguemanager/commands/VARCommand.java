@@ -1,12 +1,12 @@
-package io.github.divinerealms.commands;
+package io.github.divinerealms.leaguemanager.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-import io.github.divinerealms.configs.Lang;
-import io.github.divinerealms.managers.UtilManager;
-import io.github.divinerealms.utils.Helper;
-import io.github.divinerealms.utils.Logger;
-import io.github.divinerealms.utils.Time;
+import io.github.divinerealms.leaguemanager.configs.Lang;
+import io.github.divinerealms.leaguemanager.utils.Logger;
+import io.github.divinerealms.leaguemanager.utils.Time;
+import io.github.divinerealms.leaguemanager.managers.UtilManager;
+import io.github.divinerealms.leaguemanager.utils.Helper;
 import lombok.Getter;
 import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.model.user.User;

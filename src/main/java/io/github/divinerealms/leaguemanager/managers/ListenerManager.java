@@ -1,7 +1,7 @@
-package io.github.divinerealms.managers;
+package io.github.divinerealms.leaguemanager.managers;
 
-import io.github.divinerealms.listeners.ChatListener;
-import io.github.divinerealms.listeners.GUIListener;
+import io.github.divinerealms.leaguemanager.listeners.ChatListener;
+import io.github.divinerealms.leaguemanager.listeners.GUIListener;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.HandlerList;

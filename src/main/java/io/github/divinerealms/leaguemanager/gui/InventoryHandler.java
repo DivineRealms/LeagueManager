@@ -1,4 +1,4 @@
-package io.github.divinerealms.gui;
+package io.github.divinerealms.leaguemanager.gui;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
