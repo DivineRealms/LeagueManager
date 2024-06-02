@@ -100,8 +100,18 @@ public class Helper {
   }
 
   public boolean playerHasPermission(final UUID uniqueId, final String permission) {
-    final CachedPermissionData cachedPermissionData = getUserManager().getUser(uniqueId).getCachedData().getPermissionData();
+    final User user = getUserManager().getUser(uniqueId);
+    if (user == null) return false;
+    final CachedPermissionData cachedPermissionData = user.getCachedData().getPermissionData();
     return cachedPermissionData.checkPermission(permission).asBoolean();
+  }
+
+  public boolean playerCheckPermission(final UUID uniqueId, final String permission) {
+    final User user = getUserManager().getUser(uniqueId);
+    if (user == null) return false;
+    final CachedPermissionData cachedPermissionData = user.getCachedData().getPermissionData();
+    final Node permissionNode = cachedPermissionData.queryPermission(permission).node();
+    return permissionNode != null && permissionNode.getValue();
   }
 
   public void playerAddPermission(final UUID uniqueId, final String permission) {

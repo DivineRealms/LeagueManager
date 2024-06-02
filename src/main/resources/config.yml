@@ -1,3 +1,2 @@
-regions:
-  - "testgol"
-discordWebhookURL: ""
+disabled-items:
+  - FIREWORK

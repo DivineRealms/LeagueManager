@@ -38,6 +38,7 @@ public enum Lang {
       "&6 /&evar add &2<&aigrač&2> &3[&bvreme&3]",
       "&6 /&evar remove &2<&aigrač&2>",
       "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r")),
+  DISABLED_ITEM("disabled-item", "&4▎ &cNe možete koristiti {0} dok je FC isključen!"),
   USER_BAN("user.ban", "&a▎ &b{0} &fje banovan iz FC-a na &e{1}&f zbog '&4{2}&f'!"),
   USER_BANNED("user.banned", "&4▎ &cBanovani ste iz FC-a na &e{0} &czbog '&4{1}&c'!"),
   USER_STILL_BANNED("user.still-banned", String.join(System.lineSeparator(),
