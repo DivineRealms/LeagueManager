@@ -4,7 +4,7 @@ import io.github.divinerealms.leaguemanager.configs.Lang;
 import io.github.divinerealms.leaguemanager.gui.InventoryButton;
 import io.github.divinerealms.leaguemanager.gui.InventoryGUI;
 import io.github.divinerealms.leaguemanager.managers.GUIManager;
-import io.github.divinerealms.leaguemanager.managers.RostersDataManager;
+import io.github.divinerealms.leaguemanager.managers.DataManager;
 import io.github.divinerealms.leaguemanager.managers.UtilManager;
 import io.github.divinerealms.leaguemanager.utils.Helper;
 import io.github.divinerealms.leaguemanager.utils.Logger;
@@ -28,14 +28,14 @@ public class PerPlayerGUI extends InventoryGUI {
   private final Logger logger;
   private final Helper helper;
   private final GUIManager guiManager;
-  private final RostersDataManager dataManager;
+  private final DataManager dataManager;
 
   public PerPlayerGUI(final UtilManager utilManager, final GUIManager guiManager) {
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
     this.guiManager = guiManager;
-    this.dataManager = new RostersDataManager(utilManager.getPlugin());
+    this.dataManager = new DataManager(utilManager.getPlugin());
   }
 
   @Override

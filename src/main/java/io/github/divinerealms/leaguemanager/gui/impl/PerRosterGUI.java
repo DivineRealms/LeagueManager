@@ -7,7 +7,7 @@ import io.github.divinerealms.leaguemanager.managers.GUIManager;
 import io.github.divinerealms.leaguemanager.managers.UtilManager;
 import io.github.divinerealms.leaguemanager.utils.Helper;
 import io.github.divinerealms.leaguemanager.utils.Logger;
-import io.github.divinerealms.leaguemanager.managers.RostersDataManager;
+import io.github.divinerealms.leaguemanager.managers.DataManager;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
@@ -28,7 +28,7 @@ public class PerRosterGUI extends InventoryGUI {
   private final GUIManager guiManager;
   private final Logger logger;
   private final Helper helper;
-  private final RostersDataManager dataManager;
+  private final DataManager dataManager;
   private final String team;
 
   public PerRosterGUI(UtilManager utilManager, GUIManager guiManager) {
@@ -36,7 +36,7 @@ public class PerRosterGUI extends InventoryGUI {
     this.guiManager = guiManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
-    this.dataManager = new RostersDataManager(utilManager.getPlugin());
+    this.dataManager = new DataManager(utilManager.getPlugin());
     this.team = guiManager.getTeamName();
   }
 

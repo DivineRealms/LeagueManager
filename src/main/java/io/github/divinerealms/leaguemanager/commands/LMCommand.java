@@ -4,10 +4,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import io.github.divinerealms.leaguemanager.LeagueManager;
 import io.github.divinerealms.leaguemanager.configs.Lang;
-import io.github.divinerealms.leaguemanager.utils.Logger;
-import io.github.divinerealms.leaguemanager.utils.Time;
+import io.github.divinerealms.leaguemanager.managers.DataManager;
 import io.github.divinerealms.leaguemanager.managers.UtilManager;
 import io.github.divinerealms.leaguemanager.utils.Helper;
+import io.github.divinerealms.leaguemanager.utils.Logger;
+import io.github.divinerealms.leaguemanager.utils.Time;
 import lombok.Getter;
 import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.model.user.User;
@@ -18,6 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.TimeUnit;
@@ -30,12 +32,14 @@ public class LMCommand extends BaseCommand {
   private final UtilManager utilManager;
   private final Logger logger;
   private final Helper helper;
+  private final DataManager dataManager;
 
   public LMCommand(final UtilManager utilManager, final LeagueManager instance) {
     this.instance = instance;
     this.utilManager = utilManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
+    this.dataManager = new DataManager(utilManager.getPlugin());
   }
 
   @Default
@@ -104,15 +108,25 @@ public class LMCommand extends BaseCommand {
         DataMutateResult result = user.data().add(node);
 
         if (result.wasSuccessful()) {
-          if (args.length == 2) {
-            getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[]{target.getName(), time.toString(), "Kršenje pravila"}));
-            if (target.isOnline())
-              getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[]{time.toString(), "Kršenje pravila"}));
+          String reason = "Kršenje pravila";
+          if (args.length != 2) {
+            reason = StringUtils.join(args, ' ', 2, args.length);
+          }
+          getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[]{target.getName(), time.toString(), reason}));
+          if (target.isOnline()) {
+            getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[]{time.toString(), reason}));
+          }
+          String type = "bans";
+          if (getDataManager().configExists(type)) {
+            getDataManager().setConfig("bans");
+            FileConfiguration bans = getDataManager().getConfig("bans");
+            bans.set(target.getName() + ".time", time.toString());
+            bans.set(target.getName() + ".reason", reason);
+            bans.set(target.getName() + ".executor", sender.getName());
+            getDataManager().saveConfig(type);
           } else {
-            String reason = StringUtils.join(args, ' ', 2, args.length);
-            getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[]{target.getName(), time.toString(), reason}));
-            if (target.isOnline())
-              getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[]{time.toString(), reason}));
+            getDataManager().createNewFile(target.getName(), "Creating config file for " + type);
+            getLogger().send(sender, Lang.ROSTERS_FILE_NOT_FOUND.getConfigValue(new String[]{target.getName()}));
           }
           getHelper().getUserManager().saveUser(user);
         } else getLogger().send(sender, Lang.USER_ALREADY_BANNED.getConfigValue(new String[]{target.getName()}));
@@ -143,6 +157,33 @@ public class LMCommand extends BaseCommand {
         } else getLogger().send(sender, Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
       } else getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
     } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
+  }
+
+  @Subcommand("checkban")
+  @CommandCompletion("@players")
+  @CommandPermission("leaguemanager.command.checkban")
+  public void onCheckBan(CommandSender sender, String[] args) {
+    if (args.length < 1) {
+      getLogger().send(sender, Lang.USER_USAGE_CHECKBAN.getConfigValue(null));
+    } else if (args.length == 1) {
+      OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
+
+      if (target != null && target.hasPlayedBefore()) {
+        User user = getHelper().getPlayer(target.getUniqueId());
+        Node node = user.getCachedData().getPermissionData().queryPermission("leaguemanager.banned").node();
+
+        if (node != null && node.hasExpiry()) {
+          String type = "bans";
+          getDataManager().setConfig(type);
+          FileConfiguration bans = getDataManager().getConfig("bans");
+          String reason = bans.getString(target.getName() + ".reason");
+          String time = bans.getString(target.getName() + ".time");
+          String executor = bans.getString(target.getName() + ".executor");
+          String expiry = new Time(node.getExpiryDuration().getSeconds(), TimeUnit.SECONDS).toString();
+          getLogger().send(sender, Lang.USER_CHECKBAN.getConfigValue(new String[]{target.getName(),executor,reason,time,expiry}));
+        } else getLogger().send(sender, Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
+      } else getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
+    }
   }
 
   @Subcommand("suspend")

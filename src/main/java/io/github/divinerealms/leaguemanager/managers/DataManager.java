@@ -9,13 +9,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class RostersDataManager {
+public class DataManager {
   @Getter private final Plugin plugin;
   @Getter private final String folderName = "data";
   private FileConfiguration config;
   private File file;
 
-  public RostersDataManager(Plugin plugin) {
+  public DataManager(Plugin plugin) {
     this.plugin = plugin;
   }
 

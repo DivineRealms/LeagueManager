@@ -109,7 +109,7 @@ public class Time {
   private static long appendTime(long time, long unitInMS, String name, StringBuilder builder) {
     long timeInUnits = (time - (time % unitInMS)) / unitInMS;
 
-    if (timeInUnits > 0) builder.append(", ").append(timeInUnits).append(' ').append(name);
+    if (timeInUnits > 0) builder.append(", ").append(timeInUnits).append(name);
 
     return time - timeInUnits * unitInMS;
   }

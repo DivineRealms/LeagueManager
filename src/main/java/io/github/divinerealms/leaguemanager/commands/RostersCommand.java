@@ -7,7 +7,7 @@ import io.github.divinerealms.leaguemanager.gui.impl.PerRosterGUI;
 import io.github.divinerealms.leaguemanager.gui.impl.RostersGUI;
 import io.github.divinerealms.leaguemanager.managers.GUIManager;
 import io.github.divinerealms.leaguemanager.utils.Logger;
-import io.github.divinerealms.leaguemanager.managers.RostersDataManager;
+import io.github.divinerealms.leaguemanager.managers.DataManager;
 import io.github.divinerealms.leaguemanager.managers.UtilManager;
 import io.github.divinerealms.leaguemanager.utils.Helper;
 import lombok.Getter;
@@ -36,14 +36,14 @@ public class RostersCommand extends BaseCommand {
   private final GUIManager guiManager;
   private final Logger logger;
   private final Helper helper;
-  private final RostersDataManager dataManager;
+  private final DataManager dataManager;
 
   public RostersCommand(final UtilManager utilManager, final GUIManager guiManager) {
     this.utilManager = utilManager;
     this.guiManager = guiManager;
     this.logger = utilManager.getLogger();
     this.helper = utilManager.getHelper();
-    this.dataManager = new RostersDataManager(utilManager.getPlugin());
+    this.dataManager = new DataManager(utilManager.getPlugin());
   }
 
   @Default
@@ -203,7 +203,7 @@ public class RostersCommand extends BaseCommand {
         getHelper().playerAddGroup(target.getUniqueId(), teamName);
         getLogger().send("fcfa", Lang.ROSTERS_USER_ADDED.getConfigValue(new String[]{sender.getName(), target.getName(), teamName.toUpperCase()}));
       } else {
-        getDataManager().createNewFile(target.getName(), "Created config file for player " + target.getName());
+        getDataManager().createNewFile(target.getName(), "Created config file for " + type);
         getLogger().send(sender, Lang.ROSTERS_FILE_NOT_FOUND.getConfigValue(new String[]{target.getName()}));
       }
     } else getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));

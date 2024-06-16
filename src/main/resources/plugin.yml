@@ -8,6 +8,7 @@ depend:
   - LuckPerms
 softdepend:
   - HeadDatabase
+  - WorldEdit
 description: Plugin for easier league organization.
 website: https://divinerealms.org
 load: POSTWORLD
