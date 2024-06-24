@@ -33,6 +33,12 @@ public class Logger {
     else getConsoleSender().sendMessage(message);
   }
 
+  public void info(String message) {
+    message = ChatColor.translateAlternateColorCodes('&', message);
+    String prefix = ChatColor.translateAlternateColorCodes('&', "&2[&dLeague&6Manager&2] &r");
+    getConsoleSender().sendMessage(prefix + message);
+  }
+
   public void send(final String rank, final String message) {
     getServer().broadcast(message, "group." + rank);
     getConsoleSender().sendMessage(message);

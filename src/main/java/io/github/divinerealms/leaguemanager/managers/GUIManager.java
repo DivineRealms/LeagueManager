@@ -18,6 +18,7 @@ public class GUIManager {
   private final Map<Inventory, InventoryHandler> activeInventories = new HashMap<>();
   @Getter @Setter private String teamName;
   @Getter @Setter private OfflinePlayer target;
+  @Getter @Setter private String playerName;
 
   public void openGUI(InventoryGUI gui, Player player) {
     this.registerHandledInventory(gui.getInventory(), gui);

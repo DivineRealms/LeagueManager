@@ -180,4 +180,9 @@ public class Helper {
     final CachedMetaData metaData = group.getCachedData().getMetaData();
     return metaData.getMeta().containsKey(metaType);
   }
+
+  public int groupGetMetaWeight(final String groupName) {
+    final Group group = getGroup(groupName);
+    return group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+  }
 }

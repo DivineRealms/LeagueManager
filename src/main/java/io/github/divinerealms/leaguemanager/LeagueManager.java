@@ -1,9 +1,7 @@
 package io.github.divinerealms.leaguemanager;
 
 import co.aikar.commands.BukkitCommandManager;
-import io.github.divinerealms.leaguemanager.commands.LMCommand;
-import io.github.divinerealms.leaguemanager.commands.RostersCommand;
-import io.github.divinerealms.leaguemanager.commands.VARCommand;
+import io.github.divinerealms.leaguemanager.commands.*;
 import io.github.divinerealms.leaguemanager.configs.Config;
 import io.github.divinerealms.leaguemanager.configs.Lang;
 import io.github.divinerealms.leaguemanager.managers.ConfigManager;
@@ -47,10 +45,10 @@ public class LeagueManager extends JavaPlugin {
 
     getUtilManager().getLogger().initializeStrings();
     getUtilManager().getLogger().sendBanner();
-    getLogger().info("Loading commands...");
+    getUtilManager().getLogger().info("Loading commands...");
     setup();
-    getLogger().info("Loading listeners...");
-    getLogger().info("Successfully enabled!");
+    getUtilManager().getLogger().info("Loading listeners...");
+    getUtilManager().getLogger().info("Successfully enabled!");
   }
 
   @Override
@@ -66,6 +64,8 @@ public class LeagueManager extends JavaPlugin {
     commandManager.registerCommand(new LMCommand(getUtilManager(), this));
     commandManager.registerCommand(new VARCommand(getUtilManager()));
     commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
+    commandManager.registerCommand(new MigrateCommand(getUtilManager()));
+    commandManager.registerCommand(new StatisticsCommand(getUtilManager(), getGuiManager()));
   }
 
   public void setupMessages() {

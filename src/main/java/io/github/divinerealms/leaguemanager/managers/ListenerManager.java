@@ -1,8 +1,6 @@
 package io.github.divinerealms.leaguemanager.managers;
 
-import io.github.divinerealms.leaguemanager.listeners.ChatListener;
-import io.github.divinerealms.leaguemanager.listeners.FireworkListener;
-import io.github.divinerealms.leaguemanager.listeners.GUIListener;
+import io.github.divinerealms.leaguemanager.listeners.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.HandlerList;
@@ -29,6 +27,8 @@ public class ListenerManager {
     getPluginManager().registerEvents(new ChatListener(getUtilManager()), getPlugin());
     getPluginManager().registerEvents(new GUIListener(getGuiManager()), getPlugin());
     getPluginManager().registerEvents(new FireworkListener(getUtilManager()), getPlugin());
+    getPluginManager().registerEvents(new PlayerJoinListener(getUtilManager()), getPlugin());
+    getPluginManager().registerEvents(new PlayerQuitListener(getUtilManager()), getPlugin());
   }
 
   public void unregisterListeners() {

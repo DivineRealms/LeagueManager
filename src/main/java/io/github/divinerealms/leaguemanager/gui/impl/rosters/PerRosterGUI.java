@@ -1,13 +1,13 @@
-package io.github.divinerealms.leaguemanager.gui.impl;
+package io.github.divinerealms.leaguemanager.gui.impl.rosters;
 
 import io.github.divinerealms.leaguemanager.configs.Lang;
 import io.github.divinerealms.leaguemanager.gui.InventoryButton;
 import io.github.divinerealms.leaguemanager.gui.InventoryGUI;
+import io.github.divinerealms.leaguemanager.managers.DataManager;
 import io.github.divinerealms.leaguemanager.managers.GUIManager;
 import io.github.divinerealms.leaguemanager.managers.UtilManager;
 import io.github.divinerealms.leaguemanager.utils.Helper;
 import io.github.divinerealms.leaguemanager.utils.Logger;
-import io.github.divinerealms.leaguemanager.managers.DataManager;
 import lombok.Getter;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
@@ -86,17 +86,18 @@ public class PerRosterGUI extends InventoryGUI {
     }
 
     int slot = 10;
-    String type = null;
+    String type;
 
     if (getHelper().groupExists(getTeam())) {
-      if (getHelper().groupHasMeta(getTeam(), "team")) type = "main";
-      else if (getHelper().groupHasMeta(getTeam(), "b")) type = "juniors";
+      type = getHelper().groupGetMetaWeight(getTeam()) == 100 ? "main" :
+          getHelper().groupGetMetaWeight(getTeam()) == 99 ? "juniors" : null;
 
       if (type == null) {
         getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
         return;
       }
 
+      getDataManager().setFolderName("teamdata");
       getDataManager().setConfig(type);
       FileConfiguration teamConfig = getDataManager().getConfig(type);
       if (teamConfig == null) {
@@ -107,12 +108,15 @@ public class PerRosterGUI extends InventoryGUI {
       boolean managerFound = false;
       boolean captainFound = false;
 
-      for (String teamPlayer : teamConfig.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
+      for (String teamPlayer : teamConfig.getStringList(getTeam() + ".players")) {
+        getDataManager().setFolderName("playerdata");
+        getDataManager().setConfig(teamPlayer);
+        FileConfiguration playerData = getDataManager().getConfig(teamPlayer);
         if (playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&2Director"))) {
-          this.addButton(10, this.createPlayerHead(teamConfig, type, "&a&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
-                  getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position", "/")),
-                  getUtilManager().color("&fDržava: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".country", "/")),
-                  getUtilManager().color("&fBroj: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".number", 0)))
+          this.addButton(10, this.createPlayerHead(playerData, teamPlayer, "&a&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
+                  getUtilManager().color("&fPozicija: &e" + playerData.getString("position", "/")),
+                  getUtilManager().color("&fDržava: &e" + playerData.getString("country", "/")),
+                  getUtilManager().color("&fBroj: &e" + playerData.getInt("number", 0)))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
                 if (!hasAccess(target)) return;
@@ -122,11 +126,11 @@ public class PerRosterGUI extends InventoryGUI {
               }));
           managerFound = true;
         } else if (playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
-          this.addButton(11, this.createPlayerHead(teamConfig, type, "&c&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
-                  getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position", "/")),
-                  getUtilManager().color("&fDržava: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".country", "/")),
-                  getUtilManager().color("&fBroj: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".number", 0)),
-                  getUtilManager().color("&fUgovor: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".contract", 0) + " sezone"))
+          this.addButton(11, this.createPlayerHead(playerData, teamPlayer, "&c&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
+                  getUtilManager().color("&fPozicija: &e" + playerData.getString("position", "/")),
+                  getUtilManager().color("&fDržava: &e" + playerData.getString("country", "/")),
+                  getUtilManager().color("&fBroj: &e" + playerData.getInt("number", 0)),
+                  getUtilManager().color("&fUgovor: &e" + playerData.getInt("contract", 0) + " sezone"))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
                 if (!hasAccess(target)) return;
@@ -138,15 +142,18 @@ public class PerRosterGUI extends InventoryGUI {
         }
       }
 
-      for (String teamPlayer : teamConfig.getConfigurationSection(getTeam() + ".players").getKeys(false)) {
+      for (String teamPlayer : teamConfig.getStringList(getTeam() + ".players")) {
+        getDataManager().setFolderName("playerdata");
+        getDataManager().setConfig(teamPlayer);
+        FileConfiguration playerData = getDataManager().getConfig(teamPlayer);
         if (!playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&2Director")) && !playerRole(teamConfig, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
           while (slot == 17 || slot == 18 || slot == 26 || slot == 10 && managerFound || captainFound && slot == 11) slot++;
           if (slot > 25) break;
-          this.addButton(slot, this.createPlayerHead(teamConfig, type, "&b&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
-                  getUtilManager().color("&fPozicija: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".position", "")),
-                  getUtilManager().color("&fDržava: &e" + teamConfig.getString(getTeam() + ".players." + teamPlayer + ".country", "/")),
-                  getUtilManager().color("&fBroj: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".number", 0)),
-                  getUtilManager().color("&fUgovor: &e" + teamConfig.getInt(getTeam() + ".players." + teamPlayer + ".contract", 0) + " sezone"))
+          this.addButton(slot, this.createPlayerHead(playerData, teamPlayer, "&b&l" + teamPlayer, teamPlayer, playerRole(teamConfig, teamPlayer), "",
+                  getUtilManager().color("&fPozicija: &e" + playerData.getString("position", "")),
+                  getUtilManager().color("&fDržava: &e" + playerData.getString("country", "/")),
+                  getUtilManager().color("&fBroj: &e" + playerData.getInt("number", 0)),
+                  getUtilManager().color("&fUgovor: &e" + playerData.getInt("contract", 0) + " sezone"))
               .consumer(event -> {
                 Player target = (Player) event.getWhoClicked();
                 if (!hasAccess(target)) return;
@@ -179,21 +186,16 @@ public class PerRosterGUI extends InventoryGUI {
     return getHelper().playerInGroup(player.getUniqueId(), "fcfa");
   }
 
-//  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-//  private boolean isManager(Player player) {
-//    return getHelper().playerHasPermission(player.getUniqueId(), "tab.group." + getTeam().toLowerCase() + "-director");
-//  }
-
-  private InventoryButton createPlayerHead(FileConfiguration team, String type, String title, String playerName, String... lore) {
-    ItemStack skull = team.getItemStack(getTeam() + ".players." + playerName + ".head");
+  private InventoryButton createPlayerHead(FileConfiguration playerData, String name, String title, String playerName, String... lore) {
+    ItemStack skull = playerData.getItemStack("head");
     if (skull == null) {
       ItemStack newSkull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
       SkullMeta skullMeta = (SkullMeta) newSkull.getItemMeta();
       skullMeta.setOwner(playerName);
       skullMeta.setDisplayName(getUtilManager().color(title));
       newSkull.setItemMeta(skullMeta);
-      team.set(getTeam() + ".players." + playerName + ".head", newSkull);
-      getDataManager().saveConfig(type);
+      playerData.set("head", newSkull);
+      getDataManager().saveConfig(name);
       return new InventoryButton().creator(player -> newSkull).consumer(event -> {});
     }
     SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
