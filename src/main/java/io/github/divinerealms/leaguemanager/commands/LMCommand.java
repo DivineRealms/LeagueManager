@@ -1,6 +1,7 @@
 package io.github.divinerealms.leaguemanager.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.divinerealms.leaguemanager.LeagueManager;
 import io.github.divinerealms.leaguemanager.configs.Lang;
@@ -19,7 +20,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.TimeUnit;
@@ -33,6 +33,7 @@ public class LMCommand extends BaseCommand {
   private final Logger logger;
   private final Helper helper;
   private final DataManager dataManager;
+  private final String folderName = "playerdata";
 
   public LMCommand(final UtilManager utilManager, final LeagueManager instance) {
     this.instance = instance;
@@ -55,18 +56,16 @@ public class LMCommand extends BaseCommand {
     getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
   }
 
-  @Subcommand("help")
+  @HelpCommand
   @CommandPermission("leaguemanager.command.help")
-  public void onHelp(CommandSender sender) {
-    getLogger().send(sender, Lang.HELP.getConfigValue(null));
+  public void onHelp(CommandSender sender, CommandHelp help) {
+    help.showHelp();
   }
 
   @Subcommand("reload")
   @CommandPermission("leaguemanager.command.reload")
   public void onReload(CommandSender sender) {
-    getInstance().setupMessages();
-    getInstance().setup();
-    getUtilManager().reload();
+    getInstance().onEnable();
     getLogger().send(sender, Lang.RELOAD.getConfigValue(null));
   }
 
@@ -75,12 +74,14 @@ public class LMCommand extends BaseCommand {
   public void onToggle(CommandSender sender) {
     String state;
     Server server = getInstance().getServer();
-    if (getHelper().groupHasPermission("default", "leaguemanager.footcube")) {
+    if (getUtilManager().isFcEnabled()) {
       state = Lang.OFF.getConfigValue(null);
-      getHelper().groupAddPermission("default", "leaguemanager.footcube", false);
+      getHelper().groupAddPermission("default", "leaguemanager.footcube", "football", false);
+      getUtilManager().setFcEnabled(false);
     } else {
       state = Lang.ON.getConfigValue(null);
-      getHelper().groupAddPermission("default", "leaguemanager.footcube", true);
+      getHelper().groupAddPermission("default", "leaguemanager.footcube", "football", true);
+      getUtilManager().setFcEnabled(true);
     }
     server.broadcastMessage(Lang.TOGGLE.getConfigValue(new String[]{state,sender.getName()}));
   }
@@ -109,22 +110,22 @@ public class LMCommand extends BaseCommand {
 
         if (result.wasSuccessful()) {
           String reason = "Kršenje pravila";
-          if (args.length != 2) {
-            reason = StringUtils.join(args, ' ', 2, args.length);
-          }
+
+          if (args.length != 2) reason = StringUtils.join(args, ' ', 2, args.length);
+
           getLogger().send(sender, Lang.USER_BAN.getConfigValue(new String[]{target.getName(), time.toString(), reason}));
           if (target.isOnline()) {
             getLogger().send(target.getPlayer(), Lang.USER_BANNED.getConfigValue(new String[]{time.toString(), reason}));
           }
-          getDataManager().setFolderName("playerdata");
-          if (getDataManager().configExists(target.getName())) {
-            getDataManager().setConfig(target.getName());
-            FileConfiguration playerData = getDataManager().getConfig(target.getName());
-            playerData.set("ban.time", time.toString());
-            playerData.set("ban.reason", reason);
-            playerData.set("ban.executor", sender.getName());
-            getDataManager().saveConfig(target.getName());
+
+          if (getDataManager().configExists(getFolderName(), target.getName())) {
+            getDataManager().setConfig(getFolderName(), target.getName());
+            getDataManager().getConfig().set("ban.time", time.toString());
+            getDataManager().getConfig().set("ban.reason", reason);
+            getDataManager().getConfig().set("ban.executor", sender.getName());
+            getDataManager().saveConfig();
           }
+
           getHelper().getUserManager().saveUser(user);
         } else getLogger().send(sender, Lang.USER_ALREADY_BANNED.getConfigValue(new String[]{target.getName()}));
       } else getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
@@ -147,15 +148,18 @@ public class LMCommand extends BaseCommand {
         if (node != null && node.hasExpiry()) {
           DataMutateResult result = user.data().remove(node);
           if (result.wasSuccessful()) {
-            getDataManager().setFolderName("playerdata");
-            if (getDataManager().configExists(target.getName())) {
-              getDataManager().setConfig(target.getName());
-              FileConfiguration playerData = getDataManager().getConfig(target.getName());
-              playerData.set("ban", null);
-              getDataManager().saveConfig(target.getName());
+            if (getDataManager().configExists(getFolderName(), target.getName())) {
+              getDataManager().setConfig(getFolderName(), target.getName());
+              getDataManager().getConfig().set("ban", null);
+              getDataManager().saveConfig();
             }
+
             getLogger().send(sender, Lang.USER_UNBAN.getConfigValue(new String[]{target.getName()}));
-            if (target.isOnline()) getLogger().send(target.getPlayer(), Lang.USER_UNBANNED.getConfigValue(null));
+
+            if (target.isOnline()) {
+              getLogger().send(target.getPlayer(), Lang.USER_UNBANNED.getConfigValue(null));
+            }
+
             getHelper().getUserManager().saveUser(user);
           } else getLogger().send(sender, Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
         } else getLogger().send(sender, Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
@@ -177,13 +181,18 @@ public class LMCommand extends BaseCommand {
         Node node = user.getCachedData().getPermissionData().queryPermission("leaguemanager.banned").node();
 
         if (node != null && node.hasExpiry()) {
-          getDataManager().setFolderName("playerdata");
-          getDataManager().setConfig(target.getName());
-          FileConfiguration playerData = getDataManager().getConfig(target.getName());
-          String reason = playerData.getString("ban.reason");
-          String time = playerData.getString("ban.time");
-          String executor = playerData.getString("ban.executor");
+          getDataManager().setConfig(getFolderName(), target.getName());
+
+          if (getDataManager().getConfig().get("ban") == null) {
+            getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"string nije pronađen"}));
+            return;
+          }
+
+          String reason = getDataManager().getConfig().getString("ban.reason");
+          String time = getDataManager().getConfig().getString("ban.time");
+          String executor = getDataManager().getConfig().getString("ban.executor");
           String expiry = new Time(node.getExpiryDuration().getSeconds(), TimeUnit.SECONDS).toString();
+
           getLogger().send(sender, Lang.USER_CHECKBAN.getConfigValue(new String[]{target.getName(),executor,reason,time,expiry}));
         } else getLogger().send(sender, Lang.USER_NOT_BANNED.getConfigValue(new String[]{target.getName()}));
       } else getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
@@ -214,21 +223,22 @@ public class LMCommand extends BaseCommand {
 
         if (result.wasSuccessful()) {
           String reason = "Kršenje pravila";
-          if (args.length != 2) {
-            reason = StringUtils.join(args, ' ', 2, args.length);
-          }
+          if (args.length != 2) reason = StringUtils.join(args, ' ', 2, args.length);
+
           getLogger().send(sender, Lang.USER_SUSPEND.getConfigValue(new String[]{target.getName(), time.toString(), reason}));
-          if (target.isOnline())
+
+          if (target.isOnline()) {
             getLogger().send(target.getPlayer(), Lang.USER_SUSPENDED.getConfigValue(new String[]{time.toString(), reason}));
-          getDataManager().setFolderName("playerdata");
-          if (getDataManager().configExists(target.getName())) {
-            getDataManager().setConfig(target.getName());
-            FileConfiguration playerData = getDataManager().getConfig(target.getName());
-            playerData.set("suspend.time", time.toString());
-            playerData.set("suspend.reason", reason);
-            playerData.set("suspend.executor", sender.getName());
-            getDataManager().saveConfig(target.getName());
           }
+
+          if (getDataManager().configExists(getFolderName(), target.getName())) {
+            getDataManager().setConfig(getFolderName(), target.getName());
+            getDataManager().getConfig().set("suspend.time", time.toString());
+            getDataManager().getConfig().set("suspend.reason", reason);
+            getDataManager().getConfig().set("suspend.executor", sender.getName());
+            getDataManager().saveConfig();
+          }
+
           getHelper().getUserManager().saveUser(user);
         } else getLogger().send(sender, Lang.USER_ALREADY_SUSPENDED.getConfigValue(new String[]{target.getName()}));
       } else getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
@@ -251,15 +261,18 @@ public class LMCommand extends BaseCommand {
         if (node != null && node.hasExpiry()) {
           DataMutateResult result = user.data().remove(node);
           if (result.wasSuccessful()) {
-            getDataManager().setFolderName("playerdata");
-            if (getDataManager().configExists(target.getName())) {
-              getDataManager().setConfig(target.getName());
-              FileConfiguration playerData = getDataManager().getConfig(target.getName());
-              playerData.set("suspend", null);
-              getDataManager().saveConfig(target.getName());
+            if (getDataManager().configExists(getFolderName(), target.getName())) {
+              getDataManager().setConfig(getFolderName(), target.getName());
+              getDataManager().getConfig().set("suspend", null);
+              getDataManager().saveConfig();
             }
+
             getLogger().send(sender, Lang.USER_UNSUSPEND.getConfigValue(new String[]{target.getName()}));
-            if (target.isOnline()) getLogger().send(target.getPlayer(), Lang.USER_UNSUSPENDED.getConfigValue(null));
+
+            if (target.isOnline()) {
+              getLogger().send(target.getPlayer(), Lang.USER_UNSUSPENDED.getConfigValue(null));
+            }
+
             getHelper().getUserManager().saveUser(user);
           } else getLogger().send(sender, Lang.USER_NOT_SUSPENDED.getConfigValue(new String[]{target.getName()}));
         } else getLogger().send(sender, Lang.USER_NOT_SUSPENDED.getConfigValue(new String[]{target.getName()}));
@@ -281,13 +294,18 @@ public class LMCommand extends BaseCommand {
         Node node = user.getCachedData().getPermissionData().queryPermission("group.suspend").node();
 
         if (node != null && node.hasExpiry()) {
-          getDataManager().setFolderName("playerdata");
-          getDataManager().setConfig(target.getName());
-          FileConfiguration playerData = getDataManager().getConfig(target.getName());
-          String reason = playerData.getString("suspend.reason");
-          String time = playerData.getString("suspend.time");
-          String executor = playerData.getString("suspend.executor");
+          getDataManager().setConfig(getFolderName(), target.getName());
+
+          if (getDataManager().getConfig().get("suspend") == null) {
+            getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"string nije pronađen"}));
+            return;
+          }
+
+          String reason = getDataManager().getConfig().getString("suspend.reason");
+          String time = getDataManager().getConfig().getString("suspend.time");
+          String executor = getDataManager().getConfig().getString("suspend.executor");
           String expiry = new Time(node.getExpiryDuration().getSeconds(), TimeUnit.SECONDS).toString();
+
           getLogger().send(sender, Lang.USER_CHECKSUSPEND.getConfigValue(new String[]{target.getName(),executor,reason,time,expiry}));
         } else getLogger().send(sender, Lang.USER_NOT_SUSPENDED.getConfigValue(new String[]{target.getName()}));
       } else getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));

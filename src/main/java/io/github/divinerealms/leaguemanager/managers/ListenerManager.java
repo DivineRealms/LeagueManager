@@ -26,7 +26,7 @@ public class ListenerManager {
     setRegistered(true);
     getPluginManager().registerEvents(new ChatListener(getUtilManager()), getPlugin());
     getPluginManager().registerEvents(new GUIListener(getGuiManager()), getPlugin());
-    getPluginManager().registerEvents(new FireworkListener(getUtilManager()), getPlugin());
+    getPluginManager().registerEvents(new DisabledItemsListener(getUtilManager()), getPlugin());
     getPluginManager().registerEvents(new PlayerJoinListener(getUtilManager()), getPlugin());
     getPluginManager().registerEvents(new PlayerQuitListener(getUtilManager()), getPlugin());
   }

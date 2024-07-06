@@ -38,40 +38,40 @@ public class Helper {
   @Setter
   private LuckPerms luckPermsAPI;
 
-  public Helper(final Plugin plugin) {
+  public Helper(Plugin plugin) {
     this.plugin = plugin;
     this.luckPermsAPI = LeagueManager.getInstance().getLuckPermsAPI();
     this.userManager = getLuckPermsAPI().getUserManager();
     this.groupManager = getLuckPermsAPI().getGroupManager();
   }
 
-  public User getPlayer(final UUID uniqueId) {
-    final CompletableFuture<User> userFuture = getUserManager().loadUser(uniqueId);
+  public User getPlayer(UUID uniqueId) {
+    CompletableFuture<User> userFuture = getUserManager().loadUser(uniqueId);
     return userFuture.join();
   }
 
-  public Duration getPermissionExpireTime(final UUID uniqueId, final String permission) {
-    final User user = getPlayer(uniqueId);
-    final Node node = user.getCachedData().getPermissionData().queryPermission(permission).node();
+  public Duration getPermissionExpireTime(UUID uniqueId, String permission) {
+    User user = getPlayer(uniqueId);
+    Node node = user.getCachedData().getPermissionData().queryPermission(permission).node();
     assert node != null;
     return node.getExpiryDuration();
   }
 
-  public boolean playerInGroup(final UUID uniqueId, final String groupName) {
-    final User user = getPlayer(uniqueId);
-    final Group group = getGroup(groupName);
+  public boolean playerInGroup(UUID uniqueId, String groupName) {
+    User user = getPlayer(uniqueId);
+    Group group = getGroup(groupName);
     return user.getInheritedGroups(user.getQueryOptions()).contains(group);
   }
 
-  public void playerRemoveTeams(final UUID uniqueId) {
-    final User user = getPlayer(uniqueId);
-    for (final Group group : user.getInheritedGroups(user.getQueryOptions())) {
-      final int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
-      if (groupWeight == 100 || groupWeight == 99) playerRemoveGroup(uniqueId, group.getName());
+  public void playerRemoveTeams(UUID uniqueId) {
+    User user = getPlayer(uniqueId);
+    for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
+      int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
+      if (groupWeight == 100 || groupWeight == 99) playerRemoveGroup(uniqueId, group.getName(), "football");
     }
   }
 
-  public String playerGetTeam(final UUID uniqueId, int weight) {
+  public String playerGetTeam(UUID uniqueId, int weight) {
     User user = getPlayer(uniqueId);
     for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
       int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
@@ -80,7 +80,7 @@ public class Helper {
     return "/";
   }
 
-  public boolean playerHasTeam(final UUID uniqueId) {
+  public boolean playerHasTeam(UUID uniqueId) {
     User user = getPlayer(uniqueId);
     for (Group group : user.getInheritedGroups(user.getQueryOptions())) {
       int groupWeight = group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
@@ -89,100 +89,100 @@ public class Helper {
     return false;
   }
 
-  public void playerAddGroup(final UUID uniqueId, final String groupName) {
-    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
+  public void playerAddGroup(UUID uniqueId, String groupName, String server) {
+    InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", server).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(inheritanceNode));
   }
 
-  public void playerRemoveGroup(final UUID uniqueId, final String groupName) {
-    final InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", "football").build();
+  public void playerRemoveGroup(UUID uniqueId, String groupName, String server) {
+    InheritanceNode inheritanceNode = InheritanceNode.builder(groupName).withContext("server", server).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().remove(inheritanceNode));
   }
 
-  public boolean playerHasPermission(final UUID uniqueId, final String permission) {
-    final User user = getUserManager().getUser(uniqueId);
+  public boolean playerHasPermission(UUID uniqueId, String permission) {
+    User user = getUserManager().getUser(uniqueId);
     if (user == null) return false;
-    final CachedPermissionData cachedPermissionData = user.getCachedData().getPermissionData();
+    CachedPermissionData cachedPermissionData = user.getCachedData().getPermissionData();
     return cachedPermissionData.checkPermission(permission).asBoolean();
   }
 
-  public boolean playerCheckPermission(final UUID uniqueId, final String permission) {
-    final User user = getUserManager().getUser(uniqueId);
+  public boolean playerCheckPermission(UUID uniqueId, String permission) {
+    User user = getUserManager().getUser(uniqueId);
     if (user == null) return false;
-    final CachedPermissionData cachedPermissionData = user.getCachedData().getPermissionData();
-    final Node permissionNode = cachedPermissionData.queryPermission(permission).node();
+    CachedPermissionData cachedPermissionData = user.getCachedData().getPermissionData();
+    Node permissionNode = cachedPermissionData.queryPermission(permission).node();
     return permissionNode != null && permissionNode.getValue();
   }
 
-  public void playerAddPermission(final UUID uniqueId, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+  public void playerAddPermission(UUID uniqueId, String permission, String server) {
+    PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", server).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(permissionNode));
   }
 
-  public void playerRemovePermission(final UUID uniqueId, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+  public void playerRemovePermission(UUID uniqueId, String permission, String server) {
+    PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", server).build();
     getUserManager().modifyUser(uniqueId, user -> user.data().remove(permissionNode));
   }
 
-  public void playerAddMeta(final UUID uniqueId, final String key, final String value) {
-    final MetaNode node = MetaNode.builder(key, value).withContext("server", "football").build();
+  public void playerAddMeta(UUID uniqueId, String key, String value) {
+    MetaNode node = MetaNode.builder(key, value).withContext("server", "football").build();
     getUserManager().modifyUser(uniqueId, user -> user.data().add(node));
   }
 
-  public void playerRemoveMeta(final UUID uniqueId, final String key) {
-    final User user = getPlayer(uniqueId);
-    final MetaNode node = user.getCachedData().getMetaData().queryMetaValue(key).node();
+  public void playerRemoveMeta(UUID uniqueId, String key) {
+    User user = getPlayer(uniqueId);
+    MetaNode node = user.getCachedData().getMetaData().queryMetaValue(key).node();
     if (node != null)
       getUserManager().modifyUser(uniqueId, u -> u.data().remove(node));
   }
 
-  public String playerGetMeta(final UUID uniqueId, final String key) {
-    final User user = getPlayer(uniqueId);
+  public String playerGetMeta(UUID uniqueId, String key) {
+    User user = getPlayer(uniqueId);
     return user.getCachedData().getMetaData().getMetaValue(key);
   }
 
-  public boolean playerHasMeta(final UUID uniqueId, final String metaType) {
-    final User user = getPlayer(uniqueId);
-    final CachedMetaData metaData = user.getCachedData().getMetaData();
+  public boolean playerHasMeta(UUID uniqueId, String metaType) {
+    User user = getPlayer(uniqueId);
+    CachedMetaData metaData = user.getCachedData().getMetaData();
     return metaData.getMeta().containsKey(metaType);
   }
 
-  public Group getGroup(final String groupName) {
+  public Group getGroup(String groupName) {
     return getGroupManager().getGroup(groupName);
   }
 
-  public String getGroupMeta(final String groupName, final String metaType) {
-    final Group group = getGroup(groupName);
+  public String getGroupMeta(String groupName, String metaType) {
+    Group group = getGroup(groupName);
     return group.getCachedData().getMetaData().getMetaValue(metaType);
   }
 
-  public boolean groupHasPermission(final String groupName, final String permission) {
-    final Group group = getGroup(groupName);
+  public boolean groupHasPermission(String groupName, String permission) {
+    Group group = getGroup(groupName);
     return group.getCachedData().getPermissionData().checkPermission(permission).asBoolean();
   }
 
-  public void groupAddPermission(final String groupName, final String permission, final boolean toggle) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).value(toggle).withContext("server", "football").build();
+  public void groupAddPermission(String groupName, String permission, String server, boolean toggle) {
+    PermissionNode permissionNode = PermissionNode.builder(permission).value(toggle).withContext("server", server).build();
     getGroupManager().modifyGroup(groupName, group -> group.data().add(permissionNode));
   }
 
-  public void groupRemovePermission(final String groupName, final String permission) {
-    final PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", "football").build();
+  public void groupRemovePermission(String groupName, String permission, String server) {
+    PermissionNode permissionNode = PermissionNode.builder(permission).withContext("server", server).build();
     getGroupManager().modifyGroup(groupName, group -> group.data().remove(permissionNode));
   }
 
-  public boolean groupExists(final String groupName) {
+  public boolean groupExists(String groupName) {
     return getGroup(groupName) != null;
   }
 
-  public boolean groupHasMeta(final String groupName, final String metaType) {
-    final Group group = getGroup(groupName);
-    final CachedMetaData metaData = group.getCachedData().getMetaData();
+  public boolean groupHasMeta(String groupName, String metaType) {
+    Group group = getGroup(groupName);
+    CachedMetaData metaData = group.getCachedData().getMetaData();
     return metaData.getMeta().containsKey(metaType);
   }
 
-  public int groupGetMetaWeight(final String groupName) {
-    final Group group = getGroup(groupName);
+  public int groupGetMetaWeight(String groupName) {
+    Group group = getGroup(groupName);
     return group.getWeight().isPresent() ? group.getWeight().getAsInt() : 0;
   }
 }

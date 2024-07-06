@@ -49,7 +49,7 @@ public class ChatListener implements Listener {
     }
 
     if (matcherCommands.find()) {
-      if (!player.hasPermission("leaguemanager.footcube")) {
+      if (!getUtilManager().isFcEnabled()) {
         if (player.hasPermission("group.fcfa")) return;
         else {
           getLogger().send(player, Lang.FOOTCUBE_DISABLED.getConfigValue(null));

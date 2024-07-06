@@ -17,6 +17,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("deprecation")
 @Getter
 @CommandAlias("var")
 @CommandPermission("leaguemanager.command.var")

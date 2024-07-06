@@ -1,4 +1,4 @@
-package io.github.divinerealms.leaguemanager.gui.impl.rosters;
+package io.github.divinerealms.leaguemanager.gui.impl;
 
 import io.github.divinerealms.leaguemanager.configs.Lang;
 import io.github.divinerealms.leaguemanager.gui.InventoryButton;
@@ -30,6 +30,8 @@ public class PerPlayerGUI extends InventoryGUI {
   private final Helper helper;
   private final GUIManager guiManager;
   private final DataManager dataManager;
+  private final String teamData = "teamdata";
+  private final String playerData = "playerdata";
 
   public PerPlayerGUI(final UtilManager utilManager, final GUIManager guiManager) {
     this.utilManager = utilManager;
@@ -57,82 +59,81 @@ public class PerPlayerGUI extends InventoryGUI {
         return;
       }
 
-      getDataManager().setFolderName("teamdata");
-      getDataManager().setConfig(type);
-      FileConfiguration teamConfig = getDataManager().getConfig(type);
-      if (teamConfig == null) {
-        getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"fajl"}));
-        return;
-      }
+      getDataManager().setConfig(getTeamData(), type);
 
       String targetName = getGuiManager().getTarget().getName();
       for (int slot = 0; slot <= 44; slot++) {
         if (slot == 10) {
-          boolean isManager = teamConfig.getString(teamName + ".manager") != null && teamConfig.getString(teamName + ".manager").equals(targetName);
+          boolean isManager = getDataManager().getConfig().getString(teamName + ".manager") != null && getDataManager().getConfig().getString(teamName + ".manager").equals(targetName);
           this.addButton(slot, this.createHead(!isManager ? "&aPostavite za Menadžera" : "&cSkinite Menadžera",
               !isManager ? "9868" : "9335")
               .consumer(event -> {
                 UUID targetUUID = getGuiManager().getTarget().getUniqueId();
-                getDataManager().setFolderName("teamdata");
-                getDataManager().setConfig(type);
-                FileConfiguration config = getDataManager().getConfig(type);
+                getDataManager().setConfig(getTeamData(), type);
                 if (!isManager) {
-                  config.set(teamName.toUpperCase() + ".manager", targetName);
-                  getDataManager().saveConfig(type);
-                  getHelper().playerAddPermission(targetUUID, "tab.group." + teamName + "-director");
-                  getHelper().playerAddGroup(targetUUID, "director");
+                  getDataManager().getConfig().set(teamName.toUpperCase() + ".manager", targetName);
+                  getDataManager().saveConfig();
+
+                  getHelper().playerAddPermission(targetUUID, "tab.group." + teamName + "-director", "football");
+                  getHelper().playerAddGroup(targetUUID, "director", "global");
                   getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{targetName, "MANAGER", teamName.toUpperCase()}));
                 } else {
-                  config.set(teamName.toUpperCase() + ".manager", null);
-                  getDataManager().saveConfig(type);
-                  getHelper().playerRemovePermission(targetUUID, "tab.group." + teamName + "-director");
-                  getHelper().playerRemoveGroup(targetUUID, "director");
+                  getDataManager().getConfig().set(teamName.toUpperCase() + ".manager", null);
+                  getDataManager().saveConfig();
+
+                  getHelper().playerRemovePermission(targetUUID, "tab.group." + teamName + "-director", "football");
+                  getHelper().playerRemoveGroup(targetUUID, "director", "global");
                   getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{targetName, "PLAYER", teamName.toUpperCase()}));
                 }
                 event.getWhoClicked().closeInventory();
                 getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), getGuiManager()), (Player) event.getWhoClicked());
               }));
         } else if (slot == 11) {
-          boolean isCaptain = teamConfig.getString(teamName + ".captain") != null && teamConfig.getString(teamName + ".captain").equals(targetName);
+          boolean isCaptain = getDataManager().getConfig().getString(teamName + ".captain") != null && getDataManager().getConfig().getString(teamName + ".captain").equals(targetName);
           this.addButton(slot, this.createHead(!isCaptain ? "&aPostavite za Kapitena" : "&cSkinite Kapitena",
               !isCaptain ? "9868" : "9335")
               .consumer(event -> {
-                getDataManager().setFolderName("teamdata");
-                getDataManager().setConfig(type);
-                FileConfiguration config = getDataManager().getConfig(type);
+                getDataManager().setConfig(getTeamData(), type);
                 if (!isCaptain) {
-                  config.set(teamName.toUpperCase() + ".captain", targetName);
-                  getDataManager().saveConfig(type);
+                  getDataManager().getConfig().set(teamName.toUpperCase() + ".captain", targetName);
+                  getDataManager().saveConfig();
                   getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{targetName, "CAPTAIN", teamName.toUpperCase()}));
                 } else {
-                  config.set(teamName.toUpperCase() + ".captain", null);
-                  getDataManager().saveConfig(type);
+                  getDataManager().getConfig().set(teamName.toUpperCase() + ".captain", null);
+                  getDataManager().saveConfig();
                   getLogger().send("fcfa", Lang.ROSTERS_SET_ROLE.getConfigValue(new String[]{targetName, "PLAYER", teamName.toUpperCase()}));
                 }
                 event.getWhoClicked().closeInventory();
                 getGuiManager().openGUI(new PerRosterGUI(getUtilManager(), getGuiManager()), (Player) event.getWhoClicked());
               }));
         } else if (slot == 12) {
-          boolean inTeam = teamConfig.getStringList(teamName + ".players").contains(targetName);
+          boolean inTeam = getDataManager().getConfig().getStringList(teamName + ".players").contains(targetName);
           this.addButton(slot, this.createHead(inTeam ? "&dRaskinite Ugovor" : "&aPotpišite Igrača",
                   inTeam ? "9490" : "21771")
               .consumer(event -> {
-                getDataManager().setFolderName("teamdata");
-                getDataManager().setConfig(type);
-                FileConfiguration config = getDataManager().getConfig(type);
+                getDataManager().setConfig(getTeamData(), type);
                 if (inTeam) {
-                  getHelper().playerRemoveGroup(getGuiManager().getTarget().getUniqueId(), teamName);
-                  List<String> players = config.getStringList(teamName.toUpperCase() + ".players");
+                  getHelper().playerRemoveGroup(getGuiManager().getTarget().getUniqueId(), teamName, "football");
+
+                  List<String> players = getDataManager().getConfig().getStringList(teamName.toUpperCase() + ".players");
                   players.remove(targetName);
-                  config.set(teamName.toUpperCase() + ".players", players);
-                  getDataManager().saveConfig(type);
+                  getDataManager().getConfig().set(teamName.toUpperCase() + ".players", players);
+                  getDataManager().saveConfig();
+
+                  getDataManager().setConfig(getPlayerData(), targetName);
+                  getDataManager().getConfig().set("team", null);
+                  getDataManager().saveConfig();
                   getLogger().send("fcfa", Lang.ROSTERS_USER_REMOVED.getConfigValue(new String[]{player.getName(), targetName, teamName.toUpperCase()}));
                 } else {
-                  getHelper().playerAddGroup(getGuiManager().getTarget().getUniqueId(), teamName);
-                  List<String> players = config.getStringList(teamName.toUpperCase() + ".players");
+                  getHelper().playerAddGroup(getGuiManager().getTarget().getUniqueId(), teamName, "football");
+                  List<String> players = getDataManager().getConfig().getStringList(teamName.toUpperCase() + ".players");
                   players.add(targetName);
-                  config.set(teamName.toUpperCase() + ".players." + targetName, "/");
-                  getDataManager().saveConfig(type);
+                  getDataManager().getConfig().set(teamName.toUpperCase() + ".players." + targetName, players);
+                  getDataManager().saveConfig();
+
+                  getDataManager().setConfig(getPlayerData(), targetName);
+                  getDataManager().getConfig().set("team", teamName.toUpperCase());
+                  getDataManager().saveConfig();
                   getLogger().send("fcfa", Lang.ROSTERS_USER_ADDED.getConfigValue(new String[]{player.getName(), targetName, teamName.toUpperCase()}));
                 }
                 event.getWhoClicked().closeInventory();
@@ -155,14 +156,9 @@ public class PerPlayerGUI extends InventoryGUI {
               .consumer(event -> event.getWhoClicked().closeInventory()));
         } else this.addButton(slot, this.createButton("&r", (byte) 7));
       }
-      getDataManager().setFolderName("playerdata");
-      getDataManager().setConfig(targetName);
-      FileConfiguration playerData = getDataManager().getConfig(targetName);
-      if (playerData == null) {
-        getLogger().send(player, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"fajl"}));
-        return;
-      }
-      this.addButton(28, this.createPlayerHead(playerData, targetName, "&b&l" + targetName, targetName, playerRole(teamConfig, targetName), "", getUtilManager().color("&fPozicija: &e" + teamConfig.getString(teamName + ".players." + targetName + ".position"))).consumer(event -> {}));
+
+      getDataManager().setConfig(getPlayerData(), targetName);
+      this.addButton(28, this.createPlayerHead(getDataManager().getConfig(), "&b&l" + targetName, targetName, playerRole(getDataManager().getConfig(), targetName), "", getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig().getString(teamName + ".players." + targetName + ".position"))).consumer(event -> {}));
     }
     super.decorate(player);
   }
@@ -181,7 +177,7 @@ public class PerPlayerGUI extends InventoryGUI {
     return player;
   }
 
-  private InventoryButton createPlayerHead(FileConfiguration playerData, String uuid, String title, String playerName, String... lore) {
+  private InventoryButton createPlayerHead(FileConfiguration playerData, String title, String playerName, String... lore) {
     ItemStack skull = playerData.getItemStack("head");
     if (skull == null) {
       ItemStack newSkull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
@@ -190,7 +186,7 @@ public class PerPlayerGUI extends InventoryGUI {
       skullMeta.setDisplayName(getUtilManager().color(title));
       newSkull.setItemMeta(skullMeta);
       playerData.set("head", newSkull);
-      getDataManager().saveConfig(uuid);
+      getDataManager().saveConfig();
       return new InventoryButton().creator(player -> newSkull).consumer(event -> {});
     }
     SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();

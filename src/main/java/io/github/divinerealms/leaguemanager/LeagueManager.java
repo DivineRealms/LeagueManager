@@ -2,6 +2,10 @@ package io.github.divinerealms.leaguemanager;
 
 import co.aikar.commands.BukkitCommandManager;
 import io.github.divinerealms.leaguemanager.commands.*;
+import io.github.divinerealms.leaguemanager.commands.timers.OXECommand;
+import io.github.divinerealms.leaguemanager.commands.timers.ResultCommand;
+import io.github.divinerealms.leaguemanager.commands.timers.TXFCommand;
+import io.github.divinerealms.leaguemanager.commands.timers.TimerCommand;
 import io.github.divinerealms.leaguemanager.configs.Config;
 import io.github.divinerealms.leaguemanager.configs.Lang;
 import io.github.divinerealms.leaguemanager.managers.ConfigManager;
@@ -30,42 +34,45 @@ public class LeagueManager extends JavaPlugin {
   @Override
   public void onEnable() {
     instance = this;
+    getServer().getScheduler().cancelTasks(getInstance());
     setupMessages();
-    Config.setup(this);
-    config = Config.getConfig("config.yml");
+    setupConfig();
+    setupLuckPermsAPI();
+    setupManagers();
+    setupCommands();
+    setupListeners();
 
-    if (!setupLuckPermsAPI()) {
-      getLogger().info("&cDisabled due to no LuckPerms dependency found!");
-      getServer().getPluginManager().disablePlugin(this);
-    }
-
-    utilManager = new UtilManager(this);
-    guiManager = new GUIManager();
-    listenerManager = new ListenerManager(this, utilManager, guiManager);
-
-    getUtilManager().getLogger().initializeStrings();
     getUtilManager().getLogger().sendBanner();
-    getUtilManager().getLogger().info("Loading commands...");
-    setup();
-    getUtilManager().getLogger().info("Loading listeners...");
     getUtilManager().getLogger().info("Successfully enabled!");
   }
 
   @Override
   public void onDisable() {
-    getListenerManager().unregisterListeners();
+    if (listenerManager != null) {
+      getListenerManager().unregisterListeners();
+    }
+    getServer().getScheduler().cancelTasks(getInstance());
   }
 
-  public void setup() {
-    if (getListenerManager().isRegistered()) getListenerManager().unregisterListeners();
-    getListenerManager().registerListeners();
+  private void setupConfig() {
+    Config.setup(this);
+    config = Config.getConfig("config.yml");
+  }
 
-    BukkitCommandManager commandManager = new BukkitCommandManager(this);
-    commandManager.registerCommand(new LMCommand(getUtilManager(), this));
-    commandManager.registerCommand(new VARCommand(getUtilManager()));
-    commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
-    commandManager.registerCommand(new MigrateCommand(getUtilManager()));
-    commandManager.registerCommand(new StatisticsCommand(getUtilManager(), getGuiManager()));
+  private void setupLuckPermsAPI() {
+    RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
+    if (provider != null) {
+      luckPermsAPI = provider.getProvider();
+    } else {
+      getLogger().warning("LuckPerms not found! Disabling plugin due to missing dependency.");
+      getServer().getPluginManager().disablePlugin(this);
+    }
+  }
+
+  private void setupManagers() {
+    utilManager = new UtilManager(this);
+    guiManager = new GUIManager();
+    listenerManager = new ListenerManager(this, utilManager, guiManager);
   }
 
   public void setupMessages() {
@@ -73,19 +80,35 @@ public class LeagueManager extends JavaPlugin {
     loadMessages();
   }
 
-  private boolean setupLuckPermsAPI() {
-    RegisteredServiceProvider<LuckPerms> lpp = getServer().getServicesManager().getRegistration(LuckPerms.class);
-    if (lpp != null) setLuckPermsAPI(lpp.getProvider());
-    return getLuckPermsAPI() != null;
-  }
-
   private void loadMessages() {
     Lang.setFile(getMessagesFile().getConfig("messages.yml"));
 
-    for (final Lang value : Lang.values())
+    for (Lang value : Lang.values())
       getMessagesFile().getConfig("messages.yml").addDefault(value.getPath(), value.getDefault());
 
     getMessagesFile().getConfig("messages.yml").options().copyDefaults(true);
     getMessagesFile().saveConfig("messages.yml");
+  }
+
+  private void setupCommands() {
+    BukkitCommandManager commandManager = new BukkitCommandManager(this);
+    //noinspection deprecation
+    commandManager.enableUnstableAPI("help");
+    commandManager.registerCommand(new LMCommand(getUtilManager(), this));
+    commandManager.registerCommand(new VARCommand(getUtilManager()));
+    commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
+    commandManager.registerCommand(new MigrateCommand(getUtilManager()));
+    commandManager.registerCommand(new StatisticsCommand(getUtilManager()));
+    commandManager.registerCommand(new ResultCommand(this, getUtilManager()));
+    commandManager.registerCommand(new TimerCommand(this, getUtilManager()));
+    commandManager.registerCommand(new OXECommand(this, getUtilManager()));
+    commandManager.registerCommand(new TXFCommand(this, getUtilManager()));
+  }
+
+  private void setupListeners() {
+    if (listenerManager.isRegistered()) {
+      listenerManager.unregisterListeners();
+    }
+    listenerManager.registerListeners();
   }
 }

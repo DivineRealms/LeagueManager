@@ -68,6 +68,7 @@ public class Logger {
   }
 
   public void sendBanner() {
+    initializeStrings();
     for (final String message : startupBanner())
       getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
   }

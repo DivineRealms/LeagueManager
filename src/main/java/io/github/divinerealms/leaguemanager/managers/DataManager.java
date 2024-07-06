@@ -13,9 +13,8 @@ import java.util.logging.Level;
 
 public class DataManager {
   @Getter private final Plugin plugin;
-  @Getter @Setter
-  private String folderName = "data";
-  private FileConfiguration config;
+  @Getter @Setter private String folderName;
+  @Setter @Getter private FileConfiguration config;
   private File file;
 
   public DataManager(Plugin plugin) {
@@ -24,8 +23,8 @@ public class DataManager {
 
   public void createNewFile(String name, String message) {
     reloadConfig(name);
-    saveConfig(name);
-    loadConfig(name);
+    saveConfig();
+    loadConfig();
 
     if (message != null) getPlugin().getLogger().info(message);
   }
@@ -35,43 +34,43 @@ public class DataManager {
     return config;
   }
 
-  public void setConfig(String name) {
-    file = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
+  public void setConfig(String folderName, String configName) {
+    file = new File(getPlugin().getDataFolder() + File.separator + folderName, configName + ".yml");
     config = YamlConfiguration.loadConfiguration(file);
   }
 
-  public void loadConfig(String name) {
+  public void loadConfig() {
     config.options().copyDefaults(true);
-    saveConfig(name);
+    saveConfig();
   }
 
   public void reloadConfig(String name) {
-    if (file == null) file = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
+    if (file == null) file = new File(getPlugin().getDataFolder() + File.separator + getFolderName(), name + ".yml");
     config = YamlConfiguration.loadConfiguration(file);
   }
 
-  public void saveConfig (String name) {
+  public void saveConfig() {
     if (config == null || file == null) return;
     try {
-      getConfig(name).save(file);
+      getConfig().save(file);
     } catch (final IOException exception) {
       getPlugin().getLogger().log(Level.SEVERE, "Could not save config to " + file, exception);
     }
   }
 
-  public boolean deleteFiles(String folderName, String name) {
-    File file = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
+  public boolean deleteFiles(String name) {
+    File file = new File(getPlugin().getDataFolder() + File.separator + getFolderName(), name + ".yml");
     return file.delete();
   }
 
-  public boolean configExists(String name) {
+  public boolean configExists(String folderName, String name) {
     File file = new File(getPlugin().getDataFolder() + File.separator + folderName, name + ".yml");
     return file.exists();
   }
 
-  public void copyFile(final String folderName, final String oldFileName, final String newFileName) {
-    File oldFile = new File(getPlugin().getDataFolder() + File.separator + folderName, oldFileName + ".yml");
-    File newFile = new File(getPlugin().getDataFolder() + File.separator + folderName, newFileName + ".yml");
+  public void copyFile(final String oldFileName, final String newFileName) {
+    File oldFile = new File(getPlugin().getDataFolder() + File.separator + getFolderName(), oldFileName + ".yml");
+    File newFile = new File(getPlugin().getDataFolder() + File.separator + getFolderName(), newFileName + ".yml");
     FileUtil.copy(oldFile, newFile);
   }
 }
