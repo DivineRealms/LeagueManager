@@ -13,6 +13,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 @SuppressWarnings("deprecation")
 @Getter
 @CommandAlias("statistics|stats")
@@ -39,31 +41,36 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      getDataManager().setConfig(getPlayerData(), sender.getName());
+      Player player = (Player) sender;
+      UUID playerUUID = player.getUniqueId();
+
+      getDataManager().setConfig(getPlayerData(), playerUUID.toString());
       getLogger().send(sender, Lang.STATISTICS.getConfigValue(new String[]{
           Lang.STATISTICS_SELF_TITLE.getConfigValue(null),
-          String.valueOf(getDataManager().getConfig().getInt("goals", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("assists", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("yellow-cards", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("red-cards", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("clean-sheets", 0))
+          String.valueOf(getDataManager().getConfig(playerUUID.toString()).getInt("goals", 0)),
+          String.valueOf(getDataManager().getConfig(playerUUID.toString()).getInt("assists", 0)),
+          String.valueOf(getDataManager().getConfig(playerUUID.toString()).getInt("yellow-cards", 0)),
+          String.valueOf(getDataManager().getConfig(playerUUID.toString()).getInt("red-cards", 0)),
+          String.valueOf(getDataManager().getConfig(playerUUID.toString()).getInt("clean-sheets", 0))
       }));
     } else if (args.length == 1) {
-      Player target = Bukkit.getPlayer(args[0]);
+      OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
 
-      if (!getDataManager().configExists(getPlayerData(), target.getName())) {
+      if (!getDataManager().configExists(getPlayerData(), target.getUniqueId().toString())) {
         getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
         return;
       }
 
-      getDataManager().setConfig(getPlayerData(), target.getName());
+      UUID targetUUID = target.getUniqueId();
+
+      getDataManager().setConfig(getPlayerData(), targetUUID.toString());
       getLogger().send(sender, Lang.STATISTICS.getConfigValue(new String[]{
           Lang.STATISTICS_OTHER_TITLE.getConfigValue(new String[]{target.getName()}),
-          String.valueOf(getDataManager().getConfig().getInt("goals", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("assists", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("yellow-cards", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("red-cards", 0)),
-          String.valueOf(getDataManager().getConfig().getInt("clean-sheets", 0))
+          String.valueOf(getDataManager().getConfig(targetUUID.toString()).getInt("goals", 0)),
+          String.valueOf(getDataManager().getConfig(targetUUID.toString()).getInt("assists", 0)),
+          String.valueOf(getDataManager().getConfig(targetUUID.toString()).getInt("yellow-cards", 0)),
+          String.valueOf(getDataManager().getConfig(targetUUID.toString()).getInt("red-cards", 0)),
+          String.valueOf(getDataManager().getConfig(targetUUID.toString()).getInt("clean-sheets", 0))
       }));
     } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
   }
@@ -97,12 +104,14 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      if (!getDataManager().configExists(getPlayerData(), target.getName())) {
+      UUID targetUUID = target.getUniqueId();
+
+      if (!getDataManager().configExists(getPlayerData(), targetUUID.toString())) {
         getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
         return;
       }
 
-      getDataManager().setConfig(getPlayerData(), target.getName());
+      getDataManager().setConfig(getPlayerData(), targetUUID.toString());
       String type = args[1];
       int value;
 
@@ -113,9 +122,9 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      int existingValue = getDataManager().getConfig().getInt(type);
-      getDataManager().getConfig().set(type, existingValue + value);
-      getDataManager().saveConfig();
+      int existingValue = getDataManager().getConfig(targetUUID.toString()).getInt(type);
+      getDataManager().getConfig(targetUUID.toString()).set(type, existingValue + value);
+      getDataManager().saveConfig(targetUUID.toString());
 
       getLogger().send(sender, Lang.STATISTICS_ADDED.getConfigValue(new String[]{String.valueOf(value), type, target.getName()}));
     } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
@@ -140,7 +149,9 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      getDataManager().setConfig(getPlayerData(), target.getName());
+      UUID targetUUID = target.getUniqueId();
+
+      getDataManager().setConfig(getPlayerData(), targetUUID.toString());
       String type = args[1];
       int value;
 
@@ -151,9 +162,9 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      int existingValue = getDataManager().getConfig().getInt(type);
-      getDataManager().getConfig().set(type, existingValue - value);
-      getDataManager().saveConfig();
+      int existingValue = getDataManager().getConfig(targetUUID.toString()).getInt(type);
+      getDataManager().getConfig(targetUUID.toString()).set(type, existingValue - value);
+      getDataManager().saveConfig(targetUUID.toString());
 
       getLogger().send(sender, Lang.STATISTICS_REMOVED.getConfigValue(new String[]{String.valueOf(value), type, target.getName()}));
     } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
@@ -173,12 +184,14 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      if (!getDataManager().configExists(getPlayerData(), target.getName())) {
+      UUID targetUUID = target.getUniqueId();
+
+      if (!getDataManager().configExists(getPlayerData(), targetUUID.toString())) {
         getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
         return;
       }
 
-      getDataManager().setConfig(getPlayerData(), target.getName());
+      getDataManager().setConfig(getPlayerData(), targetUUID.toString());
       String type = args[1];
       int value;
 
@@ -189,8 +202,8 @@ public class StatisticsCommand extends BaseCommand {
         return;
       }
 
-      getDataManager().getConfig().set(type, value);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(targetUUID.toString()).set(type, value);
+      getDataManager().saveConfig(targetUUID.toString());
 
       getLogger().send(sender, Lang.STATISTICS_SET.getConfigValue(new String[]{String.valueOf(value), type, target.getName()}));
     } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));

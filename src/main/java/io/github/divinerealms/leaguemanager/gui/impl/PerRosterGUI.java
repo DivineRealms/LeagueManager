@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 @Getter
@@ -103,62 +104,71 @@ public class PerRosterGUI extends InventoryGUI {
       boolean captainFound = false;
 
       getDataManager().setConfig(getTeamData(), type);
-      for (String teamPlayer : getDataManager().getConfig().getStringList(getTeam() + ".players")) {
-        if (playerRole(teamPlayer).equals(getUtilManager().color("&2Direktor"))) {
-          getDataManager().setConfig(getPlayerData(), teamPlayer);
-          this.addButton(10, this.createPlayerHead(getDataManager().getConfig(), "&a&l" + teamPlayer, teamPlayer, getUtilManager().color("&2Direktor"), "",
-                  getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig().getString("position", "/")),
-                  getUtilManager().color("&fDržava: &e" + getDataManager().getConfig().getString("country", "/")),
-                  getUtilManager().color("&fBroj: &e" + getDataManager().getConfig().getInt("number", 0)))
-              .consumer(event -> {
-                Player target = (Player) event.getWhoClicked();
-                if (!hasAccess(target)) return;
-                getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
-                target.closeInventory();
-                getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
-              }));
-          managerFound = true;
+      for (String teamPlayer : getDataManager().getConfig(type).getStringList(getTeam() + ".players")) {
+        if (playerRole(type, teamPlayer).equals(getUtilManager().color("&2Direktor"))) {
+          UUID teamPlayerUUID = Bukkit.getOfflinePlayer(teamPlayer).getUniqueId();
+          getDataManager().setConfig(getPlayerData(), teamPlayerUUID.toString());
+          if (getDataManager().configExists(getPlayerData(), teamPlayerUUID.toString())) {
+            this.addButton(10, this.createPlayerHead(getDataManager().getConfig(teamPlayerUUID.toString()), "&a&l" + teamPlayer, teamPlayerUUID, teamPlayer, getUtilManager().color("&2Direktor"), "",
+                    getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getString("position", "/")),
+                    getUtilManager().color("&fDržava: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getString("country", "/")),
+                    getUtilManager().color("&fBroj: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getInt("number", 0)))
+                .consumer(event -> {
+                  Player target = (Player) event.getWhoClicked();
+                  if (!hasAccess(target)) return;
+                  getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
+                  target.closeInventory();
+                  getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+                }));
+            managerFound = true;
+          }
         }
 
         getDataManager().setConfig(getTeamData(), type);
-        if (playerRole(teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
-          getDataManager().setConfig(getPlayerData(), teamPlayer);
-          this.addButton(11, this.createPlayerHead(getDataManager().getConfig(), "&c&l" + teamPlayer, teamPlayer, getUtilManager().color("&4Kapiten"), "",
-                  getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig().getString("position", "/")),
-                  getUtilManager().color("&fDržava: &e" + getDataManager().getConfig().getString("country", "/")),
-                  getUtilManager().color("&fBroj: &e" + getDataManager().getConfig().getInt("number", 0)),
-                  getUtilManager().color("&fUgovor: &e" + getDataManager().getConfig().getInt("contract", 0) + " sezone"))
-              .consumer(event -> {
-                Player target = (Player) event.getWhoClicked();
-                if (!hasAccess(target)) return;
-                getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
-                target.closeInventory();
-                getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
-              }));
-          captainFound = true;
+        if (playerRole(type, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
+          UUID teamPlayerUUID = Bukkit.getOfflinePlayer(teamPlayer).getUniqueId();
+          getDataManager().setConfig(getPlayerData(), teamPlayerUUID.toString());
+          if (getDataManager().configExists(getPlayerData(), teamPlayerUUID.toString())) {
+            this.addButton(11, this.createPlayerHead(getDataManager().getConfig(teamPlayerUUID.toString()), "&c&l" + teamPlayer, teamPlayerUUID, teamPlayer, getUtilManager().color("&4Kapiten"), "",
+                    getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getString("position", "/")),
+                    getUtilManager().color("&fDržava: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getString("country", "/")),
+                    getUtilManager().color("&fBroj: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getInt("number", 0)),
+                    getUtilManager().color("&fUgovor: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getInt("contract", 0) + " sezone"))
+                .consumer(event -> {
+                  Player target = (Player) event.getWhoClicked();
+                  if (!hasAccess(target)) return;
+                  getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
+                  target.closeInventory();
+                  getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+                }));
+            captainFound = true;
+          }
         }
       }
 
       getDataManager().setConfig(getTeamData(), type);
-      for (String teamPlayer : getDataManager().getConfig().getStringList(getTeam() + ".players")) {
-        if (!playerRole(teamPlayer).equals(getUtilManager().color("&2Direktor")) &&
-            !playerRole(teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
-          getDataManager().setConfig(getPlayerData(), teamPlayer);
+      for (String teamPlayer : getDataManager().getConfig(type).getStringList(getTeam() + ".players")) {
+        if (!playerRole(type, teamPlayer).equals(getUtilManager().color("&2Direktor")) &&
+            !playerRole(type, teamPlayer).equals(getUtilManager().color("&4Kapiten"))) {
+          UUID teamPlayerUUID = Bukkit.getOfflinePlayer(teamPlayer).getUniqueId();
+          getDataManager().setConfig(getPlayerData(), teamPlayerUUID.toString());
           while (slot == 17 || slot == 18 || slot == 26 || slot == 10 && managerFound || captainFound && slot == 11)
             slot++;
           if (slot > 25) break;
-          this.addButton(slot, this.createPlayerHead(getDataManager().getConfig(), "&b&l" + teamPlayer, teamPlayer, getUtilManager().color("&7Igrač"), "",
-                  getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig().getString("position", "")),
-                  getUtilManager().color("&fDržava: &e" + getDataManager().getConfig().getString("country", "/")),
-                  getUtilManager().color("&fBroj: &e" + getDataManager().getConfig().getInt("number", 0)),
-                  getUtilManager().color("&fUgovor: &e" + getDataManager().getConfig().getInt("contract", 0) + " sezone"))
-              .consumer(event -> {
-                Player target = (Player) event.getWhoClicked();
-                if (!hasAccess(target)) return;
-                getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
-                target.closeInventory();
-                getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
-              }));
+          if (getDataManager().configExists(getPlayerData(), teamPlayerUUID.toString())) {
+            this.addButton(slot, this.createPlayerHead(getDataManager().getConfig(teamPlayerUUID.toString()), "&b&l" + teamPlayer, teamPlayerUUID, teamPlayer, getUtilManager().color("&7Igrač"), "",
+                    getUtilManager().color("&fPozicija: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getString("position", "")),
+                    getUtilManager().color("&fDržava: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getString("country", "/")),
+                    getUtilManager().color("&fBroj: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getInt("number", 0)),
+                    getUtilManager().color("&fUgovor: &e" + getDataManager().getConfig(teamPlayerUUID.toString()).getInt("contract", 0) + " sezone"))
+                .consumer(event -> {
+                  Player target = (Player) event.getWhoClicked();
+                  if (!hasAccess(target)) return;
+                  getGuiManager().setTarget(Bukkit.getOfflinePlayer(teamPlayer));
+                  target.closeInventory();
+                  getGuiManager().openGUI(new PerPlayerGUI(getUtilManager(), getGuiManager()), target);
+                }));
+          }
           slot++;
         }
       }
@@ -167,10 +177,10 @@ public class PerRosterGUI extends InventoryGUI {
     super.decorate(player);
   }
 
-  private String playerRole(String teamPlayer) {
+  private String playerRole(String configName, String teamPlayer) {
     String player = getUtilManager().color("&7Igrač");
-    String manager = getDataManager().getConfig().getString(getTeam() + ".manager");
-    String captain = getDataManager().getConfig().getString(getTeam() + ".captain");
+    String manager = getDataManager().getConfig(configName).getString(getTeam() + ".manager");
+    String captain = getDataManager().getConfig(configName).getString(getTeam() + ".captain");
 
     if (manager != null && manager.equals(teamPlayer)) {
       return getUtilManager().color("&2Direktor");
@@ -185,7 +195,7 @@ public class PerRosterGUI extends InventoryGUI {
     return getHelper().playerInGroup(player.getUniqueId(), "fcfa");
   }
 
-  private InventoryButton createPlayerHead(FileConfiguration playerData, String title, String playerName, String... lore) {
+  private InventoryButton createPlayerHead(FileConfiguration playerData, String title, UUID targetUUID, String playerName, String... lore) {
     ItemStack skull = playerData.getItemStack("head");
     if (skull == null) {
       ItemStack newSkull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
@@ -194,7 +204,7 @@ public class PerRosterGUI extends InventoryGUI {
       skullMeta.setDisplayName(getUtilManager().color(title));
       newSkull.setItemMeta(skullMeta);
       playerData.set("head", newSkull);
-      getDataManager().saveConfig();
+      getDataManager().saveConfig(targetUUID.toString());
       return new InventoryButton().creator(player -> newSkull).consumer(event -> {});
     }
     SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();

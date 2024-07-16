@@ -27,6 +27,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 @Getter
@@ -103,11 +104,11 @@ public class RostersCommand extends BaseCommand {
         }
 
         getDataManager().setConfig(getTeamData(), type);
-        getDataManager().getConfig().set(team + ".name", name.toUpperCase());
-        getDataManager().getConfig().set(team + ".tag", tag);
+        getDataManager().getConfig(type).set(team + ".name", name.toUpperCase());
+        getDataManager().getConfig(type).set(team + ".tag", tag);
         List<String> players = new ArrayList<>();
-        getDataManager().getConfig().set(team + ".players", players);
-        getDataManager().saveConfig();
+        getDataManager().getConfig(type).set(team + ".players", players);
+        getDataManager().saveConfig(type);
       } else if (args[2].equalsIgnoreCase("b")) {
         group.data().add(WeightNode.builder(99).withContext("server", "football").build());
         group.data().add(MetaNode.builder("b", tag).withContext("server", "football").build());
@@ -120,11 +121,11 @@ public class RostersCommand extends BaseCommand {
         }
 
         getDataManager().setConfig(getTeamData(), type);
-        getDataManager().getConfig().set(team + ".name", team);
-        getDataManager().getConfig().set(team + ".tag", tag);
+        getDataManager().getConfig(type).set(team + ".name", team);
+        getDataManager().getConfig(type).set(team + ".tag", tag);
         List<String> players = new ArrayList<>();
-        getDataManager().getConfig().set(team + ".players", players);
-        getDataManager().saveConfig();
+        getDataManager().getConfig(type).set(team + ".players", players);
+        getDataManager().saveConfig(type);
       } else getLogger().send(sender, Lang.UNKNOWN_COMMAND.getConfigValue(null));
 
       for (String permission : getHelper().getPermissions()) {
@@ -165,9 +166,9 @@ public class RostersCommand extends BaseCommand {
     }
 
     getDataManager().setConfig(getTeamData(), type);
-    if (getDataManager().getConfig().get(name) != null) {
-      getDataManager().getConfig().set(name, null);
-      getDataManager().saveConfig();
+    if (getDataManager().getConfig(type).get(name) != null) {
+      getDataManager().getConfig(type).set(name, null);
+      getDataManager().saveConfig(type);
       getLogger().send("fcfa", Lang.ROSTERS_DELETED_FILES.getConfigValue(new String[]{name.toUpperCase()}));
     } else getLogger().send("fcfa", Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"tim"}));
   }
@@ -182,8 +183,8 @@ public class RostersCommand extends BaseCommand {
     }
 
     String team = args[0].toUpperCase(), type;
-    Player target = Bukkit.getPlayer(args[1]);
-    if (target == null || !target.isOnline()) {
+    OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+    if (target == null || !target.hasPlayedBefore()) {
       getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
       return;
     }
@@ -198,7 +199,7 @@ public class RostersCommand extends BaseCommand {
       return;
     }
 
-    if (!getDataManager().configExists(getPlayerData(), target.getName())) {
+    if (!getDataManager().configExists(getPlayerData(), target.getUniqueId().toString())) {
       getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
       return;
     }
@@ -206,9 +207,9 @@ public class RostersCommand extends BaseCommand {
     Player player = (Player) sender;
 
     if (hasAccess(player) || isManager(player, team)) {
-      getDataManager().setConfig(getPlayerData(), target.getName());
-      getDataManager().getConfig().set("team", team.toUpperCase());
-      getDataManager().saveConfig();
+      getDataManager().setConfig(getPlayerData(), target.getUniqueId().toString());
+      getDataManager().getConfig(target.getUniqueId().toString()).set("team", team.toUpperCase());
+      getDataManager().saveConfig(target.getUniqueId().toString());
 
       type = getHelper().groupGetMetaWeight(team) == 100 ? "main" :
           getHelper().groupGetMetaWeight(team) == 99 ? "juniors" : null;
@@ -224,10 +225,10 @@ public class RostersCommand extends BaseCommand {
       }
 
       getDataManager().setConfig(getTeamData(), type);
-      List<String> players = getDataManager().getConfig().getStringList(team + ".players");
+      List<String> players = getDataManager().getConfig(type).getStringList(team + ".players");
       players.add(target.getName());
-      getDataManager().getConfig().set(team + ".players", players);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(type).set(team + ".players", players);
+      getDataManager().saveConfig(type);
 
       if (getHelper().groupGetMetaWeight(team) == 100) {
         getHelper().playerRemoveTeams(target.getUniqueId());
@@ -263,17 +264,17 @@ public class RostersCommand extends BaseCommand {
     Player player = (Player) sender;
 
     if (hasAccess(player) || isManager(player, team)) {
-      getDataManager().getConfig().set("team", null);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(target.getUniqueId().toString()).set("team", null);
+      getDataManager().saveConfig(target.getUniqueId().toString());
 
       type = getHelper().groupGetMetaWeight(team) == 100 ? "main" :
           getHelper().groupGetMetaWeight(team) == 99 ? "juniors" : null;
 
       getDataManager().setConfig(getTeamData(), type);
-      List<String> players = getDataManager().getConfig().getStringList(team + ".players");
+      List<String> players = getDataManager().getConfig(type).getStringList(team + ".players");
       players.remove(target.getName());
-      getDataManager().getConfig().set(team + ".players", players);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(type).set(team + ".players", players);
+      getDataManager().saveConfig(type);
 
       getHelper().playerRemoveGroup(target.getUniqueId(), team, "football");
       getLogger().send("fcfa", Lang.ROSTERS_USER_REMOVED.getConfigValue(new String[]{sender.getName(), target.getName(), team.toUpperCase()}));
@@ -321,8 +322,8 @@ public class RostersCommand extends BaseCommand {
       Player player = (Player) sender;
 
       if (hasAccess(player) || isManager(player, team)) {
-        getDataManager().getConfig().set(team.toUpperCase() + "." + arg, arg.equalsIgnoreCase("name") ? name : tag);
-        getDataManager().saveConfig();
+        getDataManager().getConfig(type).set(team.toUpperCase() + "." + arg, arg.equalsIgnoreCase("name") ? name : tag);
+        getDataManager().saveConfig(type);
         getLogger().send(sender, Lang.ROSTERS_SET.getConfigValue(new String[]{sender.getName(), args[1].toUpperCase(), "tim", team.toUpperCase(), name}));
       } else getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     } else {
@@ -341,7 +342,9 @@ public class RostersCommand extends BaseCommand {
         team = getHelper().playerGetTeam(target.getUniqueId(), 99);
       }
 
-      getDataManager().setConfig(getPlayerData(), target.getName());
+      UUID playerUUID = target.getUniqueId();
+
+      getDataManager().setConfig(getPlayerData(), playerUUID.toString());
       Player player = (Player) sender;
 
       if (hasAccess(player) || isManager(player, team)) {
@@ -352,24 +355,24 @@ public class RostersCommand extends BaseCommand {
 
         switch (args[1].toLowerCase()) {
           case "country":
-            getDataManager().getConfig().set("country", String.valueOf(args[2]));
+            getDataManager().getConfig(playerUUID.toString()).set("country", String.valueOf(args[2]));
             break;
           case "number":
-            getDataManager().getConfig().set("number", Integer.valueOf(args[2]));
+            getDataManager().getConfig(playerUUID.toString()).set("number", Integer.valueOf(args[2]));
             break;
           case "contract":
-            getDataManager().getConfig().set("contract", Integer.valueOf(args[2]));
+            getDataManager().getConfig(playerUUID.toString()).set("contract", Integer.valueOf(args[2]));
             break;
           case "position":
             String position = StringUtils.join(args, ' ', 2, args.length);
-            getDataManager().getConfig().set("position", position);
+            getDataManager().getConfig(playerUUID.toString()).set("position", position);
             break;
           default:
             getLogger().send(sender, Lang.ROSTERS_SET_USAGE.getConfigValue(null));
             break;
         }
 
-        getDataManager().saveConfig();
+        getDataManager().saveConfig(playerUUID.toString());
         getLogger().send(sender, Lang.ROSTERS_SET.getConfigValue(new String[]{sender.getName(), args[1].toUpperCase(), "igrača", target.getName(), value}));
       } else getLogger().send(sender, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
     }
@@ -394,7 +397,10 @@ public class RostersCommand extends BaseCommand {
       return;
     }
 
-    getDataManager().setConfig(getTeamData(), team);
+    String type = getHelper().groupGetMetaWeight(team) == 100 ? "main" :
+        getHelper().groupGetMetaWeight(team) == 99 ? "juniors" : null;
+
+    getDataManager().setConfig(getTeamData(), type);
     if (hasAccess(player) || isManager(player, team)) {
       ItemStack banner = player.getInventory().getItemInHand();
       ItemMeta bannerMeta = banner.getItemMeta();
@@ -403,8 +409,8 @@ public class RostersCommand extends BaseCommand {
       banner.setItemMeta(bannerMeta);
       banner.setAmount(1);
 
-      getDataManager().getConfig().set("banner", banner);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(type).set(team + ".banner", banner);
+      getDataManager().saveConfig(type);
       getLogger().send(player, Lang.ROSTERS_BANNER_SET.getConfigValue(new String[]{team.toUpperCase()}));
     } else getLogger().send(player, Lang.INSUFFICIENT_PERMISSION.getConfigValue(null));
   }

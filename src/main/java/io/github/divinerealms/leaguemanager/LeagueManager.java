@@ -8,10 +8,7 @@ import io.github.divinerealms.leaguemanager.commands.timers.TXFCommand;
 import io.github.divinerealms.leaguemanager.commands.timers.TimerCommand;
 import io.github.divinerealms.leaguemanager.configs.Config;
 import io.github.divinerealms.leaguemanager.configs.Lang;
-import io.github.divinerealms.leaguemanager.managers.ConfigManager;
-import io.github.divinerealms.leaguemanager.managers.GUIManager;
-import io.github.divinerealms.leaguemanager.managers.ListenerManager;
-import io.github.divinerealms.leaguemanager.managers.UtilManager;
+import io.github.divinerealms.leaguemanager.managers.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.luckperms.api.LuckPerms;
@@ -22,9 +19,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Setter
 @Getter
 public class LeagueManager extends JavaPlugin {
-  private ConfigManager messagesFile = new ConfigManager(this, "");
+  private ConfigManager configManager = new ConfigManager(this, "");
   private YamlConfiguration config;
   private LuckPerms luckPermsAPI = null;
+  private boolean essentialsLoaded = false;
   private UtilManager utilManager;
   private GUIManager guiManager;
   private ListenerManager listenerManager;
@@ -56,6 +54,7 @@ public class LeagueManager extends JavaPlugin {
 
   private void setupConfig() {
     Config.setup(this);
+    configManager.loadConfig("#League Manager Config", "config.yml");
     config = Config.getConfig("config.yml");
   }
 
@@ -76,25 +75,25 @@ public class LeagueManager extends JavaPlugin {
   }
 
   public void setupMessages() {
-    getMessagesFile().createNewFile("messages.yml", "Loading messages.yml", "LeagueManager Messages");
+    getConfigManager().createNewFile("messages.yml", "Loading messages.yml", "LeagueManager Messages");
     loadMessages();
   }
 
   private void loadMessages() {
-    Lang.setFile(getMessagesFile().getConfig("messages.yml"));
+    Lang.setFile(getConfigManager().getConfig("messages.yml"));
 
     for (Lang value : Lang.values())
-      getMessagesFile().getConfig("messages.yml").addDefault(value.getPath(), value.getDefault());
+      getConfigManager().getConfig("messages.yml").addDefault(value.getPath(), value.getDefault());
 
-    getMessagesFile().getConfig("messages.yml").options().copyDefaults(true);
-    getMessagesFile().saveConfig("messages.yml");
+    getConfigManager().getConfig("messages.yml").options().copyDefaults(true);
+    getConfigManager().saveConfig("messages.yml");
   }
 
   private void setupCommands() {
     BukkitCommandManager commandManager = new BukkitCommandManager(this);
     //noinspection deprecation
     commandManager.enableUnstableAPI("help");
-    commandManager.registerCommand(new LMCommand(getUtilManager(), this));
+    commandManager.registerCommand(new LMCommand(getUtilManager()));
     commandManager.registerCommand(new VARCommand(getUtilManager()));
     commandManager.registerCommand(new RostersCommand(getUtilManager(), getGuiManager()));
     commandManager.registerCommand(new MigrateCommand(getUtilManager()));

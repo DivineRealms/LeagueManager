@@ -25,18 +25,18 @@ public class PlayerQuitListener implements Listener {
   public void onPlayerQuit(PlayerQuitEvent event) {
     Player player = event.getPlayer();
     String playerName = player.getName(), playerAddress = player.getAddress().getAddress().getHostAddress();
-    getDataManager().setConfig("playerdata", playerName);
+    getDataManager().setConfig("playerdata", player.getUniqueId().toString());
 
-    if (getDataManager().getConfig().get("address") == null) {
+    if (getDataManager().getConfig(player.getUniqueId().toString()).get("address") == null) {
       getLogger().info("Setting IP Address for player " + playerName);
-      getDataManager().getConfig().set("address", playerAddress);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(player.getUniqueId().toString()).set("address", playerAddress);
+      getDataManager().saveConfig(player.getUniqueId().toString());
     }
 
-    if (!getDataManager().getConfig().get("address").equals(playerAddress)) {
+    if (!getDataManager().getConfig(player.getUniqueId().toString()).get("address").equals(playerAddress)) {
       getLogger().info("Updating IP Address for player " + playerName + " (new IP: " + playerAddress + ").");
-      getDataManager().getConfig().set("address", playerAddress);
-      getDataManager().saveConfig();
+      getDataManager().getConfig(player.getUniqueId().toString()).set("address", playerAddress);
+      getDataManager().saveConfig(player.getUniqueId().toString());
     }
   }
 }

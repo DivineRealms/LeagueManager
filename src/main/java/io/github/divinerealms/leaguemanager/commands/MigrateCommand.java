@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 @Getter
@@ -29,7 +30,7 @@ public class MigrateCommand extends BaseCommand {
   private final DataManager dataManager;
   private final Helper helper;
   private final Logger logger;
-  private final String folderName = "playerdata";
+  private final String playerDataFolder = "playerdata";
 
   public MigrateCommand(final UtilManager utilManager) {
     this.utilManager = utilManager;
@@ -62,45 +63,53 @@ public class MigrateCommand extends BaseCommand {
         return;
       }
 
-      if (!getDataManager().configExists(getFolderName(), oldNick)) {
+      UUID oldPlayerUUID = getPlayerUUID(oldNick);
+      if (oldPlayerUUID == null) {
+        getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
+        return;
+      }
+
+      UUID newPlayerUUID = player.getUniqueId();
+
+      if (!getDataManager().configExists(playerDataFolder, oldPlayerUUID.toString())) {
         getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
         return;
       }
 
-      getDataManager().setConfig(getFolderName(), oldNick);
-      String senderIP = player.getAddress().getAddress().getHostAddress();
-      String oldNickIP = getDataManager().getConfig().getString("address");
-      if (!senderIP.equals(oldNickIP)) {
-        getLogger().send(sender, Lang.MIGRATE_SAME.getConfigValue(null));
-        return;
-      }
+      // Copy oldNick's data to sender's data
+      getDataManager().copyFile(oldPlayerUUID.toString(), newPlayerUUID.toString());
 
-      getDataManager().copyFile(oldNick, sender.getName());
+      // Delete oldNick's data
+      getDataManager().deleteFiles(oldPlayerUUID.toString());
 
-      if (getDataManager().deleteFiles(oldNick)) {
-        getLogger().info("Deleted playerdata file for &c" + oldNick);
-        }
+      // Set sender's data
+      getDataManager().setConfig(playerDataFolder, newPlayerUUID.toString());
+      getDataManager().getConfig(newPlayerUUID.toString()).set("name", player.getName());
+      getDataManager().removePlayerUUID(oldPlayerUUID);
+      getDataManager().addPlayerUUID(newPlayerUUID, player.getName());
 
-      getDataManager().setConfig(getFolderName(), sender.getName());
-      getDataManager().getConfig().set("name", sender.getName());
-
+      // Set sender's skull
       ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
       SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
-      skullMeta.setOwner(sender.getName());
+      skullMeta.setOwner(player.getName());
       skull.setItemMeta(skullMeta);
-      getDataManager().getConfig().set("head", skull);
+      getDataManager().getConfig(newPlayerUUID.toString()).set("head", skull);
 
-      getDataManager().saveConfig();
+      // Save sender's config
+      getDataManager().saveConfig(newPlayerUUID.toString());
 
-      Collection<Node> nodes = getHelper().getPlayer(offlinePlayer.getUniqueId()).getNodes();
-      getHelper().getUserManager().modifyUser(player.getUniqueId(), user -> {
+      // Migrate permissions from oldNick to sender
+      Collection<Node> nodes = getHelper().getPlayer(oldPlayerUUID).getNodes();
+      getHelper().getUserManager().modifyUser(newPlayerUUID, user -> {
         for (Node node : nodes) user.data().add(node);
       });
 
+      // Inform sender
       getLogger().send(sender, Lang.MIGRATED.getConfigValue(null));
-      getLogger().send("fcfa", Lang.MIGRATED_NOTIFY.getConfigValue(new String[]{sender.getName(),oldNick}));
+      getLogger().send("fcfa", Lang.MIGRATED_NOTIFY.getConfigValue(new String[]{sender.getName(), oldNick}));
 
-      getHelper().getUserManager().modifyUser(offlinePlayer.getUniqueId(), user -> user.data().clear());
+      // Clear oldNick's permissions
+      getHelper().getUserManager().modifyUser(oldPlayerUUID, user -> user.data().clear());
     } else if (args.length == 2 && sender.hasPermission("group.mod")) {
       String oldNick = args[0];
       OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(oldNick);
@@ -115,45 +124,69 @@ public class MigrateCommand extends BaseCommand {
         return;
       }
 
-      if (!getDataManager().configExists(getFolderName(), oldNick)) {
+      UUID oldPlayerUUID = getPlayerUUID(oldNick);
+      if (oldPlayerUUID == null) {
+        getLogger().send(sender, Lang.USER_NOT_FOUND.getConfigValue(null));
+        return;
+      }
+
+      UUID newPlayerUUID = target.getUniqueId();
+
+      if (!getDataManager().configExists(playerDataFolder, oldPlayerUUID.toString())) {
         getLogger().send(sender, Lang.ROSTERS_NOT_FOUND.getConfigValue(new String[]{"igrač"}));
         return;
       }
 
-      getDataManager().setConfig(getFolderName(), oldNick);
+      // Check IP matching
       String targetIP = target.getAddress().getAddress().getHostAddress();
-      String oldNickIP = getDataManager().getConfig().getString("address");
+      String oldNickIP = getDataManager().getConfig(oldPlayerUUID.toString()).getString("address");
       if (!targetIP.equals(oldNickIP)) {
         getLogger().send(sender, Lang.MIGRATE_SAME.getConfigValue(null));
         return;
       }
 
-      getDataManager().copyFile(oldNick, target.getName());
+      // Copy oldNick's data to target's data
+      getDataManager().copyFile(oldPlayerUUID.toString(), newPlayerUUID.toString());
 
-      if (getDataManager().deleteFiles(oldNick)) {
-        getLogger().info("Deleted playerdata file for &c" + oldNick);
-      }
+      // Delete oldNick's data
+      getDataManager().deleteFiles(oldPlayerUUID.toString());
 
-      getDataManager().setConfig(getFolderName(), target.getName());
-      getDataManager().getConfig().set("name", target.getName());
+      // Set target's data
+      getDataManager().setConfig(playerDataFolder, newPlayerUUID.toString());
+      getDataManager().getConfig(newPlayerUUID.toString()).set("name", target.getName());
+      getDataManager().removePlayerUUID(oldPlayerUUID);
+      getDataManager().addPlayerUUID(newPlayerUUID, target.getName());
 
+      // Set target's skull
       ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
       SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();
       skullMeta.setOwner(target.getName());
       skull.setItemMeta(skullMeta);
-      getDataManager().getConfig().set("head", skull);
+      getDataManager().getConfig(newPlayerUUID.toString()).set("head", skull);
 
-      getDataManager().saveConfig();
+      // Save target's config
+      getDataManager().saveConfig(newPlayerUUID.toString());
 
-      Collection<Node> nodes = getHelper().getPlayer(offlinePlayer.getUniqueId()).getNodes();
-      getHelper().getUserManager().modifyUser(target.getUniqueId(), user -> {
+      // Migrate permissions from oldNick to target
+      Collection<Node> nodes = getHelper().getPlayer(oldPlayerUUID).getNodes();
+      getHelper().getUserManager().modifyUser(newPlayerUUID, user -> {
         for (Node node : nodes) user.data().add(node);
       });
 
+      // Inform target
       getLogger().send(target, Lang.MIGRATED.getConfigValue(null));
-      getLogger().send("fcfa", Lang.MIGRATED_OTHER.getConfigValue(new String[]{sender.getName(),target.getName(),oldNick}));
+      getLogger().send("fcfa", Lang.MIGRATED_OTHER.getConfigValue(new String[]{sender.getName(), target.getName(), oldNick}));
 
-      getHelper().getUserManager().modifyUser(offlinePlayer.getUniqueId(), user -> user.data().clear());
+      // Clear oldNick's permissions
+      getHelper().getUserManager().modifyUser(oldPlayerUUID, user -> user.data().clear());
     }
+  }
+
+  private UUID getPlayerUUID(String playerName) {
+    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+    if (offlinePlayer != null && offlinePlayer.hasPlayedBefore()) {
+      return offlinePlayer.getUniqueId();
+    }
+    return null;
   }
 }

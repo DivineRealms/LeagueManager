@@ -11,8 +11,10 @@ import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.awt.*;
@@ -86,6 +88,11 @@ public class ResultCommand extends BaseCommand {
       secondHalf().getAfterTimer().run();
       Bukkit.getScheduler().cancelTasks(getPlugin());
       reset();
+      Location spawn = new Location(sender.getServer().getWorld("world"), -8374.500, 9.00, -6040.500);
+      Player player = (Player) sender;
+      player.teleport(spawn);
+      Bukkit.dispatchCommand(player, "setspawn");
+      getPlugin().getServer().getScheduler().runTaskLater(getPlugin(), () -> Bukkit.dispatchCommand(player, "back"), 10L);
     } else getLogger().send(sender, Lang.TIMER_NOT_AVAILABLE.getConfigValue(null));
   }
 
@@ -272,6 +279,12 @@ public class ResultCommand extends BaseCommand {
               getHelper().getGroupMeta(args[1], "team") :
               getHelper().groupHasMeta(args[1], "b") ?
                   getHelper().getGroupMeta(args[1], "b") : AWAY_NAME;
+          Bukkit.dispatchCommand(sender, "warp " + args[0] + "top");
+          Bukkit.dispatchCommand(sender, "setspawn");
+          for (Player player : getPlugin().getServer().getOnlinePlayers()) {
+            getPlugin().getServer().getScheduler().runTaskLater(getPlugin(), () ->
+                Bukkit.dispatchCommand(player, "spawn"), 20L);
+          }
         }
       } else {
         league = false;
@@ -294,8 +307,8 @@ public class ResultCommand extends BaseCommand {
   @Subcommand("prefix")
   @CommandPermission("leaguemanager.command.result.prefix")
   public void onPrefix(CommandSender sender, String[] args) {
-    cleanPrefix = ChatColor.stripColor(StringUtils.join(args, " ", 0, args.length));
     prefix = getUtilManager().color(StringUtils.join(args, " ", 0, args.length));
+    cleanPrefix = ChatColor.stripColor(prefix);
     getLogger().send("fcfa", Lang.TIMER_PREFIX_SET.getConfigValue(new String[]{getPrefix()}));
   }
 
@@ -350,12 +363,16 @@ public class ResultCommand extends BaseCommand {
     return new Timer(getPlugin(), (int) (time.toSeconds() + 60), () -> getLogger().send("default", Lang.RESULT_SECONDHALF.getConfigValue(new String[]{matchTime, getPrefix(), home, "" + home_result, "" + away_result, away})), () -> {
       if (isLeague()) {
         if (webhook != null) {
-          getDataManager().setConfig("teamdata", "main");
-          webhook.setContent(getDataManager().getConfig().getString(home_result > away_result ? HOME_NAME : AWAY_NAME + ".win-video"));
-          try {
-            webhook.execute();
-          } catch (IOException e) {
-            getLogger().send("hoster", e.getMessage());
+          if (home_result != away_result) {
+            getDataManager().setConfig("teamdata", "main");
+            webhook.setContent(getDataManager().getConfig("main").getString(home_result > away_result ?
+                HOME_NAME + ".win-video" : away_result > home_result ?
+                AWAY_NAME + ".win-video" : null));
+            try {
+              webhook.execute();
+            } catch (IOException e) {
+              getLogger().send("hoster", e.getMessage());
+            }
           }
         }
       }
