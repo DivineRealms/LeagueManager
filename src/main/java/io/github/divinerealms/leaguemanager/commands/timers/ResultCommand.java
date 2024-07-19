@@ -133,7 +133,7 @@ public class ResultCommand extends BaseCommand {
   @CommandPermission("leaguemanager.command.result.extend")
   public void onExtend(CommandSender sender, String[] args) {
     if (getUtilManager().isTaskQueued(getTimerId())) {
-      if (args.length < 1) {
+      if (args.length < 2) {
         getLogger().send(sender, Lang.RESULT_HELP.getConfigValue(null));
         return;
       }
