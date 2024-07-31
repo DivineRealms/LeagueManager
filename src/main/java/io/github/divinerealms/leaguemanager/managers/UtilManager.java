@@ -1,7 +1,9 @@
 package io.github.divinerealms.leaguemanager.managers;
 
-import io.github.divinerealms.leaguemanager.utils.Logger;
+import io.github.divinerealms.leaguemanager.configs.Lang;
+import io.github.divinerealms.leaguemanager.utils.CubeCleaner;
 import io.github.divinerealms.leaguemanager.utils.Helper;
+import io.github.divinerealms.leaguemanager.utils.Logger;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -14,20 +16,24 @@ import java.time.format.DateTimeFormatter;
 @Getter
 public class UtilManager {
   private final Plugin plugin;
-  private Logger logger;
-  private Helper helper;
+  private final Logger logger;
+  private final Helper helper;
+  private final CubeCleaner cubeCleaner;
   @Setter private boolean fcEnabled = true;
   @Getter private boolean debug = true;
 
-  public UtilManager(final Plugin plugin) {
+  public UtilManager(Plugin plugin) {
     this.plugin = plugin;
     this.logger = new Logger(plugin);
     this.helper = new Helper(plugin);
-  }
+    this.cubeCleaner = new CubeCleaner(this);
 
-  public void reload() {
-    this.logger = new Logger(plugin);
-    this.helper = new Helper(plugin);
+    getPlugin().getServer().getScheduler().runTaskTimer(getPlugin(), () -> {
+      getCubeCleaner().clearCubes();
+      if (!getCubeCleaner().isEmpty()) {
+        getLogger().broadcast(Lang.CLEARED_CUBES.getConfigValue(new String[]{String.valueOf(getCubeCleaner().getAmount())}));
+      }
+    }, 20L, getCubeCleaner().getRemoveInterval());
   }
 
   public String color(final String string) {

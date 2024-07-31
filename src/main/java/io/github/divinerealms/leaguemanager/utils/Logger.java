@@ -50,6 +50,10 @@ public class Logger {
     ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
   }
 
+  public void broadcast(final String message) {
+    getServer().broadcastMessage(message);
+  }
+
   public void broadcastBar(final String message) {
     IChatBaseComponent iChatBaseComponent = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
     PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(iChatBaseComponent, (byte) 2);

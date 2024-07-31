@@ -32,7 +32,7 @@ public class Config {
   }
 
   public static void saveConfig(YamlConfiguration config, String configName) {
-    File file = new File(configName);
+    File file = new File(plugin.getDataFolder().getAbsolutePath() + File.separatorChar + configName);
     try {
       config.save(file);
     } catch (IOException exception) {

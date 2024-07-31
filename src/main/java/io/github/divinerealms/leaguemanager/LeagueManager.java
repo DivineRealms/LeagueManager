@@ -46,7 +46,7 @@ public class LeagueManager extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    if (listenerManager != null) {
+    if (this.listenerManager != null) {
       getListenerManager().unregisterListeners();
     }
     getServer().getScheduler().cancelTasks(getInstance());
@@ -54,14 +54,14 @@ public class LeagueManager extends JavaPlugin {
 
   private void setupConfig() {
     Config.setup(this);
-    configManager.loadConfig("#League Manager Config", "config.yml");
-    config = Config.getConfig("config.yml");
+    this.configManager.loadConfig("#League Manager Config", "config.yml");
+    this.config = Config.getConfig("config.yml");
   }
 
   private void setupLuckPermsAPI() {
     RegisteredServiceProvider<LuckPerms> provider = getServer().getServicesManager().getRegistration(LuckPerms.class);
     if (provider != null) {
-      luckPermsAPI = provider.getProvider();
+      this.luckPermsAPI = provider.getProvider();
     } else {
       getLogger().warning("LuckPerms not found! Disabling plugin due to missing dependency.");
       getServer().getPluginManager().disablePlugin(this);
@@ -69,9 +69,9 @@ public class LeagueManager extends JavaPlugin {
   }
 
   private void setupManagers() {
-    utilManager = new UtilManager(this);
-    guiManager = new GUIManager();
-    listenerManager = new ListenerManager(this, utilManager, guiManager);
+    this.utilManager = new UtilManager(this);
+    this.guiManager = new GUIManager();
+    this.listenerManager = new ListenerManager(this, this.utilManager, this.guiManager);
   }
 
   public void setupMessages() {
@@ -105,9 +105,9 @@ public class LeagueManager extends JavaPlugin {
   }
 
   private void setupListeners() {
-    if (listenerManager.isRegistered()) {
-      listenerManager.unregisterListeners();
+    if (this.listenerManager.isRegistered()) {
+      this.listenerManager.unregisterListeners();
     }
-    listenerManager.registerListeners();
+    this.listenerManager.registerListeners();
   }
 }

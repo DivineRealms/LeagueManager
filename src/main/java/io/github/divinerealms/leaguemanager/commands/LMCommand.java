@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.divinerealms.leaguemanager.LeagueManager;
+import io.github.divinerealms.leaguemanager.configs.Config;
 import io.github.divinerealms.leaguemanager.configs.Lang;
 import io.github.divinerealms.leaguemanager.managers.DataManager;
 import io.github.divinerealms.leaguemanager.managers.UtilManager;
@@ -15,12 +16,10 @@ import net.luckperms.api.model.data.DataMutateResult;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -88,6 +87,30 @@ public class LMCommand extends BaseCommand {
       getUtilManager().setFcEnabled(true);
     }
     server.broadcastMessage(Lang.TOGGLE.getConfigValue(new String[]{state, sender.getName()}));
+  }
+
+  @Subcommand("setPracticeArea|spa")
+  @CommandPermission("leaguemanager.command.setPracticeArea")
+  public void onPracticeAreaSet(CommandSender sender, String[] args) {
+    if (!(sender instanceof Player)) {
+      getLogger().send(sender, Lang.INGAME_ONLY.getConfigValue(null));
+      return;
+    }
+
+    Player player = (Player) sender;
+
+    if (args.length < 1) {
+      getLogger().send(player, Lang.CLEARED_CUBES_USAGE.getConfigValue(null));
+    } else {
+      YamlConfiguration config = Config.getConfig("config.yml");
+      String locName = args[0];
+      Location loc = player.getLocation();
+
+      config.set("practice-areas." + locName, loc);
+      Config.saveConfig(config, "config.yml");
+
+      getLogger().send(player, Lang.PRACTICE_AREA_SET.getConfigValue(new String[]{locName, String.valueOf(loc.getX()), String.valueOf(loc.getY()), String.valueOf(loc.getZ())}));
+    }
   }
 
   @Subcommand("ban")

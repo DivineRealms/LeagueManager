@@ -1,0 +1,318 @@
+# #League Manager Config
+prefix:
+  default: '&8▎ &f'
+  error: '&4▎ &c'
+  success: '&a▎ &f'
+  info: '&b▎ &f'
+  warn: '&6▎ &e'
+'on': '&a&luključen'
+'off': '&c&lisključen'
+reload: '{prefix_success}&fPlugin osvežen!'
+unknown-command: '{prefix_error}&cNepoznata komanda.'
+insufficient-permission: '{prefix_error}&cNedovoljno dozvola.'
+ingame-only: '{prefix_error}&cKomanda se može koristiti samo u igri.'
+toggle: |-
+  {prefix_warn}&r
+  {prefix_warn}&e   &lFootcube je {0}
+  {prefix_warn}&f   &fOd strane: &b{1}&f.
+  {prefix_warn}&r
+footcube-disabled: '{prefix_error}&cFootcube je trenutno isključen.'
+invalid-time: |-
+  {prefix_error}&cArgument za vreme "&e{0}&c" nije validan.
+  {prefix_error}&cPrimer: &e20min
+invalid-value: '{prefix_error}&cArgument nije validan. Koristite samo brojeve.'
+help: |-
+  &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+  &f Pomoćnik za LeagueManager Komande
+  &r &r
+  &6 /&elm reload &7- &fOsvežite plugin.
+  &6 /&elm toggle &7- &fIsključite/uključite FC.
+  &6 /&elm ban&6|&eunban &2<&aigrač&2> &7- &f(Un)Ban igrača iz FC.
+  &6 /&elm suspend&6|&eunsuspend &2<&aigrač&2> &7- &f(Un)Suspend igrača iz Lige.
+  &6 /&elm checkban&6|&echecksuspend &2<&aigrač&2> &7- &fProverite igrača.
+  &r &r
+  &e &lRosters Komande:&r
+  &6 /&erosters&6|&ert &3[&bgui&3]
+  &6 /&erosters&6|&ert help
+  &r &r
+  &a &lVAR Komande:&r
+  &6 /&evar add &2<&aigrač&2>
+  &6 /&evar remove &2<&aigrač&2>
+  &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+disabled-item: '{prefix_error}&cNe možete koristiti &6"&e{0}&6" &cdok je FC isključen!'
+user:
+  ban: '{prefix_success}&b{0} &fje banovan iz FC-a na &e{1}&f zbog "&c{2}&f"!'
+  banned: '{prefix_error}&cBanovani ste iz FC-a na &e{0} &czbog "&4{1}&c"!'
+  removed-unbanned: '{prefix_error}&cIgraču &b{0} &cje istekao FC ban.'
+  still-banned: |-
+    {prefix_error}&cBanovani ste iz fudbala!
+    {prefix_error}&cBan vam ističe za: &e{0}&c.
+  checkban: |-
+    &4▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+    &b {0} &fje &cbanovan iz FC &fod strane &e{1}&f.
+    &f Razlog: &n{2}&f.
+    &f Trajanje bana: &e{3} &7(&oističe za &e&o{4}&7)&f.
+    &4▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+  checksuspend: |-
+    &4▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+    &b {0} &fje &csuspendovan iz Lige &fod strane &e{1}&f.
+    &f Razlog: &n{2}&f.
+    &f Trajanje suspenzije: &e{3} &7(&oističe za &e&o{4}&7)&f.
+    &4▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+  unban: '{prefix_success}&b{0} &fje unbanovan!'
+  unbanned: '{prefix_default}&aUnsuspendovani ste iz lige!'
+  not-banned: '{prefix_error}&b{0} &cnije banovan iz FC!'
+  already-banned: '{prefix_error}&b{0} &cje već banovan iz FC-a! Unban ga prvo.'
+  suspend: '{prefix_success}&b{0} &fje suspendovan iz Lige na &e{1}&f zbog ''&4{2}&f''!'
+  suspended: '{prefix_error}&cSuspendovani ste iz lige na &e{0} &czbog ''&4{1}&c''!'
+  already-suspended: '{prefix_error}&b{0} &cje već suspendovan iz Lige! Unsuspend ga prvo.'
+  unsuspend: '{prefix_success}&b{0} &fje unsuspendovan iz lige!'
+  not-suspended: '{prefix_error}&b{0} &cnije suspendovan!'
+  not-found: '{prefix_error}&cUneti igrač ne postoji.'
+  usage:
+    ban: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&elm ban &2<&aigrač&2> <&atrajanje&2> &3[&brazlog&3]
+    suspend: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&elm suspend &2<&aigrač&2> <&aduration&2> &3[&breason&3]
+    unban: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&elm unban &2<&aigrač&2>
+    checkban: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&elm checkban &2<&aigrač&2>
+    unsuspend: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&elm unsuspend &2<&aigrač&2>
+    checksuspend: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&elm checksuspend &2<&aigrač&2>
+var:
+  given-access: '{prefix_success}&b{0} &fje dobio/la pristup VAR-u.'
+  given-access-1: '{prefix_success}&b{0} &fje dobio/la pristup VAR-u na &e{1}&f.'
+  removed-access: '{prefix_success}&b{0} &fnema više pristup VAR-u.'
+  already-has-access: '{prefix_error}&b{0} &cveć ima pristup VAR-u.'
+  no-access: '{prefix_error}&b{0} &cnema pristup VAR-u.'
+  usage:
+    add: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&evar add &2<&aigrač&2>
+    remove: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&evar remove &2<&aigrač&2>
+  help: |-
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    &f Pomoćnik za VAR Komande
+    &r &r
+    &6 /&evar add &2<&aigrač&2>
+    &6 /&evar remove &2<&aigrač&2>
+    &r &r
+    &7 &oSve komande imaju [TAB] completion, koristite ovo za pomoć!
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+migrate:
+  help: |-
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    &f Pomoćnik za Migrate Komandu
+    &r &r
+    &6 /&emigrate &2<&astari-nick&2> &7- &fPrebacite tim sa starog nicka.
+    &6 /&emigrate &2<&aigrač&2> <&astari-nick&2>
+    &r &r
+    &7 &oSve komande imaju [TAB] completion, koristite ovo za pomoć!
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+  success: '{prefix_success}&fUspešno ste migrirali sve svoje podatke sa svog starog nicka.'
+  same: '{prefix_error}&cMožete migrirati samo naloge sa svoje IP adrese!'
+  same-kick: '{prefix_error}&cNe možete migrirati isti nalog...'
+  success-notify: '{prefix_success}&b{0} &fse migrirao sa starog nicka &c{1}&f.'
+  success-other: '{prefix_success}&e{0} &fje migrirao &b{1} sa starog nicka &c{2}&f.'
+rosters:
+  help: |-
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    &f Pomoćnik za Rosters Komande
+    &r &r
+    &6 /&erosters&6|&ert &3[&bgui&3]
+    &6 /&erosters&6|&ert help
+    &6 /&erosters&6|&ert create &2<&aimeTima&2> <&atag&2> &3[&bb&3]
+    &6 /&erosters&6|&ert delete &2<&aimeTima&2>
+    &6 /&erosters&6|&ert set &2<&aimeTima&2> <&aname&2|&atag&2> <&anazivTima&2|&atagTima&2>
+    &6 /&erosters&6|&ert set &2<&aigrač&2> <&aposition&2|&acountry&2|&acontract&2|&anumber&2>
+    &6 /&erosters&6|&ert createbanner &2<&aimeTima&2>
+    &6 /&erosters&6|&ert add &2<&aimeTima&2> <&aigrač&2>
+    &6 /&erosters&6|&ert remove &2<&aimeTima&2> <&aigrač&2>
+    &r &r
+    &7 &oSve komande imaju [TAB] completion, koristite ovo za pomoć!
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+  add:
+    usage: |-
+      &b▎ &fDodajte igrače u tim komandom: &6/&ert add &2<&atim&2> <&aigrač&2>
+      &b▎ &fPrimer: &6/&ert add ADM Neeonn
+  set: '{prefix_success}&b{0} &fje postavio/la &e{1} &fza {2} {3} &fna: &e{4}&f.'
+  generated-files: '{prefix_success}&fUspešno generisani fajlovi za tim {0}&f.'
+  not-found: '{prefix_error}&cUneti {0} ne postoji.'
+  deleted-files: '{prefix_success}&fUspešno obrisani fajlovi za tim {0}&f.'
+  file-not-found: '{prefix_error}&cFajl {0} nije pronađen. Kreiramo ga sada...'
+  set-role: '{prefix_success}&fIgrač &b{0} &fuspešno postavljen/a kao &e{1} &fza tim {2}&f!'
+  not-role: '{prefix_error}&cIgrač nema role.'
+  not-banner: '{prefix_error}&cMorate držati banner u ruci...'
+  banner-set: '{prefix_success}&fUspešno postavljena zastava za klub {0}&f.'
+  user-added: '{prefix_success}&b{0} &fje dodao/la &b{1} &fu tim {2}&f.'
+  user-removed: '{prefix_success}&b{0} &fje izbacio/la &b{1} &fiz tima {2}&f.'
+  user-not-in-team: '{prefix_error}&b{0} &cnije u navedenom timu.'
+  user-already-in-team: '{prefix_error}&b{0} &cje već u navedenom timu.'
+  team-created: '{prefix_success}&fTim {0} &fje napravljen.'
+  team-deleted: '{prefix_success}&b{0} &fje obrisao/la tim {1}&f.'
+statistics:
+  info: |-
+    &9▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    &f {0}
+    &r &r
+    &f Broj Golova: &b{1}
+    &f Broj Asistencija: &a{2}
+    &f Broj Žutih Kartona: &e{3}
+    &f Broj Crvenih Kartona: &c{4}
+    &f Broj "Clean Sheets": &d{5}
+    &9▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+  self-title: 'Vaša statistika u Ligaškim utakmicama:'
+  other-title: 'Statistika igrača &b{0} &fu Ligaškim utakmicama:'
+  usage:
+    add: |-
+      {prefix_error}&cNepoznat argument. Koristite:
+      {prefix_error}&6/&estats set &2<&aigrač&2> <&avrsta&2> <&aiznos&2>
+  added: '{prefix_success}&fUspešno ste dodali &e{0} {1} &figraču &b{2}&f.'
+  removed: '{prefix_success}&fUspešno ste uklonili &e{0} {1} &figraču &b{2}&f.'
+  set: '{prefix_success}&fUspešno ste postavili &e{0} {1} &figraču &b{2}&f.'
+leaderboard:
+  default: |-
+    {prefix_error}&cIzaberite vrstu statistike.
+    {prefix_error}&cVrste: &egoals, assists, yellow-cards, red-cards, clean-sheets
+  goals: |-
+    &9▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    &f Igrači sa najviše postignutih golova:
+    &r &r
+    &r 1. &b{0} &7- &b{1} golova
+    &r 2. &b{2} &7- &b{3} golova
+    &r 3. &b{4} &7- &b{5} golova
+    &r 4. &b{6} &7- &b{7} golova
+    &r 5. &b{8} &7- &b{9} golova
+    &r 6. &b{10} &7- &b{11} golova
+    &r 7. &b{12} &7- &b{13} golova
+    &r 8. &b{14} &7- &b{15} golova
+    &r 9. &b{16} &7- &b{17} golova
+    &r 10. &b{18} &7- &b{19} golova
+    &9▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+timer:
+  help: |-
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    &f Pomoćnik za Timer Komande.
+    &r &r
+    &6 /&etimer start &2<&avreme&2> &3[&bprefix&3]
+    &6 /&etimer stop
+    &r &r
+    &7 &oSve komande imaju [TAB] completion, koristite ovo za pomoć!
+    &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+  create: '{prefix_success}&fUspešno pokrenut timer sa ID-em &e{0}&f.'
+  stop: '{prefix_success}&fIsključen timer sa ID-em &e{0}&f.'
+  starting: |-
+    {prefix_warn}&r
+    {prefix_warn}&r    &l{0} &8- &e&lPOČETAK UTAKMICE!
+    {prefix_warn}&r
+  end: '{0} &6┃ &fTimer završen!'
+  over: '{prefix_success}&fTimer sa ID-em &e{0} &fje završen!'
+  current-time: '{0} &7┃ &fTrenutno vreme: &e{1}/{2}'
+  not-available: '{prefix_error}&cNijedan timer ne radi trenutno.'
+  already-running: |-
+    {prefix_error}&cVeć postoji jedan timer ili niste podesili sve.
+    {prefix_error}&cPodesite &6/&ers teams &ci &6/&ers time 20min&c.
+  prefix-set: '{prefix_success}&fPrefix podešen na {0}&f.'
+  teams-set: '{prefix_success}&fTimovi podešeni na {0} &f(home) i {1}&f (away).'
+  time-set: '{prefix_success}&fVreme podešeno na {0}&f.'
+result:
+  help: "&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\
+    ▬&r\n&fPomoćnik za Result Komande:\n&r &r\n&f &lKomande Podešavanja:\n&6 /&ers\
+    \ prefix &2<&aprefix&2> &7(&f/rs prefix &b&lEvent&7)\n&6 /&ers teams &2<&ahome&2>\
+    \ <&aaway&2> &7(&f/rs teams nkp vtz&7)\n&6 /&ers time &2<&atime&2> &7(&f/rs time\
+    \ 20min&7)\n&r &r\n&e &lKomande Kontrole:\n&6 /&ers start&6|&estop\n&6 /&ers pause&6|&eresume\n\
+    &7 - &fKoristite &epause &fna kraju prvog poluvremena.\n&7 - &fKoristite &eresume\
+    \ &fza početak drugog poluvremena.\n&6 /&ers extend &2<&aadd&2|&aremove&2> <&atime&2>\
+    \ &7(&f/rs extend add 2min30s&7)\n&6 /&ers add&6|&erem&6(&e&oove&6) &2<&ahome&2|&aaway&2>\
+    \ <&ascorer&2> <&aassist&2> \n&r &r\n&7 &oSve komande imaju [TAB] completion,\
+    \ koristite ovo za pomoć!\n&7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\
+    ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r"
+  add: |-
+    {prefix_warn}&r
+    {prefix_warn}&e  &lGOOOOOOOOOOOOL za {1}&r&l!
+    {prefix_warn}&b  Strelac: &a{0}
+    {prefix_warn}&r
+  add-assist: |-
+    {prefix_warn}&r
+    {prefix_warn}&e  &lGOOOOOOOOOOOOL za {1}&r&l!
+    {prefix_warn}&b  Strelac: &a{0}
+    {prefix_warn}&f  Asistent: &b{2}
+    {prefix_warn}&r
+  captains-set: '{prefix_success}&fKapiten home &b{0}&f, away &b{1}&f. Podešeno uspešno.'
+  full-lives: '{prefix_error}&f{0} &cveć ima sve živote.'
+  eliminated: '{prefix_error}&f{0} &cje već eliminisan.'
+  added-life: '{prefix_success}&fDodat jedan život za tim {0}&f!'
+  removed-life: '{prefix_success}&fSkinut jedan život za tim {0}&f!'
+  remove: '{prefix_success}&fSkinut jedan gol za tim {0}&f.'
+  add-usage: '{prefix_error}&cMorate navesti tim.'
+  starting: '{0} &7┃ &fMeč počinje!'
+  actionbar: '{0} &7┃ &f{1} &e{2} - {3} &f{4} &7┃ &f{5}{6}/{7}{8}'
+  actionbar-ht: '{0} &7┃ &f{1} &e{2} - {3} &f{4} &7┃ &fPoluvreme!'
+  end: '{0} &7┃ &fMeč završen! Rezultat: &f{1} &e{2} &f- &e{3} &f{4}&f.'
+  halftime: |-
+    {prefix_warn}&r
+    {prefix_warn}&e  &lPOLUVREME! {0}
+    {prefix_warn}&f  Rezultat: &f{2} &e{3} &f- &e{4} &f{5}
+    {prefix_warn}&r
+  secondhalf: |-
+    {prefix_warn}&r
+    {prefix_warn}&e  &lPOČETAK DRUGOG POLUVREMENA! {0}
+    {prefix_warn}&f  Rezultat: &f{2} &e{3} &f- &e{4} &f{5}
+    {prefix_warn}&r
+  over: |-
+    {prefix_warn}&r
+    {prefix_warn}&e  &lKRAJ UTAKMICE! {0}
+    {prefix_warn}&f  Rezultat: &f{2} &e{3} &f- &e{4} &f{5}
+    {prefix_warn}&r
+  2x4:
+    help: |-
+      &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+      &6 /&e2x4 start&6|&estop
+      &6 /&e2x4 type &2<&atype&2> &7- &fEvent type (&o2x4/3x4/...&f).
+      &6 /&e2x4 add&6/&erem team_color &7(&f/2x4 add blue&7)
+      &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    actionbar: '{0} &7┃ &fRezultat: &b{1} &c{2} &a{3} &e{4} &7┃ &fVreme: &e{5}'
+    over: '{prefix_warn}{0} &6┃ &fMeč završen! Rezultat: &b{1} &c{2} &a{3} &e{4}&f!'
+    end: '{0} &6┃ &fMeč završen! Rezultat: &b{1} &c{2} &a{3} &e{4}'
+  1x8:
+    help: |-
+      &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+      &6 /&e1x8 start&6|&estop
+      &6 /&e1x8 type &2<&atype&2> &7- &fEvent type (1x8/2x8/...&f).
+      &6 /&e1x8 add&6/&erem team_color &7(&f/1x8 rem red&7)
+      &7▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r
+    actionbar: '{0} &7┃ &fRezultat: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6} &d{7} &0{8}
+      &7┃ &fVreme: &e{9}'
+    over: '{prefix_warn}{0} &6┃ &fMeč završen! Rezultat: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6}
+      &d{7} &0{8}&f!'
+    end: '{0} &6┃ &fMeč završen! Rezultat: &8{1} &c{2} &6{3} &e{4} &a{5} &b{6} &d{7}
+      &0{8}'
+webhook:
+  not-setup: '{prefix_error}&cNiste dodali URL za Discord Webhook u config.yml!'
+  not-setup-prefix: '{prefix_error}&cNamestite prefix prvo.'
+  teams-set: <:testfcfa:1245847737862328481> Ubrzo počinje {0}, utakmica **{1} - {2}**!
+  match-start: <:testfcfa:1245847737862328481> `00:01` Početak utakmice! **{1} - {2}**
+  match-ended: <:testfcfa:1245847737862328481> `{4}` Kraj utakmice! **{0} {1} - {2} {3}**
+  match-halftime: <:testfcfa:1245847737862328481> `{0}` Poluvreme! **{1} {2} - {3} {4}**
+  match-secondhalf: <:testfcfa:1245847737862328481> `10:01` Početak drugog poluvremena! **{0} {1} - {2} {3}**
+  match-score:
+    color: '#ffb80c'
+    author:
+      name: GOOOOL za {0}
+      icon: https://cdn.discordapp.com/emojis/1067135709644865637.webp
+    description: '<:ArrowRightGray:813815804768026705>Strelac: **{0}**\n<:ArrowRightGray:813815804768026705>Rezultat:
+      **{3} {4} - {5} {6}**\n<:ArrowRightGray:813815804768026705>Vreme: `{2}`'
+  match-assist: '<:ArrowRightGray:813815804768026705>Strelac: **{0}**\n<:ArrowRightGray:813815804768026705>Asistent:
+    **{3}**\n<:ArrowRightGray:813815804768026705>Rezultat: **{4} {5} - {6} {7}**\n<:ArrowRightGray:813815804768026705>Vreme:
+    `{2}`'
